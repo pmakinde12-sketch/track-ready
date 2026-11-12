@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>Track Ready</title>
+<style>
+  :root{--bg:#0e141c;--card:#161f2b;--card2:#1d2836;--line:#273546;--tx:#eef2f6;--mut:#93a3b5;--or:#ff7a00;--or2:#ffb020;--gr:#3ccf7a;--rd:#ff5a5a;--bl:#3d8bff}
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--bg);color:var(--tx);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-tap-highlight-color:transparent}
+  body{min-height:100vh;padding-bottom:84px}
+  .wrap{max-width:560px;margin:0 auto;padding:0 16px}
+  header{position:sticky;top:0;z-index:5;background:linear-gradient(var(--bg) 70%,rgba(14,20,28,0));padding:14px 0 10px}
+  .brand{display:flex;align-items:center;gap:10px}
+  .logo{width:34px;height:34px;border-radius:9px;background:var(--or);display:grid;place-items:center;font-weight:900;color:#111;font-size:15px;letter-spacing:-1px}
+  .brand h1{font-size:20px;font-weight:900;letter-spacing:-.5px}
+  .brand small{display:block;font-size:11.5px;color:var(--mut);font-weight:700;letter-spacing:.3px}
+  h2{font-size:13px;letter-spacing:1.4px;color:var(--or2);margin:20px 0 10px;font-weight:900}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .comp{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;cursor:pointer;text-align:left;color:var(--tx);font:inherit;position:relative}
+  .comp.on{border-color:var(--or)}
+  .comp .e{font-size:22px}
+  .comp .n{font-weight:900;font-size:14.5px;margin-top:4px}
+  .comp .h{font-size:11.5px;color:var(--mut);font-weight:700;margin-top:2px}
+  .bar{height:6px;background:var(--card2);border-radius:4px;margin-top:9px;overflow:hidden}
+  .bar>div{height:100%;background:var(--gr);border-radius:4px}
+  .pct{font-size:11px;color:var(--mut);margin-top:4px;font-weight:700}
+  .tick{position:absolute;top:10px;right:10px;width:20px;height:20px;border-radius:6px;border:2px solid var(--line);display:grid;place-items:center;font-size:12px;font-weight:900}
+  .comp.on .tick{background:var(--or);border-color:var(--or);color:#111}
+  .btn{font:inherit;font-weight:900;font-size:16px;border:0;border-radius:13px;padding:14px 16px;width:100%;cursor:pointer;background:var(--or);color:#111;box-shadow:0 4px 0 #a84f00}
+  .btn.sec{background:var(--card2);color:var(--tx);box-shadow:none;border:1px solid var(--line)}
+  .btn:active{transform:translateY(2px)}
+  .row{display:flex;gap:10px}
+  .row .btn{flex:1}
+  .stat{display:flex;gap:10px}
+  .stat .card{flex:1;text-align:center;padding:12px 6px}
+  .stat b{display:block;font-size:24px;font-weight:900}
+  .stat span{font-size:11.5px;color:var(--mut);font-weight:700}
+  nav{position:fixed;bottom:0;left:0;right:0;background:rgba(14,20,28,.96);border-top:1px solid var(--line);display:flex;justify-content:center;z-index:6;backdrop-filter:blur(8px)}
+  nav .in{display:flex;max-width:560px;width:100%}
+  nav button{flex:1;background:none;border:0;color:var(--mut);font:inherit;font-size:11px;font-weight:800;padding:10px 0 14px;cursor:pointer}
+  nav button i{display:block;font-style:normal;font-size:20px;margin-bottom:2px}
+  nav button.on{color:var(--or)}
+  .q{font-size:19px;font-weight:800;line-height:1.38;margin:6px 0 14px}
+  .meta{display:flex;justify-content:space-between;font-size:12px;color:var(--mut);font-weight:800}
+  .opt{display:block;width:100%;text-align:left;font:inherit;font-size:15.5px;font-weight:650;line-height:1.35;color:var(--tx);background:var(--card);border:2px solid var(--line);border-radius:13px;padding:13px 14px;margin-bottom:9px;cursor:pointer}
+  .opt.good{border-color:var(--gr);background:rgba(60,207,122,.12)}
+  .opt.bad{border-color:var(--rd);background:rgba(255,90,90,.1)}
+  .opt:disabled{cursor:default;color:var(--tx)}
+  .fb{border-radius:13px;padding:13px 14px;margin:6px 0 12px;font-size:14.5px;line-height:1.5}
+  .fb.ok{background:rgba(60,207,122,.12);border:1px solid rgba(60,207,122,.45)}
+  .fb.no{background:rgba(255,90,90,.1);border:1px solid rgba(255,90,90,.45)}
+  .fb b{display:block;margin-bottom:3px;font-size:15.5px}
+  .ref{display:inline-block;margin-top:8px;font-size:12px;font-weight:800;color:var(--or2);background:rgba(255,176,32,.1);border-radius:6px;padding:3px 7px}
+  .prog{height:6px;background:var(--card2);border-radius:4px;overflow:hidden;margin:8px 0 4px}
+  .prog>div{height:100%;background:var(--or);transition:width .3s}
+  table{width:100%;border-collapse:collapse;font-size:13.5px}
+  th,td{text-align:left;padding:9px 6px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{color:var(--mut);font-size:11.5px;letter-spacing:.6px}
+  td.c{font-weight:900;color:var(--or2);white-space:nowrap}
+  .new{display:inline-block;font-size:10.5px;font-weight:900;background:var(--gr);color:#0b1a10;border-radius:5px;padding:1px 6px;margin-left:4px;vertical-align:middle}
+  .chg{border-left:3px solid var(--or);padding:2px 0 2px 12px;margin:12px 0}
+  .chg b{display:block;font-size:15px;margin-bottom:3px}
+  .chg p{font-size:14px;line-height:1.5;color:#cfd8e2}
+  .muted{color:var(--mut);font-size:13px;line-height:1.5}
+  .big{font-size:46px;font-weight:900;letter-spacing:-1px}
+  .pill{display:inline-block;padding:4px 10px;border-radius:999px;font-size:12px;font-weight:900}
+  .alert{background:rgba(255,122,0,.12);border:1px solid rgba(255,122,0,.5);border-radius:14px;padding:12px 14px;font-size:14px;line-height:1.5}
+  .alert b{color:var(--or2)}
+  .timer{font-variant-numeric:tabular-nums}
+  .hide{display:none!important}
+  .wl{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--line);font-size:14px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header><div class="brand" onclick="location.href='index.html'" style="cursor:pointer"><div class="logo">TR</div><div><h1>Track Ready</h1><small>RULE BOOK REVISION · UPDATED JUNE 2026</small></div></div></header>
+  <main id="view"></main>
+</div>
+<nav><div class="in">
+  <button data-t="home" class="on"><i>🏠</i>Home</button>
+  <button data-t="scen"><i>🎮</i>Scenarios</button>
+  <button data-t="mock"><i>📝</i>Mock test</button>
+  <button data-t="news"><i>🆕</i>What's changed</button>
+  <button data-t="books"><i>📚</i>Handbooks</button>
+</div></nav>
+
+<script>
+(()=>{
+// ================= CONTENT =================
+// All questions written in our own words from the current handbooks. Refs give handbook, issue and section.
+const COMPS={
+  pts:{n:'PTS',full:'Personal Track Safety',e:'🦺',hb:'HB1'},
+  ac:{n:'AC lines',full:'AC electrified lines (OLE)',e:'⚡',hb:'HB16'},
+  dc:{n:'DC lines',full:'DC electrified lines (conductor rail)',e:'🔌',hb:'HB17'},
+  lo:{n:'Lookout / SW',full:'Lookout & Site Warden',e:'📯',hb:'HB3'},
+  coss:{n:'COSS',full:'Controller of Site Safety',e:'🧢',hb:'HB7'},
+  iwa:{n:'IWA',full:'Individual Working Alone',e:'🚶',hb:'HB6'},
+  pc:{n:'PC / Blockages',full:'Protection Controller & line blockages',e:'🛑',hb:'HB8'},
+  hs:{n:'Handsignaller',full:'Handsignalling duties',e:'🚩',hb:'HB5'},
+  es:{n:'ES',full:'Engineering Supervisor',e:'🏗️',hb:'HB12'},
+  mc:{n:'MC / OTP',full:'Machine Controller & OTP operator',e:'🚜',hb:'HB15'},
+};
+const R={HB1:'HB1 Iss 9',HB3:'HB3 Iss 4',HB5:'HB5 Iss 3',HB6:'HB6 Iss 8',HB7:'HB7 Iss 10',HB8:'HB8 Iss 10',HB12:'HB12 Iss 11',HB15:'HB15 Iss 7',HB16:'HB16 Iss 7',HB17:'HB17',RBBL:'RBBL Iss 43'};
+// [comp, question, options, correctIndex, explanation, ref]
+const Q=[
+// ---------- PTS (HB1) ----------
+['pts','When are you counted as being "on or near the line"?',['On the line, or within 3 m of it with no permanent fence or structure in between','Anywhere inside the railway boundary','Only when standing in the four-foot','Within 10 m of any running rail'],0,'You\'re on or near the line if you\'re on it, or within 3 m (10 ft) of it without a permanent fence or structure between you and it.',R.HB1+' §1'],
+['pts','Line speed is 90 mph. How far from the nearest line a train could approach on must your position of safety be?',['At least 0.9 m','At least 1.25 m','At least 2 m','At least 3 m'],1,'Up to 100 mph, a position of safety is at least 1.25 m (4 ft) from the nearest line a train could approach on.',R.HB1+' §1'],
+['pts','Line speed is 110 mph. What is the minimum distance for a position of safety?',['1.25 m','1.5 m','2 m','2.75 m'],2,'Above 100 mph (up to 125 mph), it\'s at least 2 m (6 ft 6 in).',R.HB1+' §1'],
+['pts','When you\'re allowed on or near the line on your own, how often must you look up?',['Every 5 seconds','Every 10 seconds','Every 30 seconds','Only when you hear a train'],0,'Look up at least every 5 seconds when you\'re on or near the line alone.',R.HB1+' §4.3'],
+['pts','On your own on or near the line, you must be in a position of safety at least how long before a train arrives?',['5 seconds','10 seconds','20 seconds','45 seconds'],1,'You must be in a position of safety at least 10 seconds before the train arrives.',R.HB1+' §4.3'],
+['pts','A driver sounds the warning horn at you. How do you acknowledge it?',['Wave both arms','Raise one arm above your head','Thumbs up','Shout back'],1,'Raise one arm above your head to acknowledge the driver\'s warning.',R.HB1+' §3.1, §4.4'],
+['pts','The lookout gives a warning. What do you do?',['Finish the job you\'re on, then move','Stop work, acknowledge, move to the position of safety straight away','Look to see how close the train is first','Wait for the COSS to tell you'],1,'Stop work, acknowledge and go straight to your position of safety. Don\'t leave it until the COSS says so.',R.HB1+' §5.4'],
+['pts','A colleague doesn\'t acknowledge the lookout\'s warning. What should the lookout do?',['Walk over and tap them','Give an urgent warning with short, sharp blasts','Tell the COSS after the train has passed','Nothing, it\'s their responsibility'],1,'If someone doesn\'t acknowledge, the lookout gives an urgent warning with repeated short, sharp blasts.',R.HB1+' §5.4'],
+['pts','You need to take a phone call while you\'re on or near the line. What do you do?',['Walk and talk, but keep looking up','Move to a position of safety and stand still until you\'ve finished','Use one earbud only','Only answer if it\'s the COSS'],1,'Move to a position of safety first, then stand still until the call is finished.',R.HB1+' §4.3'],
+['pts','Which of these are you allowed to wear on or near the line?',['Headphones with music on low','Noise-cancelling earbuds','Nothing that reduces your ability to see or hear trains','A hood up in the rain'],2,'Don\'t wear anything that reduces your ability to see or hear approaching trains.',R.HB1+' §4.3'],
+['pts','When crossing the line, what must you avoid stepping on?',['Ballast','Rails, sleepers, or between moving parts of points','The cess','Cable troughing only'],1,'Don\'t step on rails or sleepers, or between movable parts of points.',R.HB1+' §4.3'],
+['pts','How can you identify the COSS?',['They carry the safe work pack','Armlet on the left arm or a badge on the chest','They wear a white helmet','They stand at the back of the group'],1,'The COSS wears an armlet on the left arm or a badge on the chest (white letters on blue).',R.HB1+' §5.2 · '+R.HB7+' §1'],
+['pts','You\'ve been briefed by the COSS. What do you sign to confirm you understand the safe system of work?',['NR3180','RT3199','RT9909 safe-work briefing form','Nothing, verbal is enough'],2,'Each person signs the RT9909 safe-work briefing form.',R.HB1+' §5.2'],
+['pts','There\'s a safety barrier between the site and the open line. What mustn\'t you do?',['Work within 2 m of it','Lean on it or rest tools against it','Walk alongside it','Step over it to fetch tools'],1,'Don\'t lean on it or rest tools or equipment against it.',R.HB1+' §5.3'],
+['pts','You need to stop a train in daylight but have no red flag. What do you do?',['Wave one arm','Raise both arms above your head','Stand in the four-foot','Throw something onto the track'],1,'In daylight, show a red flag. Without one, raise both arms above your head.',R.HB1+' §8.2'],
+['pts','You need to stop a train in the dark. What do you show?',['A white light held still','A red light, or wave any light violently','Nothing, drivers can\'t see you','Your phone torch held steady'],1,'Show a red light, or wave any light violently.',R.HB1+' §8.2'],
+['pts','How should an emergency call to the signaller begin?',['"Hello, it\'s urgent"','"This is an emergency call"','Your Sentinel number','"Mayday, mayday"'],1,'Start with "This is an emergency call".',R.HB1+' §6.1'],
+['pts','When must you carry a suitable lamp?',['Only at night','In darkness, poor visibility, or when entering a tunnel','Never, high-vis is enough','Only if you\'re the COSS'],1,'In darkness, poor visibility or when entering a tunnel.',R.HB1+' §4.1'],
+['pts','You want to join a group already working on site. What do you do first?',['Walk to them and introduce yourself','Speak to the COSS and agree your access point and destination','Ring the signaller','Wait at the access point for a lookout'],1,'Speak to the COSS before walking to the site, agree your access point and destination, and don\'t set off until the arrangements are explained.',R.HB1+' §4.5'],
+['pts','You\'re on a station platform doing engineering work 1 m from the edge. Are you "on or near the line"?',['No, platforms never count','Yes, engineering or technical work within 1.25 m of the edge counts','Only if a train is due','Only at night'],1,'On a platform you\'re not on or near the line, unless you\'re doing engineering or technical work within 1.25 m (4 ft) of the edge.',R.HB1+' §1'],
+['pts','A site warden warns you. What do you do?',['Move to the position of safety 25 m away','Check you\'re in the safe area and step back immediately if you\'re not','Carry on, wardens are only for visitors','Call the COSS'],1,'Check you\'re in the safe area, and step back immediately if you\'re in the danger area.',R.HB1+' §5.5'],
+['pts','How close can you go to a fallen overhead power line (or anything touching it)?',['Not within 5 m until the electricity company says it\'s safe','2.75 m','1 m if you\'re wearing gloves','It\'s fine once the lights go out'],0,'Keep 5 m away until the electricity company confirms it\'s safe.',R.HB1+' §7.7'],
+// ---------- AC (HB16) ----------
+['ac','How close can you, or anything you\'re holding, get to live overhead line equipment?',['No closer than 2.75 m (9 ft)','No closer than 1.5 m','No closer than 600 mm','Any distance if you don\'t touch it'],0,'Stay at least 2.75 m from live OLE, pantographs or roof equipment in any direction, unless a method statement allows otherwise.',R.HB16+' §4.1'],
+['ac','You\'re not sure whether the OLE is live. What do you assume?',['It\'s off at night','It\'s live and dangerous to life','Ask a colleague and go with them','It\'s safe if no trains are running'],1,'If in doubt, treat it as live and dangerous.',R.HB16+' §2'],
+['ac','The ECO has confirmed the power is off. Can you treat the OLE as safe now?',['Yes','No, still dangerous until an overhead line permit is issued (or local isolation with a safety document)','Yes, once 10 minutes have passed','Only the contact wire is safe'],1,'Even after the ECO says it\'s off, keep treating it as dangerous until a permit or local isolation document applies.',R.HB16+' §3.1'],
+['ac','How should you carry a long item, like a ladder or bar, under OLE?',['Upright, so you can see it','Horizontally, getting help if needed','Over your shoulder at an angle','Drag it'],1,'Carry long items horizontally and get help if needed.',R.HB16+' §4.3'],
+['ac','There\'s a plastic bag caught on the overhead wires. What do you do?',['Knock it off with an insulated pole','Don\'t approach it. Report it to the ECO','Leave it, it\'s harmless','Climb a ladder to remove it'],1,'Treat anything attached to or near the OLE as live. Don\'t approach it, report it.',R.HB16+' §3.2, §3.3'],
+['ac','When working on a vehicle under OLE, what\'s the limit?',['Never above cant rail level','Never above the buffers','Roof is fine if the pantograph is down','No limit with gloves'],0,'Never take yourself, or anything you hold, above cant rail level (unless an exception applies).',R.HB16+' §4.2'],
+['ac','You spot a broken rail with a red-marked bond next to it. What mustn\'t you do?',['Report it','Touch the broken rail, the red bond or anything connected','Keep clear','Tell the signaller'],1,'Don\'t touch a broken rail, a red-marked bond, or equipment connected to it. Report it.',R.HB16+' §3.3'],
+['ac','Under the June 2026 changes, what must the COSS see before work starts under an overhead line permit?',['A train pass the site','The "test before touch" being carried out','The ECO arrive on site','Two earths fitted by the group'],1,'The COSS must see the "test before touch" done and sign the permit before work starts, and again if work moves to another part of the OLE.',R.HB16+' §9 · '+R.RBBL],
+['ac','Work under an overhead line permit is finished. What happens before the permit goes back?',['Leave tools on site for tomorrow','Clear everyone and everything to at least 2.75 m and tell them to treat the OLE as live again','Ring the signaller','Nothing'],1,'Clear people and materials to at least 2.75 m, tell everyone to treat it as live, then complete the permit and hand it to the nominated person.',R.HB16+' §9.4'],
+['ac','When reporting to the ECO, which detail helps them find the exact spot?',['Your Sentinel number','The nearest OLE structure number or plate','The weather','The time of the last train'],1,'Give your details, line(s), location and the nearest OLE structure number or plate.',R.HB16+' §5.2'],
+// ---------- DC (HB17) ----------
+['dc','How far must you (and anything you\'re holding) keep from live conductor rail equipment, unless a method statement and risk assessment are in place?',['300 mm','1.5 m','2.75 m','3 m'],1,'Stay at least 1.5 m from live CRE unless an approved method statement and electrical risk assessment are being followed.',R.HB17+' §4.1'],
+['dc','Which of these must you never step on?',['Ballast','The conductor rail or its guard boarding','A sleeper end in the cess','Cable trough lids'],1,'Don\'t touch or step on the conductor rail, shoe gear or guard boarding.',R.HB17+' §3.1'],
+['dc','Where must you never step when crossing a DC line?',['Between the conductor rail and the running rail next to it','In the cess','Over the four-foot','On a walkway'],0,'Never step between the conductor rail and the adjacent running rail.',R.HB17+' §3.1'],
+['dc','Fitting a track-circuit clip on a DC line, which rail do you put it on first?',['The running rail nearest the conductor rail','The running rail furthest from the conductor rail','The conductor rail','Either'],1,'Apply to the running rail furthest from the conductor rail first, and remove from the nearest one first.',R.HB17+' §4.1'],
+['dc','The train\'s collector shoes aren\'t touching the conductor rail. Can you touch them?',['Yes','No, never touch collector shoes','Only with gloves','Only if the train is stabled'],1,'Don\'t touch collector shoes, whether or not they\'re touching the conductor rail.',R.HB17+' §3.1'],
+['dc','Flood water is up to the conductor rail. What do you do?',['Wade through carefully','Don\'t step in it. Report flooding above sleeper level to the ECO','Wait for a train to clear it','Lay boards across'],1,'Don\'t step into it, and report flooding above sleeper level, with its depth and extent, to the ECO.',R.HB17+' §3.1, §3.2'],
+['dc','Under the June 2026 wording, how is conductor rail equipment described once the power is confirmed off?',['Safe to touch','Safe to approach but not touch','Still dangerous to approach','Earthed'],1,'The June 2026 changes describe it as safe to approach, but not to touch.',R.HB17+' · '+R.RBBL],
+['dc','Cables run alongside the line and under it. How do you treat them?',['As dead','As live. Don\'t interfere with them or their covers','Fine to step on troughs','Only signalling cables are live'],1,'Treat these cables as live and leave them and their covers alone.',R.HB17+' §3.1'],
+// ---------- Lookout / Site warden (HB3) ----------
+['lo','What does a lookout\'s armlet or badge look like?',['Blue with white letters','White with "LOOKOUT" in red letters','Orange with black letters','Yellow with "LOOKOUT" in blue'],1,'White, with LOOKOUT in red letters, worn on the left arm or upper chest.',R.HB3+' §2'],
+['lo','What does a site warden\'s armlet look like?',['White with "SITE WARDEN" in blue letters','White with red letters','Green with white letters','Orange with black letters'],0,'White, with SITE WARDEN in blue letters.',R.HB3+' §2'],
+['lo','As a lookout, what happens to your mobile phone?',['On silent','Switched off','In your pocket on vibrate','Used only for timing trains'],1,'Keep your phone switched off and stay alert.',R.HB3+' §4'],
+['lo','It\'s quiet and the group is behind. Can you help with the work while acting as lookout?',['Yes, if there are no trains due','No, you take no part in the work and have no other duties','Yes, if the COSS agrees','Only carrying light tools'],1,'A lookout takes no part in the work and doesn\'t do other duties.',R.HB3+' §4'],
+['lo','Fog rolls in and your view of approaching trains is getting worse. What do you do?',['Keep going and listen harder','Give the warning and tell the COSS','Move closer to the group','Use a torch'],1,'If you can no longer give adequate warning, give the warning and tell the COSS.',R.HB3+' §4'],
+['lo','Can site lookouts be used in darkness or in a tunnel?',['Yes, with a torch','No','Only on a 25 mph line','Only with two lookouts'],1,'Site lookouts aren\'t permitted in darkness, poor visibility, or in or near a tunnel.',R.HB3+' §4'],
+['lo','As site warden, someone steps over the safe-area limit. What do you do?',['Tell the COSS at break','Shout "get back". If they don\'t, give repeated short sharp blasts until they do','Grab them','Stop all work and ring the signaller'],1,'Shout "get back". If they don\'t come back straight away, give repeated short sharp blasts on a whistle or horn until they do.',R.HB3+' §3'],
+['lo','When can you leave your post as lookout?',['When your shift time ends','When the COSS says you\'re not needed, or another lookout relieves you','When the last train has passed','At meal breaks'],1,'Only when the COSS says so or another lookout takes over.',R.HB3+' §4'],
+['lo','Under the current COSS handbook, lookout warning can only be used if approaching trains are going no faster than…',['25 mph','50 mph','75 mph','100 mph'],0,'Lookouts can only be used if there\'s no alternative, it\'s planned and authorised at director level, and approaching trains are 25 mph or less.',R.HB7+' §6.8'],
+// ---------- COSS (HB7) ----------
+['coss','What does the COSS armlet look like?',['White letters on blue','Red letters on white','Black letters on white','Green letters on white'],0,'White letters on a blue background, worn only while acting as COSS.',R.HB7+' §1'],
+['coss','HB7 lists the safe systems of work. Which comes last, used only when nothing else can be?',['Safeguarded','Fenced','Equipment warning','Lookout warning'],3,'The list runs: safeguarded, fenced, separated, equipment warning, lookout warning. Lookouts only when no alternative can be used.',R.HB7+' §6.2, §6.8'],
+['coss','You want to use lookout warning. What\'s the maximum permissible speed of an approaching train?',['25 mph','40 mph','60 mph','No limit if sighting is good'],0,'Not more than 25 mph (40 km/h), and it must be planned in advance and authorised at director level.',R.HB7+' §6.8'],
+['coss','With lookout warning, what\'s the furthest the group can have to walk along the line to reach the position of safety?',['10 m','25 m','50 m','100 m'],1,'No more than 25 m.',R.HB7+' §6.8'],
+['coss','What\'s the maximum required warning time allowed when using lookouts?',['30 seconds','45 seconds','60 seconds','90 seconds'],1,'The required warning time must be 45 seconds or less, otherwise lookouts can\'t be used.',R.HB7+' §6.8'],
+['coss','Working out required warning time, what\'s the minimum time everyone must be in the position of safety?',['5 seconds','10 seconds','15 seconds','20 seconds'],1,'Add time to stop work, time to reach safety, 5 s per extra direction, 5 s if alone, and a minimum 10 s in the position of safety.',R.HB7+' §6.8'],
+['coss','How much extra warning time do you add for each extra direction a lookout has to watch?',['2 seconds','5 seconds','10 seconds','None'],1,'Add 5 seconds for each extra direction watched.',R.HB7+' §6.8'],
+['coss','Working without blocking an open line and with no barrier, how close can anyone get to the nearest running rail?',['No closer than 1.25 m','No closer than 2 m','No closer than 3 m','No closer than 0.9 m'],1,'Keep everyone at least 2 m from the nearest running rail of an open line (1.25 m with a rigid or tensioned barrier or permanent fence).',R.HB7+' §3.1'],
+['coss','You want to use barricade tape or netting at 1.25 m from the nearest rail. What\'s the maximum line speed?',['20 mph','40 mph','75 mph','100 mph'],1,'Tape or netting at 1.25 m only where line speed is 40 mph or less. At 2 m there\'s no speed limit. Never at 0.9 m.',R.HB7+' §6.5'],
+['coss','Using site wardens, how far must the safe area be from the nearest running rail?',['At least 1.25 m','At least 2 m','At least 3 m','At least 5 m'],1,'The safe area must be at least 2 m from the nearest running rail.',R.HB7+' §6.6'],
+['coss','When planning a walk, what gap do you keep between the group and any open line without setting up a safe system?',['1.25 m','2 m','3 m','5 m'],2,'Keep at least 3 m from any open line, or set up a safe system.',R.HB7+' §5.1'],
+['coss','The Crossing the Line procedure can be used for up to how many running lines?',['Two','Four','Six','Any number'],1,'Up to four running lines, at approved locations, while walking (not working), after phoning the signaller.',R.HB7+' §3.3'],
+['coss','Using ATWS or another equipment warning system, what must you make sure of?',['Everyone can reach safety at least 10 s before a train arrives, and it\'s tested before work','It\'s switched on after work starts','A lookout is also posted','It covers one direction only'],0,'It must give adequate warning, let everyone reach safety at least 10 s before a train arrives, not be masked by noise, and be tested before work.',R.HB7+' §6.7'],
+['coss','How must you stay in contact with your group?',['By radio','By phone','In sight and within verbal contact, without radios or phones','Through the lookout'],2,'Keep everyone in sight and within verbal contact, without using radios or phones.',R.HB7+' §6.1'],
+['coss','You need to leave site. Who can take over as COSS?',['The most experienced person in the group','Only another COSS','The lookout','The PC'],1,'The role only passes to another COSS. The group carries on only once they\'ve taken over.',R.HB7+' §6.1'],
+['coss','A train\'s coming and someone has a heavy item in the four-foot. What does the rule say about tools?',['Leave everything','Take tools to the position of safety unless they\'re too heavy to be moved by a train\'s slipstream, then leave them clear of the line','Everyone carries the heavy item together','Leave tools on the rail'],1,'Take tools with you unless they\'re too heavy to be moved by slipstream, in which case leave them clear of the line.',R.HB7+' §6.8'],
+['coss','You can no longer see your whole group properly. What do you do?',['Shout louder','Stop work and get everyone to a position of safety','Ask the lookout to watch them','Carry on, you\'ll check in later'],1,'If you can\'t observe the group properly, stop work and remove everyone to safety.',R.HB7+' §6.1'],
+['coss','Which of these situations rules out lookouts?',['A train could be routed onto your line after the lookout has seen it','It\'s a sunny day','The group is 4 people','The line is plain line'],0,'You can\'t use lookouts if a train could be routed onto the line after the lookout has seen it, among other restrictions.',R.HB7+' §6.8'],
+// ---------- IWA (HB6) ----------
+['iwa','As an IWA working without blocking an open line, how far from the nearest running rail must you stay?',['More than 1.25 m','More than 2 m','More than 3 m','More than 5 m'],1,'Only if the work won\'t affect line safety and you stay more than 2 m from the nearest running rail.',R.HB6+' §3.1'],
+['iwa','Patrolling as an IWA, which of these is NOT allowed?',['Patrolling in daylight','Patrolling in darkness, poor visibility or a tunnel','Looking up every 5 seconds','Reaching safety 10 s before a train'],1,'Patrolling this way isn\'t allowed in darkness, poor visibility or tunnels.',R.HB6+' §3.2'],
+['iwa','When working out your warning time as an IWA, how much extra do you add for working alone?',['5 seconds','10 seconds','15 seconds','Nothing'],0,'Add 5 s for working alone plus 10 s minimum in the position of safety. Total must be 45 s or less.',R.HB6+' Aid table'],
+['iwa','There\'s a barrier at 0.9 m with ATWS. Can you use it as part of your safe system?',['Yes','No','Only below 40 mph','Only in daylight'],1,'A barrier at 0.9 m with ATWS must not be used as part of your safe system.',R.HB6+' §3.3'],
+['iwa','You need to use a road vehicle within 2 m of the line. How is this classed?',['Normal work','Work that affects line safety, so the line must be blocked','Only needs a lookout','Fine with ATWS'],1,'Plant or road vehicles within 2 m (6 ft 6 in) count as work affecting line safety. Don\'t start until the line is blocked.',R.HB6+' §4.1, §4.2'],
+['iwa','Using Crossing the Line, what do you tell the signaller?',['Just your name','The crossing point, your name and employer, and the time needed to cross','Your Sentinel number only','Nothing, you just look and cross'],1,'Give the crossing point, your name and employer, and how long you need. Cross as soon as cleared and stay on the phone until you\'re across.',R.HB6+' §3.5'],
+['iwa','Can you use Crossing the Line while patrolling or inspecting?',['Yes','No, only while walking','Only on two lines','Only with a lookout'],1,'Only while walking, never during work, patrolling or inspecting.',R.HB6+' §3.5'],
+// ---------- PC / blockages (HB8) ----------
+['pc','When must a Protection Controller (PC) be appointed?',['Whenever a line is blocked','When two or more COSSs or IWAs need a blockage at the same place and time','Only in possessions','When the COSS is new'],1,'Appoint a PC when two or more COSSs or IWAs need a line blockage at the same place and time.',R.HB8+' §6'],
+['pc','What does the PC armlet show?',['"PC" in green on white','"PC" in blue on white','White on blue','Red on white'],0,'"PC" in green on white, on the left arm or as a badge.',R.HB8+' §6'],
+['pc','Normally, how far must your site of work be from the protecting signal or block marker?',['At least 50 m','At least 100 m','At least 200 m','At least 1 mile'],2,'Normally at least 200 m. If line-affecting work must be closer, tell the signaller and further arrangements apply.',R.HB8+' §1.4'],
+['pc','How is detonator protection laid for a line blockage?',['One detonator at the signal','Three detonators on the same rail, 20 m apart, with a possession limit board at the first','Two detonators, one on each rail','Three detonators 100 m apart'],1,'Three detonators on the same rail, 20 m apart, with a possession limit board at the first one.',R.HB8+' §2.8'],
+['pc','Which form records a line blockage?',['RT9909','RT3199','NR3180','RT3189'],2,'Complete the NR3180 and read your entry back to the signaller.',R.HB8+' §2.1'],
+['pc','Your work affects line safety. What about additional protection?',['Optional','You must always provide at least one additional protection method','Only at night','Only on bi-directional lines'],1,'Provide additional protection whenever possible, and always if the work affects line safety. The signaller won\'t give an authority number until it\'s in place.',R.HB8+' §2.2'],
+['pc','HB8 line blockages apply when…',['Engineering trains are involved','No trains or on-track plant are involved','Any on-track plant is used','Only in sidings'],1,'Use HB8 only when no trains or on-track plant are involved. Otherwise it\'s a possession (HB9).',R.HB8+' §1.1'],
+['pc','As PC, when can you give up the blockage?',['When your shift ends','When every COSS and IWA sharing it has confirmed they no longer need it','When the signaller asks','When the first group finishes'],1,'Not until every COSS or IWA has confirmed they no longer need it.',R.HB8+' §6'],
+['pc','You suspended a blockage and now want it back. What happens?',['Use the same authority number','You repeat the steps and get a new authority number','Just tell the group','Nothing, it\'s still valid'],1,'Repeat the steps. You\'ll get a new authority number.',R.HB8+' §5.3'],
+// ---------- Handsignaller (HB5) ----------
+['hs','When can you act as a handsignaller under HB5?',['Any time the COSS asks','Only when appointed by the pilot for single line working, or as signaller\'s agent at the end of an SLW section','When a signal fails','For engineering trains only'],1,'Only for single line working, appointed by the pilot to divide a section, or as the signaller\'s agent at the end of the SLW section.',R.HB5+' §4'],
+['hs','How old can a detonator be before you mustn\'t use it?',['1 year','3 years','5 years','10 years'],2,'Don\'t use one more than five years old, or any that\'s rusty, decayed or damaged.',R.HB5+' §2'],
+['hs','A wrong-direction train approaches your location. What do you show?',['Green flag','A hand danger signal until it stops','Yellow flag straight away','Nothing'],1,'Show a hand danger signal until the train stops.',R.HB5+' §5.2'],
+['hs','The signaller lets a stopped train proceed. What handsignal do you show the driver?',['Green','Yellow','Red','White light'],1,'Show a yellow handsignal.',R.HB5+' §5.2'],
+['hs','Your arm\'s tired. Can you put the flag on the ground for a moment?',['Yes, between trains','No, hold it steadily and never put it on the ground','Yes, if it\'s rolled up','Only in daylight'],1,'Hold the flag or lamp steadily and never put it on the ground.',R.HB5+' §1'],
+['hs','How far from an open line must a handsignaller\'s tent be?',['At least 1 m','At least 2 m (1.25 m if line speed is 20 mph or less)','At least 3 m','Anywhere in the cess'],1,'At least 2 m from an open line, or 1.25 m where line speed is 20 mph or less.',R.HB5+' §7'],
+['hs','As signaller\'s agent, a train passes the end of degraded working sign without permission. What do you do?',['Note it for later','Make an emergency call to the signaller immediately','Chase the train','Show a green flag'],1,'Make an emergency call to the signaller straight away.',R.HB5+' §5.2'],
+// ---------- ES (HB12) ----------
+['es','Where are work-site marker boards normally placed?',['At the protecting signal','About 100 m from each end of the work site','200 m from the PICOP','Right at the site of work'],1,'About 100 m from each end of the work site, at the agreed mileage.',R.HB12+' §3.4'],
+['es','If no WSMBs are provided, how close to the detonator protection can work happen?',['No closer than 50 m','No closer than 100 m','No closer than 200 m','Any distance'],2,'Don\'t allow work within 200 m of the detonator protection.',R.HB12+' §3.4'],
+['es','Which way do the lights on a WSMB face?',['Red towards a driver approaching, yellow towards a driver leaving','Both red','Yellow towards approaching, red towards leaving','White both ways'],0,'Red lights face an approaching driver, yellow lights face a driver leaving.',R.HB12+' §3.4'],
+['es','Who can authorise a movement entering or moving within the work site?',['The PICOP','Only the ES','Any COSS','The machine controller on their own'],1,'Only the ES.',R.HB12+' §6.1'],
+['es','Which form does the ES keep updated with arrangements, authority numbers and signatures?',['RT9909','NR3180','RT3199','RT3189'],2,'The RT3199.',R.HB12+' §3.5'],
+['es','Can equipment warning (e.g. ATWS) be used on lines within the work site?',['Yes','No','Only on adjacent lines','Only at night'],1,'Don\'t allow equipment warning on any line within the work site.',R.HB12+' §4.6'],
+['es','For safeguarded, fenced or separated working in the work site, what do you agree about movements?',['No movements, or movements not exceeding 5 mph','Max 25 mph','No limit','Max 20 mph'],0,'Either no movements, or movements not more than 5 mph (10 km/h).',R.HB12+' §4.3–4.5'],
+['es','When can you ask the PICOP for permission to remove the WSMBs?',['When your shift finishes','When the line is clear and every COSS or IWA has released protection','When the first train arrives','Any time'],1,'Only when the line is clear and every COSS or IWA has confirmed they no longer need protection.',R.HB12+' §10.3'],
+// ---------- MC / OTP (HB15) ----------
+['mc','What colour is the MC armlet lettering?',['Black on white','White on blue','Red on white','Green on white'],0,'Black lettering on white.',R.HB15+' §3.1'],
+['mc','What must the OTP operator do before any rail movement?',['Flash the lights','Give one short horn blast','Radio the PICOP','Nothing'],1,'One short horn blast before any rail movement.',R.HB15+' §7.2'],
+['mc','Maximum speed over points, in sidings, controlled from the ground, or where no speed was given?',['5 mph','10 mph','20 mph','25 mph'],0,'5 mph (10 km/h).',R.HB15+' §7.4'],
+['mc','Maximum speed for other OTP movements authorised by the ES or PICOP?',['15 mph','20 mph','25 mph','40 mph'],2,'25 mph (40 km/h).',R.HB15+' §7.4'],
+['mc','During multiple OTP movements, how far apart must machines be, and what\'s the speed limit?',['50 m, 25 mph','100 m, 20 mph','200 m, 10 mph','25 m, 5 mph'],1,'At least 100 m from the OTP ahead, at no more than 20 mph.',R.HB15+' §13.2'],
+['mc','Controlling by radio, the MC goes silent and the bleep stops. What does the operator do?',['Carry on slowly','Stop immediately','Sound the horn and continue','Reverse'],1,'Stop immediately if the MC stops speaking or the bleep can\'t be heard.',R.HB15+' §9.2'],
+['mc','The adjacent running line is less than 3 m from the OTP\'s line and you\'re working on that side. What\'s needed?',['A lookout','The adjacent line must be blocked','ATWS','Nothing extra'],1,'The adjacent line must be blocked.',R.HB15+' §10.3'],
+['mc','Can the operator use mirrors to get a clear view ahead?',['Yes','No','Only at 5 mph','Only with CCTV'],1,'The operator must always have a clear view ahead, and mirrors can\'t be used for this.',R.HB15+' §7.9'],
+['mc','When is a headlight needed at the leading end?',['Always','When travelling at 20 mph or more','Only at night','Over level crossings'],1,'A headlight is required if the OTP will travel at 20 mph or more.',R.HB15+' §7.3'],
+];
+
+const BOOKS=[
+  ['3170','A guide to personal track safety','11','2024',['pts']],
+  ['HB1','General duties and track safety for track workers','9','Dec 2025',['pts']],
+  ['HB2','Track workers using emergency protection equipment','2','Sept 2015',['pts']],
+  ['HB3','Duties of a lookout and site warden','4','Dec 2025',['lo']],
+  ['HB4','Points operator & route setting agent','2','Sept 2014',[]],
+  ['HB5','Handsignalling duties','3','Dec 2025',['hs']],
+  ['HB6','Individual working alone (IWA)','8','Sept 2024',['iwa']],
+  ['HB7','Controller of site safety (COSS)','10','Dec 2025',['coss']],
+  ['HB8','IWA, COSS or PC blocking a line','10','Sept 2024',['coss','iwa','pc']],
+  ['HB9','Safe systems of work within possessions','9','Dec 2025',['coss','iwa']],
+  ['HB10','Hand trolleys (COSS / PIC)','5','Sept 2023',[]],
+  ['HB12','Engineering supervisor (ES) in a possession','11','Dec 2025',['es']],
+  ['HB13','Person in charge of siding possession (PICOS)','4','Sept 2023',[]],
+  ['HB14','Loading / unloading rail vehicles (POCL)','3','Mar 2021',[]],
+  ['HB15','Machine controller (MC) & OTP operator','7','Sept 2024',['mc']],
+  ['HB16','AC electrified lines','7','June 2026',['ac'],1],
+  ['HB17','DC electrified lines','see note','June 2026',['dc'],1],
+  ['HB18','Level crossing attendant','4','Sept 2015',[]],
+  ['HB19','Signalling technician','6','Dec 2025',[]],
+  ['T3','Possession of a running line for engineering work','13','Dec 2025',['es']],
+];
+
+// ================= STATE =================
+const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+let mine=store.get('tr_mine',['pts']);
+let hist=store.get('tr_hist',{}); // qid -> {c:correctCount,w:wrongCount,last:1/0}
+let best=store.get('tr_best',null);
+const save=()=>{store.set('tr_mine',mine);store.set('tr_hist',hist)};
+Q.forEach((q,i)=>q.id=i);
+const qsOf=c=>Q.filter(q=>q[0]===c);
+const mastery=c=>{const qs=qsOf(c);if(!qs.length)return 0;return Math.round(qs.filter(q=>hist[q.id]&&hist[q.id].last===1).length/qs.length*100)};
+const weak=()=>Q.filter(q=>hist[q.id]&&hist[q.id].last===0&&mine.includes(q[0]));
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const V=document.getElementById('view');
+let tab='home';
+let quiz=null,timerIv=null;
+
+// ================= VIEWS =================
+function setTab(t){tab=t;document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.t===t));clearInterval(timerIv);quiz=null;render();scrollTo(0,0)}
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>setTab(b.dataset.t));
+
+function render(){
+  if(quiz)return renderQuiz();
+  if(tab==='home')return home();
+  if(tab==='scen')return scenarios();
+  if(tab==='mock')return mockIntro();
+  if(tab==='news')return news();
+  if(tab==='books')return books();
+}
+
+function home(){
+  const answered=Object.keys(hist).length;
+  const mineQs=Q.filter(q=>mine.includes(q[0]));
+  const masteredN=mineQs.filter(q=>hist[q.id]&&hist[q.id].last===1).length;
+  const w=weak();
+  V.innerHTML=`
+  <div class="alert" style="margin-top:4px"><b>Rule changes in force since 6 June 2026</b> for AC/DC electrified lines, train accidents (M1) and train movements (TW1). <u data-go="news" style="cursor:pointer">See what changed →</u></div>
+  <div class="stat" style="margin-top:12px">
+    <div class="card"><b>${mine.length}</b><span>competencies</span></div>
+    <div class="card"><b>${mineQs.length?Math.round(masteredN/mineQs.length*100):0}%</b><span>mastered</span></div>
+    <div class="card"><b>${best?best.pct+'%':'–'}</b><span>best mock</span></div>
+  </div>
+  <h2>YOUR COMPETENCIES · TAP TO PRACTISE</h2>
+  <div class="grid">${Object.entries(COMPS).filter(([k])=>mine.includes(k)).map(([k,c])=>`
+    <button class="comp on" data-p="${k}"><div class="e">${c.e}</div><div class="n">${c.n}</div><div class="h">${c.hb} · ${qsOf(k).length} questions</div>
+    <div class="bar"><div style="width:${mastery(k)}%"></div></div><div class="pct">${mastery(k)}% mastered</div></button>`).join('')}</div>
+  <div class="row" style="margin-top:12px">
+    <button class="btn" id="practiseAll">Practise all mine</button>
+    <button class="btn sec" id="weakBtn" ${w.length?'':'disabled style="opacity:.5"'}>Weak spots (${w.length})</button>
+  </div>
+  <h2>ADD OR REMOVE COMPETENCIES</h2>
+  <div class="grid">${Object.entries(COMPS).map(([k,c])=>`
+    <button class="comp ${mine.includes(k)?'on':''}" data-t="${k}"><div class="tick">${mine.includes(k)?'✓':''}</div><div class="e">${c.e}</div><div class="n">${c.n}</div><div class="h">${c.full}</div></button>`).join('')}</div>
+  <p class="muted" style="margin-top:18px">Questions are written in our own words from the current Rule Book handbooks (issues listed under Handbooks). Practice only. Not an official assessment. Always follow your briefing and your current handbooks.</p>`;
+  V.querySelectorAll('[data-p]').forEach(b=>b.onclick=()=>startPractice(qsOf(b.dataset.p),COMPS[b.dataset.p].full));
+  V.querySelectorAll('[data-t]').forEach(b=>b.onclick=()=>{const k=b.dataset.t;mine=mine.includes(k)?mine.filter(x=>x!==k):mine.concat(k);if(!mine.length)mine=['pts'];save();home()});
+  V.querySelector('#practiseAll').onclick=()=>startPractice(Q.filter(q=>mine.includes(q[0])),'All my competencies');
+  V.querySelector('#weakBtn').onclick=()=>{if(w.length)startPractice(w,'Weak spots')};
+  V.querySelector('[data-go]').onclick=()=>setTab('news');
+}
+
+function startPractice(qs,title){quiz={mode:'practice',title,qs:shuffle(qs),i:0,score:0,answered:false};render();scrollTo(0,0)}
+function startMock(){
+  const pool=Q.filter(q=>mine.includes(q[0]));
+  const n=Math.min(20,pool.length);
+  quiz={mode:'mock',title:'Mock test',qs:shuffle(pool).slice(0,n),i:0,score:0,answered:false,t0:Date.now(),limit:n*45,wrong:[]};
+  timerIv=setInterval(()=>{const el=document.getElementById('tm');if(!quiz||quiz.mode!=='mock'){clearInterval(timerIv);return}const left=quiz.limit-Math.floor((Date.now()-quiz.t0)/1000);if(left<=0){clearInterval(timerIv);finishQuiz(true);return}if(el)el.textContent=fmt(left)},500);
+  render();scrollTo(0,0);
+}
+const fmt=s=>`${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`;
+
+function renderQuiz(){
+  const z=quiz;if(z.i>=z.qs.length)return finishQuiz();
+  const q=z.qs[z.i];
+  if(!z.order||z.orderFor!==z.i){z.order=shuffle([0,1,2,3].slice(0,q[2].length));z.orderFor=z.i}
+  const c=COMPS[q[0]];
+  V.innerHTML=`
+    <div class="meta"><span>${c.e} ${c.n}</span><span>${z.mode==='mock'?`⏱ <span class="timer" id="tm">${fmt(z.limit-Math.floor((Date.now()-z.t0)/1000))}</span> · `:''}${z.i+1} / ${z.qs.length}</span></div>
+    <div class="prog"><div style="width:${z.i/z.qs.length*100}%"></div></div>
+    <div class="q">${q[1]}</div>
+    <div id="opts">${z.order.map(oi=>`<button class="opt" data-o="${oi}">${q[2][oi]}</button>`).join('')}</div>
+    <div id="after"></div>
+    <button class="btn sec" id="quit" style="margin-top:6px">${z.mode==='mock'?'Abandon test':'End practice'}</button>`;
+  V.querySelector('#quit').onclick=()=>{clearInterval(timerIv);quiz=null;render()};
+  V.querySelectorAll('.opt').forEach(b=>b.onclick=()=>answer(+b.dataset.o));
+}
+function answer(o){
+  const z=quiz,q=z.qs[z.i];if(z.answered)return;z.answered=true;
+  const ok=o===q[3];
+  const h=hist[q.id]||{c:0,w:0,last:0};ok?h.c++:h.w++;h.last=ok?1:0;hist[q.id]=h;save();
+  if(ok)z.score++;else if(z.wrong)z.wrong.push(q);
+  const btns=[...V.querySelectorAll('.opt')];btns.forEach(b=>{b.disabled=true;const bo=+b.dataset.o;if(bo===q[3])b.classList.add('good');else if(bo===o)b.classList.add('bad')});
+  if(z.mode==='mock'){z.i++;z.answered=false;setTimeout(render,350);return}
+  V.querySelector('#after').innerHTML=`<div class="fb ${ok?'ok':'no'}"><b>${ok?'✅ Correct':'❌ Not quite'}</b>${q[4]}<br><span class="ref">📖 ${q[5]}</span></div><button class="btn" id="nx">${z.i+1<z.qs.length?'Next':'See results'}</button>`;
+  V.querySelector('#nx').onclick=()=>{z.i++;z.answered=false;render();scrollTo(0,0)};
+  V.querySelector('#nx').scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+function finishQuiz(timeout){
+  clearInterval(timerIv);
+  const z=quiz;const total=z.qs.length;const pct=Math.round(z.score/total*100);
+  let extra='';
+  if(z.mode==='mock'){
+    if(!best||pct>best.pct){best={pct,date:new Date().toLocaleDateString('en-GB')};store.set('tr_best',best)}
+    const unanswered=z.qs.slice(z.i);
+    const review=z.wrong.concat(unanswered);
+    extra=`<h2>REVIEW ${review.length?'('+review.length+')':''}</h2>${review.length?review.map(q=>`<div class="card" style="margin-bottom:8px"><div style="font-weight:800;margin-bottom:6px">${q[1]}</div><div style="color:var(--gr);font-weight:800;font-size:14px">✓ ${q[2][q[3]]}</div><div class="muted" style="margin-top:4px">${q[4]}</div><span class="ref">📖 ${q[5]}</span></div>`).join(''):'<p class="muted">Nothing to review. Clean sheet.</p>'}`;
+  }
+  const verdict=pct>=90?['🏆','Track ready','#3ccf7a']:pct>=75?['👍','Nearly there','#ffb020']:['📖','Back to the handbook','#ff5a5a'];
+  V.innerHTML=`<div class="card" style="text-align:center;margin-top:6px;padding:22px 14px">
+    <div style="font-size:42px">${verdict[0]}</div>
+    <div class="big" style="color:${verdict[2]}">${pct}%</div>
+    <div style="font-weight:900;font-size:18px">${verdict[1]}</div>
+    <div class="muted" style="margin-top:6px">${z.title} · ${z.score}/${total} correct${timeout?' · time ran out':''}</div>
+    <p class="muted" style="margin-top:10px;font-size:12px">Practice target: 90%+. Real assessment formats and pass marks are set by your training provider.</p>
+  </div>
+  <div class="row" style="margin-top:12px"><button class="btn" id="again">Go again</button><button class="btn sec" id="hm">Home</button></div>${extra}`;
+  const m=z.mode,qs=z.qs,title=z.title;quiz=null;
+  V.querySelector('#again').onclick=()=>m==='mock'?startMock():startPractice(qs,title);
+  V.querySelector('#hm').onclick=()=>setTab('home');
+}
+
+function scenarios(){
+  const S=[
+    {e:'📯',n:'Open line, lookout warning',d:'PTS · You\'re in a group on a 20 mph line. Kit up, walk to site, react to a warning in 4 seconds, then spot the hazards.',c:'PTS · Lookout',href:'scenario1.html',ready:1},
+    {e:'🧢',n:'Set up the safe system',d:'COSS · 60 mph lines, clip renewal on the Up line. Pick the safe system, take the blockage, lay the detonators, fence the open line, brief the group and give it all back.',c:'COSS',href:'scenario2.html',ready:1},
+    {e:'⚡',n:'Long ladder under the wires',d:'AC lines · Carry a 4 m ladder under live OLE, report an object on the wire to the ECO, and deal with a wire down.',c:'AC lines',href:'scenario3.html',ready:1},
+    {e:'🛑',n:'Take the blockage',d:'PC · Agree a blockage with the signaller, fill in the NR3180 and lay the detonators.',c:'PC / Blockages'},
+    {e:'🚜',n:'Walk the machine in',d:'MC · Brief the operator and control a move through the work site at the right speeds.',c:'MC / OTP'},
+  ];
+  V.innerHTML=`<h2>VISUAL SCENARIOS</h2>
+  <p class="muted" style="margin-bottom:12px">Animated, real-site situations where you make the call and see what happens. This is what the quiz sites don't do.</p>
+  ${S.map(x=>`<div class="card" style="margin-bottom:10px;${x.ready?'border-color:var(--or)':'opacity:.6'}">
+    <div style="display:flex;gap:12px;align-items:flex-start"><div style="font-size:30px">${x.e}</div><div style="flex:1">
+    <div style="font-weight:900;font-size:16px">${x.n} ${x.ready?'':'<span class="pill" style="background:var(--card2);color:var(--mut);margin-left:4px">COMING</span>'}</div>
+    <div class="muted" style="margin-top:3px">${x.d}</div></div></div>
+    ${x.ready?`<a class="btn" href="${x.href}" style="display:block;text-align:center;text-decoration:none;margin-top:12px">Play scenario</a>`:''}
+  </div>`).join('')}`;
+}
+function mockIntro(){
+  const pool=Q.filter(q=>mine.includes(q[0]));const n=Math.min(20,pool.length);
+  V.innerHTML=`<h2>MOCK TEST</h2>
+  <div class="card"><div style="font-weight:900;font-size:18px">${n} questions · ${fmt(n*45)}</div>
+  <p class="muted" style="margin-top:6px">Mixed from your competencies: ${mine.map(k=>COMPS[k].n).join(', ')}. No feedback until the end, just like the real thing. Wrong answers are saved to your weak spots.</p>
+  <button class="btn" id="go" style="margin-top:14px">Start mock test</button></div>
+  ${best?`<p class="muted" style="margin-top:12px">Best so far: <b>${best.pct}%</b> (${best.date})</p>`:''}
+  <p class="muted" style="margin-top:12px">Change which competencies are included from Home.</p>`;
+  V.querySelector('#go').onclick=startMock;
+}
+
+function news(){
+  V.innerHTML=`<h2>WHAT'S CHANGED</h2>
+  <div class="card">
+    <div style="font-weight:900">June 2026 · Rule Book Briefing Leaflet Issue 43</div>
+    <div class="muted">In force 6 June 2026. Summarised in plain English.</div>
+    <div class="chg"><b>⚡ AC electrified lines (HB16 / Module AC)</b><p>New definitions (e.g. earthed, isolated, nominated person). Equipment on trains is now covered by "treat as live". Under an overhead line permit, the COSS must see the <b>test before touch</b>, both when the permit is issued and before moving to a different part of the OLE. Coasting under damaged OLE is still normally not allowed within <b>five OLE structures</b> of a tunnel or overbridge, unless a competent engineer allows it.</p></div>
+    <div class="chg"><b>🔌 DC electrified lines (HB17 / Module DC)</b><p>Now also applies between Drayton Park and Moorgate and in the Merseyrail area. Conductor rail equipment that's off is described as <b>safe to approach but not to touch</b>. The old instruction about touching running rails and other metalwork together has been removed. Short circuits now refer to taking a line blockage.</p></div>
+    <div class="chg"><b>🚆 Train accidents & evacuation (Module M1)</b><p>Big rewrite aimed at warning the signaller and other drivers sooner. A <b>Railway Emergency Call (REC) from the cab</b> is now the first way to contact the signaller. A driver stays in the cab until the signaller confirms trains have stopped. Controlled evacuation now needs the signaller told and approaching trains on affected lines stopped.</p></div>
+    <div class="chg"><b>🛤️ Train failure & train movements (M2 / TW1)</b><p>Emergency protection during extended block working removed. If a driver sees a hand danger signal unexpectedly, they must make a REC. New rules for trains put in danger in the same direction. Detonators kept for a trial period in some cases.</p></div>
+  </div>
+  <h2>KEY CURRENT RULE TO KNOW</h2>
+  <div class="card"><div class="chg" style="margin-top:0"><b>📯 Lookout warning is heavily restricted (HB7 Issue 10, in force 6 Dec 2025)</b><p>Lookouts can only be used if there's no alternative, it's planned in advance and <b>authorised at director level</b>, approaching trains are <b>25 mph or less</b>, the group walks no more than 25 m to safety, and the required warning time is 45 seconds or less.</p></div>
+  <button class="btn" id="nq">Practise the new rules</button></div>
+  <p class="muted" style="margin-top:14px">Source: RSSB Rule Book Briefing Leaflet Issue 43 and the handbooks listed under Handbooks. Read the official documents for the full detail.</p>`;
+  V.querySelector('#nq').onclick=()=>startPractice(Q.filter(q=>/June 2026|RBBL|HB7 Iss 10 §6.8/.test(q[5])||/25 mph/.test(q[1])),'New & changed rules');
+}
+
+function books(){
+  V.innerHTML=`<h2>CURRENT HANDBOOKS · JUNE 2026</h2>
+  <p class="muted" style="margin-bottom:10px">Highlighted rows are the ones for the competencies you've selected. Make sure your copies match these issues.</p>
+  <div class="card" style="padding:4px 10px"><table><tr><th>BOOK</th><th>TITLE</th><th>ISSUE</th></tr>
+  ${BOOKS.map(b=>{const on=b[4].some(k=>mine.includes(k));return `<tr style="${on?'background:rgba(255,122,0,.08)':'opacity:.7'}"><td class="c">${b[0]}</td><td>${b[1]}${b[5]?'<span class="new">JUNE 26</span>':''}</td><td>${b[2]}<div class="muted" style="font-size:11.5px">${b[3]}</div></td></tr>`}).join('')}
+  </table></div>
+  <p class="muted" style="margin-top:12px">HB17: changes in the June 2026 briefing leaflet. Check you hold the latest issue. The Rule Book is updated every June and December. Official copies are published by RSSB.</p>`;
+}
+
+if(location.hash==='#scenarios')setTab('scen');else render();
+})();
+</script>
+</body>
+</html>

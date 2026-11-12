@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Scenario 1 · Track Ready</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%;background:#9fb8c9;color:#f4f1ea;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow:hidden;touch-action:none;user-select:none;-webkit-user-select:none}
+  #game{position:fixed;inset:0}
+  .hide{display:none!important}
+  #top{position:fixed;top:0;left:0;right:0;display:flex;justify-content:space-between;align-items:center;padding:10px 14px;font-weight:900;font-size:14px;background:linear-gradient(rgba(0,0,0,.55),rgba(0,0,0,0));z-index:5;pointer-events:none}
+  #stage{letter-spacing:.5px}
+  #score{color:#ffb020}
+  #banner{position:fixed;top:44px;left:12px;right:12px;text-align:center;font-weight:900;font-size:17px;z-index:5;pointer-events:none;text-shadow:0 2px 8px #000}
+  #timerBar{position:fixed;top:100px;left:20%;right:20%;height:8px;background:rgba(0,0,0,.4);border-radius:6px;z-index:5;overflow:hidden}
+  #timerFill{height:100%;background:#ff4d4d;width:100%}
+  #sheet{position:fixed;left:0;right:0;bottom:0;z-index:6;padding:16px 16px 20px;background:rgba(14,16,20,.94);border-radius:20px 20px 0 0;max-height:62vh;overflow-y:auto;box-shadow:0 -10px 40px rgba(0,0,0,.4)}
+  #sheet h2{font-size:13px;letter-spacing:1.5px;color:#ffb020;margin-bottom:6px}
+  #sheet .q{font-size:18px;font-weight:800;line-height:1.35;margin-bottom:12px}
+  #sheet .body{font-size:14.5px;line-height:1.55;opacity:.9;margin-bottom:12px}
+  .opts{display:flex;flex-direction:column;gap:8px}
+  .opt{font:inherit;font-weight:700;font-size:15.5px;text-align:left;border:2px solid rgba(255,255,255,.12);background:rgba(255,255,255,.06);color:#fff;border-radius:12px;padding:12px 14px;cursor:pointer}
+  .opt.sel{border-color:#ffb020;background:rgba(255,176,32,.15)}
+  .opt.good{border-color:#57d27a;background:rgba(87,210,122,.18)}
+  .opt.bad{border-color:#ff5a5a;background:rgba(255,90,90,.15)}
+  .go{font:inherit;font-weight:900;font-size:17px;border:0;border-radius:12px;padding:14px;width:100%;background:#ff7a00;color:#111;margin-top:12px;cursor:pointer;box-shadow:0 4px 0 #a84f00}
+  .fb{border-radius:12px;padding:12px 14px;margin-top:10px;font-size:14.5px;line-height:1.5}
+  .fb.ok{background:rgba(87,210,122,.15);border:1px solid rgba(87,210,122,.5)}
+  .fb.no{background:rgba(255,90,90,.12);border:1px solid rgba(255,90,90,.5)}
+  .fb>b:first-child{display:block;font-size:16px;margin-bottom:3px}
+  .ref{font-size:12px;opacity:.6;margin-top:6px}
+  #pop{position:fixed;top:40%;left:0;right:0;text-align:center;font-size:40px;font-weight:900;z-index:7;pointer-events:none;opacity:0;text-shadow:0 4px 20px rgba(0,0,0,.7)}
+  #pop.on{animation:pp 1.2s ease-out}
+  @keyframes pp{0%{opacity:0;transform:scale(1.4)}15%{opacity:1;transform:scale(1)}80%{opacity:1}100%{opacity:0}}
+  #flash{position:fixed;inset:0;background:#ff2020;opacity:0;z-index:4;pointer-events:none}
+  #flash.on{animation:fl .9s ease-out}
+  @keyframes fl{0%{opacity:.45}100%{opacity:0}}
+  .tag{display:inline-block;background:#ff7a00;color:#111;font-weight:900;border-radius:6px;padding:2px 7px;font-size:12px;margin-right:6px}
+  .disc{font-size:12px;opacity:.6;margin-top:10px;line-height:1.4}
+</style>
+</head>
+<body>
+<div id="game"></div>
+<div id="top"><div id="stage">TRACK SAFE</div><div id="score">0 pts</div></div>
+<div id="banner"></div>
+<div id="timerBar" class="hide"><div id="timerFill"></div></div>
+<div id="sheet"></div>
+<div id="pop"></div>
+<div id="flash"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(()=>{
+const $=id=>document.getElementById(id);
+if(typeof THREE==='undefined'){$('sheet').innerHTML='<div class="q">Couldn\'t load the 3D engine. Check your connection and refresh.</div>';return}
+
+// ---------- audio ----------
+let ac=null;
+function tone(f,d,type='sine',v=.07,delay=0,f2){try{ac=ac||new (window.AudioContext||window.webkitAudioContext)();const t=ac.currentTime+delay,o=ac.createOscillator(),g=ac.createGain();o.type=type;o.frequency.setValueAtTime(f,t);if(f2)o.frequency.exponentialRampToValueAtTime(f2,t+d);g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g).connect(ac.destination);o.start(t);o.stop(t+d+.02)}catch(e){}}
+const S={
+  lookoutHorn(){for(let i=0;i<3;i++){tone(520,.45,'square',.06,i*.6);tone(660,.45,'square',.04,i*.6)}},
+  trainHorn(){tone(311,.9,'sawtooth',.06);tone(392,.9,'sawtooth',.05);tone(311,.9,'sawtooth',.06,1.0);tone(370,.9,'sawtooth',.05,1.0)},
+  rumble(){tone(55,2.4,'sawtooth',.06,0,40)},
+  good(){tone(660,.12,'triangle',.08);tone(990,.2,'triangle',.08,.1)},
+  bad(){tone(180,.4,'square',.06,0,90)},
+  tick(){tone(1200,.05,'square',.03)},
+  clank(){tone(900,.06,'square',.03,0,600)}
+};
+
+// ---------- renderer ----------
+const renderer=new THREE.WebGLRenderer({antialias:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio||1,2));
+$('game').appendChild(renderer.domElement);
+const scene=new THREE.Scene();
+scene.background=new THREE.Color(0xa9c3d6);
+scene.fog=new THREE.Fog(0xa9c3d6,60,260);
+const camera=new THREE.PerspectiveCamera(55,1,.1,600);
+function resize(){renderer.setSize(innerWidth,innerHeight);camera.aspect=innerWidth/innerHeight;camera.fov=innerWidth/innerHeight<.75?70:55;camera.updateProjectionMatrix()}
+addEventListener('resize',resize);resize();
+scene.add(new THREE.HemisphereLight(0xffffff,0x6b6a55,1.05));
+const sun=new THREE.DirectionalLight(0xfff2dc,.75);sun.position.set(-30,50,40);scene.add(sun);
+
+function ctex(w,h,fn,rx=1,ry=1){const c=document.createElement('canvas');c.width=w;c.height=h;const x=c.getContext('2d');fn(x,w,h);const t=new THREE.CanvasTexture(c);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(rx,ry);t.anisotropy=Math.min(8,renderer.capabilities.getMaxAnisotropy());return t}
+const gc={};const bx=(w,h,d)=>gc[w+'_'+h+'_'+d]||(gc[w+'_'+h+'_'+d]=new THREE.BoxGeometry(w,h,d));
+const mc={};const lm=c=>mc[c]||(mc[c]=new THREE.MeshLambertMaterial({color:c}));
+const basic=c=>new THREE.MeshBasicMaterial({color:c});
+function label(txt,bg='#111',fg='#fff',w=3.2){const c=document.createElement('canvas');c.width=512;c.height=128;const x=c.getContext('2d');x.fillStyle=bg;x.beginPath();x.roundRect?x.roundRect(4,4,504,120,28):x.rect(4,4,504,120);x.fill();x.fillStyle=fg;x.textAlign='center';x.textBaseline='middle';let f=60;x.font=`900 ${f}px system-ui,sans-serif`;while(x.measureText(txt).width>470){f-=3;x.font=`900 ${f}px system-ui,sans-serif`}x.fillText(txt,256,68);const t=new THREE.CanvasTexture(c);const s=new THREE.Sprite(new THREE.SpriteMaterial({map:t,depthTest:false,transparent:true}));s.scale.set(w,w/4,1);s.renderOrder=10;return s}
+
+// ---------- world (1 unit = 1 metre; track runs along X) ----------
+const UP_Z=0, DN_Z=-3.4, GAUGE=1.435, RAIL_Z=GAUGE/2;
+const LEN=700;
+const grass=ctex(128,128,(x,w,h)=>{x.fillStyle='#6f8a4a';x.fillRect(0,0,w,h);for(let i=0;i<1500;i++){x.fillStyle=Math.random()<.5?'#5f7a3d':'#86a05a';x.fillRect(Math.random()*w,Math.random()*h,2,3)}},120,40);
+const gr=new THREE.Mesh(new THREE.PlaneGeometry(LEN,160).rotateX(-Math.PI/2),new THREE.MeshLambertMaterial({map:grass}));gr.position.y=-.02;scene.add(gr);
+const ballastT=ctex(128,64,(x,w,h)=>{x.fillStyle='#8c8780';x.fillRect(0,0,w,h);for(let i=0;i<1400;i++){const c=110+Math.random()*80|0;x.fillStyle=`rgb(${c},${c-4},${c-10})`;x.fillRect(Math.random()*w,Math.random()*h,3,2)}},LEN/2,2);
+for(const z of [UP_Z,DN_Z]){
+  const bal=new THREE.Mesh(new THREE.BoxGeometry(LEN,.32,3.4),[lm(0x77736c),lm(0x77736c),new THREE.MeshLambertMaterial({map:ballastT}),lm(0x77736c),lm(0x77736c),lm(0x77736c)]);bal.position.set(0,.14,z);scene.add(bal);
+  const n=Math.floor(LEN/.65);const sl=new THREE.InstancedMesh(bx(.26,.14,2.6),lm(0x5a5a58),n);const d=new THREE.Object3D();
+  for(let i=0;i<n;i++){d.position.set(-LEN/2+i*.65,.33,z);d.updateMatrix();sl.setMatrixAt(i,d.matrix)}scene.add(sl);
+  for(const s of [-1,1]){const r=new THREE.Mesh(bx(LEN,.16,.08),lm(0x8d8a85));r.position.set(0,.47,z+s*RAIL_Z);scene.add(r);const top=new THREE.Mesh(bx(LEN,.02,.07),basic(0xd8d6d2));top.position.set(0,.56,z+s*RAIL_Z);scene.add(top)}
+}
+// cess path (near side) and far cess
+const cessT=ctex(64,64,(x,w,h)=>{x.fillStyle='#a08c6a';x.fillRect(0,0,w,h);for(let i=0;i<400;i++){x.fillStyle=Math.random()<.5?'#8c7a5a':'#b39f7c';x.fillRect(Math.random()*w,Math.random()*h,2,2)}},LEN/2,1);
+const cess=new THREE.Mesh(new THREE.PlaneGeometry(LEN,2.4).rotateX(-Math.PI/2),new THREE.MeshLambertMaterial({map:cessT}));cess.position.set(0,.03,3.0);scene.add(cess);
+// fence
+for(let x=-LEN/2;x<LEN/2;x+=3){const p=new THREE.Mesh(bx(.08,1.4,.08),lm(0x3a3d40));p.position.set(x,.7,4.9);scene.add(p)}
+for(const y of [.5,.9,1.3]){const w=new THREE.Mesh(bx(LEN,.03,.03),lm(0x555a60));w.position.set(0,y,4.9);scene.add(w)}
+for(const s of [1,-1])for(let x=-LEN/2;x<LEN/2;x+=7+Math.random()*9){if(s>0&&Math.abs(x)<40)continue;const z=s>0?8+Math.random()*12:-9-Math.random()*14;const t=new THREE.Mesh(bx(.3,2.2,.3),lm(0x5a3a22));t.position.set(x,1.1,z);scene.add(t);const f=new THREE.Mesh(new THREE.IcosahedronGeometry(1.6+Math.random(),0),lm([0x3f6a35,0x4c7a3c,0x35602e][Math.floor(Math.random()*3)]));f.position.set(x,3.3,z);scene.add(f)}
+// line speed sign
+{const p=new THREE.Mesh(bx(.1,1.8,.1),lm(0x222222));p.position.set(-14,.9,2.2);scene.add(p);const sg=label('20','#ffffff','#111',1.1);sg.position.set(-14,2.0,2.2);sg.scale.set(.9,.9,1);scene.add(sg)}
+// signal
+{const p=new THREE.Mesh(bx(.18,4.2,.18),lm(0x222222));p.position.set(-38,2.1,2.0);scene.add(p);const h=new THREE.Mesh(bx(.5,1.2,.4),lm(0x111111));h.position.set(-38,4.3,2.0);scene.add(h);const l=new THREE.Mesh(new THREE.SphereGeometry(.12,10,8),basic(0x57f287));l.position.set(-38,4.6,2.2);scene.add(l)}
+
+// ---------- people ----------
+function makePerson(vest,pants,skin,helmet){
+  const g=new THREE.Group();const legs=[],arms=[];
+  const body=new THREE.Group();g.add(body);
+  for(const s of [-1,1]){const p=new THREE.Group();p.position.set(.11*s,.82,0);const m=new THREE.Mesh(bx(.17,.82,.19),lm(pants));m.position.y=-.41;p.add(m);const b=new THREE.Mesh(bx(.2,.13,.3),lm(0x1a1a1a));b.position.set(0,-.78,-.04);p.add(b);body.add(p);legs.push(p)}
+  const torso=new THREE.Mesh(bx(.48,.62,.28),lm(vest));torso.position.y=1.13;body.add(torso);
+  if(vest===0xff7a00||vest===0xf5e042){for(const y of [1.0,1.22]){const st=new THREE.Mesh(bx(.49,.05,.29),basic(0xe8e8e8));st.position.y=y;body.add(st)}}
+  for(const s of [-1,1]){const p=new THREE.Group();p.position.set(.31*s,1.4,0);const m=new THREE.Mesh(bx(.14,.58,.15),lm(vest));m.position.y=-.27;p.add(m);const hd=new THREE.Mesh(bx(.12,.12,.12),lm(skin));hd.position.y=-.6;p.add(hd);body.add(p);arms.push(p)}
+  const head=new THREE.Mesh(bx(.3,.32,.3),lm(skin));head.position.y=1.62;body.add(head);
+  if(helmet){const h=new THREE.Mesh(bx(.36,.16,.38),lm(helmet));h.position.y=1.84;body.add(h);const br=new THREE.Mesh(bx(.36,.03,.12),lm(helmet));br.position.set(0,1.77,-.22);body.add(br)}
+  const sh=new THREE.Mesh(new THREE.CircleGeometry(.4,16).rotateX(-Math.PI/2),new THREE.MeshBasicMaterial({color:0,transparent:true,opacity:.25,depthWrite:false}));sh.position.y=.05;g.add(sh);
+  g.userData={legs,arms,body,head,walk:0,pose:'stand'};
+  return g;
+}
+const people=[];
+function addPerson(p,x,z,face){p.position.set(x,.32,z);p.rotation.y=face||0;scene.add(p);people.push(p);return p}
+// player: orange vest, white helmet (marked with a ring)
+const player=addPerson(makePerson(0xff7a00,0x1f2a44,0x7a4a2c,0xffffff),0,UP_Z,0);
+const ring=new THREE.Mesh(new THREE.RingGeometry(.5,.62,24).rotateX(-Math.PI/2),basic(0xffb020));ring.position.y=.06;player.add(ring);
+const youTag=label('YOU','#ffb020','#111',1.2);youTag.position.set(0,2.4,0);player.add(youTag);
+const coss=addPerson(makePerson(0xff7a00,0x1f2a44,0xf1c9a5,0x2b5fd6),-5,3.0,Math.PI/2);
+const cossTag=label('COSS','#2b5fd6','#fff',1.3);cossTag.position.set(0,2.4,0);coss.add(cossTag);
+const lookout=addPerson(makePerson(0xff7a00,0x1f2a44,0xa86b45,0xffffff),46,3.2,-Math.PI/2);
+const loTag=label('LOOKOUT','#111','#ffb020',1.6);loTag.position.set(0,2.4,0);lookout.add(loTag);
+const flag=new THREE.Mesh(bx(.02,.35,.45),basic(0xf5e042));flag.position.set(0,-.6,-.25);lookout.userData.arms[1].add(flag);
+const mate=addPerson(makePerson(0xff7a00,0x2a2a2a,0xd9a27a,0xffffff),2.4,UP_Z,0);
+armband(coss,0x2b5fd6);armband(lookout,0xffffff,0xd23b3b);
+
+// ---------- trains ----------
+function makeTrain(col,stripe){
+  const g=new THREE.Group();
+  const side=ctex(1024,256,(x,w,h)=>{
+    x.fillStyle=col;x.fillRect(0,0,w,h);x.fillStyle='rgba(0,0,0,.18)';x.fillRect(0,0,w,18);
+    x.fillStyle=stripe;x.fillRect(0,200,w,18);
+    for(let i=0;i<7;i++){const wx=40+i*140;
+      if(i===3){x.fillStyle='#e0b400';x.fillRect(wx-4,56,108,176);x.fillStyle='#1b1d22';x.fillRect(wx+8,70,38,80);x.fillRect(wx+58,70,38,80);x.fillStyle='#111';x.fillRect(wx+50,56,4,176);continue}
+      x.fillStyle='#1b1d22';if(x.roundRect){x.beginPath();x.roundRect(wx,64,104,70,12);x.fill()}else x.fillRect(wx,64,104,70);
+      x.fillStyle='rgba(255,255,255,.14)';x.fillRect(wx+8,70,44,18)}
+  });
+  const sideMat=new THREE.MeshLambertMaterial({map:side}),bodyMat=new THREE.MeshLambertMaterial({color:new THREE.Color(col)}),roofMat=lm(0x8b9097),under=lm(0x2a2a2a),dark=lm(0x1e1f22);
+  const roofGeo=new THREE.CylinderGeometry(1.4,1.4,19.9,18).rotateZ(Math.PI/2).scale(1,.3,1);
+  const wheelGeo=new THREE.CylinderGeometry(.42,.42,.12,14).rotateX(Math.PI/2);
+  for(let i=0;i<3;i++){
+    const cx=i*20.5+10.2;
+    const body=new THREE.Mesh(bx(20,2.7,2.8),[bodyMat,bodyMat,roofMat,under,sideMat,sideMat]);body.position.set(cx,2.35,0);g.add(body);
+    const roof=new THREE.Mesh(roofGeo,roofMat);roof.position.set(cx,3.7,0);g.add(roof);
+    const skirt=new THREE.Mesh(bx(19.6,.5,2.5),dark);skirt.position.set(cx,.85,0);g.add(skirt);
+    for(const bxp of [-7,7]){const bg=new THREE.Mesh(bx(2.8,.55,2.2),under);bg.position.set(cx+bxp,.78,0);g.add(bg);for(const wz of [-.72,.72])for(const wx of [-.85,.85]){const w=new THREE.Mesh(wheelGeo,lm(0x3a3a3a));w.position.set(cx+bxp+wx,.6,wz);g.add(w)}}
+    if(i<2){const gw=new THREE.Mesh(bx(.6,2.4,1.6),dark);gw.position.set(cx+10.25,2.3,0);g.add(gw)}
+  }
+  // cab front
+  const nose=new THREE.Mesh(bx(1.0,2.3,2.78),lm(0xf5d000));nose.position.set(-.3,2.05,0);g.add(nose);
+  const cabTop=new THREE.Mesh(bx(.8,1.15,2.6),bodyMat);cabTop.position.set(-.1,3.25,0);cabTop.rotation.z=-.22;g.add(cabTop);
+  const ws=new THREE.Mesh(bx(.06,.85,2.3),lm(0x14171c));ws.position.set(-.52,3.18,0);ws.rotation.z=-.22;g.add(ws);
+  for(const s of [-.85,.85]){const hl=new THREE.Mesh(bx(.08,.22,.42),basic(0xfff4c8));hl.position.set(-.82,1.55,s);g.add(hl);const gl=new THREE.Sprite(new THREE.SpriteMaterial({color:0xfff2c0,transparent:true,opacity:.35,depthWrite:false,blending:THREE.AdditiveBlending}));gl.scale.set(.45,.45,1);gl.position.set(-.95,1.55,s);g.add(gl)}
+  const coup=new THREE.Mesh(bx(.6,.3,.4),dark);coup.position.set(-.9,1.0,0);g.add(coup);
+  g.visible=false;scene.add(g);return g;
+}
+const upTrain=makeTrain('#e4e7ec','#2b5fd6'),dnTrain=makeTrain('#c64a3a','#f4f1ea');
+upTrain.position.z=UP_Z;dnTrain.position.z=DN_Z;dnTrain.rotation.y=Math.PI;
+// ---------- lineside detail ----------
+{
+  const skyT=ctex(4,256,(x,w,h)=>{const g=x.createLinearGradient(0,0,0,h);g.addColorStop(0,'#5d8fc4');g.addColorStop(.55,'#a9c3d6');g.addColorStop(1,'#dfe8ee');x.fillStyle=g;x.fillRect(0,0,w,h)});
+  skyT.wrapS=skyT.wrapT=THREE.ClampToEdgeWrapping;scene.background=skyT;
+  for(const z of [1.78,DN_Z-1.85]){const tr=new THREE.Mesh(bx(LEN,.24,.42),lm(0xb8b4aa));tr.position.set(0,.12,z);scene.add(tr);const lid=new THREE.Mesh(bx(LEN,.03,.44),lm(0xa6a299));lid.position.set(0,.25,z);scene.add(lid)}
+  for(let x=-LEN/2+40;x<LEN/2;x+=95){const c=new THREE.Mesh(bx(1.1,1.5,.8),lm(0x9aa0a8));c.position.set(x,.75,4.15);scene.add(c);const r=new THREE.Mesh(bx(1.25,.08,.95),lm(0x6c727a));r.position.set(x,1.54,4.15);scene.add(r);const d=new THREE.Mesh(bx(.9,1.1,.02),lm(0x8a9098));d.position.set(x,.8,3.74);scene.add(d)}
+  const mpT=ctex(64,64,(x)=>{x.fillStyle='#fff';x.fillRect(0,0,64,64);x.fillStyle='#111';x.font='900 30px system-ui';x.textAlign='center';x.fillText('12',32,30);x.font='900 20px system-ui';x.fillText('¼',32,55)});
+  for(let x=-LEN/2+25;x<LEN/2;x+=101){const p=new THREE.Mesh(bx(.08,1.0,.08),lm(0x222222));p.position.set(x,.5,4.5);scene.add(p);const s=new THREE.Mesh(bx(.45,.45,.04),[lm(0xffffff),lm(0xffffff),lm(0xffffff),lm(0xffffff),new THREE.MeshBasicMaterial({map:mpT}),new THREE.MeshBasicMaterial({map:mpT})]);s.position.set(x,1.15,4.5);scene.add(s)}
+}
+function armband(p,col,col2){const b=new THREE.Mesh(bx(.165,.13,.175),basic(col));b.position.set(0,-.13,0);p.userData.arms[0].add(b);if(col2){const s=new THREE.Mesh(bx(.168,.04,.178),basic(col2));s.position.set(0,-.13,0);p.userData.arms[0].add(s)}}
+
+
+// ---------- hazards ----------
+const hazards=[];
+function addHazard(id,obj,hitSize,pos,name,why){obj.position.copy(pos);scene.add(obj);const hit=new THREE.Mesh(bx(...hitSize),new THREE.MeshBasicMaterial({visible:false}));hit.position.copy(pos);hit.position.y+=hitSize[1]/2;hit.userData.hz=id;scene.add(hit);hazards.push({id,obj,hit,name,why,found:false})}
+{ // shovel left on the rail of the open Down line
+  const g=new THREE.Group();const h=new THREE.Mesh(bx(1.5,.09,.09),lm(0xe0a030));h.rotation.z=.08;g.add(h);const b=new THREE.Mesh(bx(.4,.05,.34),lm(0x9aa0a8));b.position.x=.85;g.add(b);
+  addHazard('tool',g,[1.8,.8,1.2],new THREE.Vector3(2.5,.6,DN_Z+RAIL_Z),'Shovel left on the open line','Tools and materials must never be left where they foul a line that trains can run on.');
+}
+{ // trailing cable across the cess walking route
+  const g=new THREE.Group();const c=new THREE.Mesh(new THREE.TorusGeometry(1.2,.04,6,30,Math.PI),lm(0x111111));c.rotation.x=-Math.PI/2;g.add(c);const reel=new THREE.Mesh(new THREE.CylinderGeometry(.3,.3,.25,16),lm(0xff6a00));reel.rotation.x=Math.PI/2;reel.position.set(1.2,.3,0);g.add(reel);
+  addHazard('cable',g,[3,.8,2],new THREE.Vector3(-2.8,.06,3.0),'Cable across the walking route','Trip hazards on the walking route or position of safety must be cleared or controlled before anyone relies on it.');
+}
+// colleague without hi-vis in the six-foot
+const noVis=makePerson(0x2f3640,0x1f2633,0xf1c9a5,null);noVis.position.set(5.5,.32,-1.7);noVis.rotation.y=-.4;scene.add(noVis);people.push(noVis);
+hazards.push({id:'novis',obj:noVis,hit:(()=>{const h=new THREE.Mesh(bx(1.2,2.2,1.2),new THREE.MeshBasicMaterial({visible:false}));h.position.set(5.5,1.2,-1.7);h.userData.hz='novis';scene.add(h);return h})(),name:'Person in the six-foot, no hi-vis',why:'Everyone on or near the line needs the correct high-vis on, and the six-foot between two open lines is not a place to stand around.',found:false});
+// distracted lookout (phone) – a second lookout further down
+const lo2=makePerson(0xff7a00,0x1f2a44,0x4e2e1c,0xffffff);lo2.position.set(-5.3,.32,4.1);lo2.rotation.y=Math.PI*0.9;scene.add(lo2);people.push(lo2);
+const ph=new THREE.Mesh(bx(.08,.14,.02),basic(0x9fd8ff));ph.position.set(0,-.5,-.12);lo2.userData.arms[1].add(ph);lo2.userData.arms[1].rotation.x=-1.4;lo2.userData.head.rotation.x=.45;
+hazards.push({id:'phone',obj:lo2,hit:(()=>{const h=new THREE.Mesh(bx(1.2,2.2,1.2),new THREE.MeshBasicMaterial({visible:false}));h.position.set(-5.3,1.2,4.1);h.userData.hz='phone';scene.add(h);return h})(),name:'Lookout on their phone',why:'A lookout\'s only job is to watch for trains and warn the group. No phones, no other tasks, eyes on the approach.',found:false});
+hazards.forEach(h=>{h.obj.visible=false;h.hit.visible=true});
+
+// ---------- tap zones (position choices) ----------
+const zones=[];
+function addZone(id,x,z,w,d,col,txt){const m=new THREE.Mesh(new THREE.PlaneGeometry(w,d).rotateX(-Math.PI/2),new THREE.MeshBasicMaterial({color:col,transparent:true,opacity:.45,depthWrite:false}));m.position.set(x,.62,z);m.userData.zone=id;m.visible=false;scene.add(m);const l=label(txt,'#111','#fff',3.4);l.position.set(x,1.9,z);l.visible=false;scene.add(l);zones.push({id,m,l});return m}
+addZone('cess',0,2.9,3,1.6,0x57d27a,'CESS (your side)');
+addZone('six',0,-1.7,2.4,1.1,0xffb020,'SIX-FOOT');
+addZone('stay',0,UP_Z,2.2,1.4,0xff5a5a,'STAY & FINISH UP');
+addZone('far',0,DN_Z-2.6,3,1.4,0x5b8def,'CROSS TO FAR SIDE');
+function showZones(on){zones.forEach(z=>{z.m.visible=on;z.l.visible=on})}
+
+// ---------- tween / animation system ----------
+const tweens=[];
+function tween(dur,fn){return new Promise(res=>tweens.push({t:0,dur,fn,res}))}
+const wait=ms=>new Promise(r=>setTimeout(r,ms));
+const ease=k=>k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2;
+const camP=new THREE.Vector3(14,7,16),camL=new THREE.Vector3(0,1,-1);
+function camTo(p,l,dur=1.4){const p0=camP.clone(),l0=camL.clone();return tween(dur,k=>{const e=ease(k);camP.lerpVectors(p0,p,e);camL.lerpVectors(l0,l,e)})}
+function walkTo(pp,x,z,speed=2.4){const sx=pp.position.x,sz=pp.position.z;const dist=Math.hypot(x-sx,z-sz);if(dist<.01)return Promise.resolve();pp.rotation.y=Math.atan2(-(x-sx),-(z-sz));pp.userData.pose='walk';return tween(dist/speed,k=>{pp.position.x=sx+(x-sx)*k;pp.position.z=sz+(z-sz)*k}).then(()=>{pp.userData.pose='stand'})}
+function runTrain(tr,from,to,speed){tr.visible=true;tr.position.x=from;return tween(Math.abs(to-from)/speed,k=>{tr.position.x=from+(to-from)*k}).then(()=>{tr.visible=false})}
+let shake=0;
+
+// ---------- UI ----------
+let score=0;
+function addScore(n){score+=n;$('score').textContent=score+' pts'}
+function stage(t){$('stage').textContent=t}
+function banner(t){$('banner').textContent=t||''}
+function pop(t,c){const p=$('pop');p.textContent=t;p.style.color=c||'#fff';p.classList.remove('on');void p.offsetWidth;p.classList.add('on')}
+function flash(){const f=$('flash');f.classList.remove('on');void f.offsetWidth;f.classList.add('on')}
+function sheet(html){const s=$('sheet');s.classList.remove('hide');s.innerHTML=html;s.scrollTop=0}
+function hideSheet(){$('sheet').classList.add('hide')}
+function info(title,body,btn='Next'){return new Promise(res=>{sheet(`<h2>${title}</h2><div class="body">${body}</div><button class="go">${btn}</button>`);$('sheet').querySelector('.go').onclick=()=>{tone(1,.01,'sine',.0001);res()}})}
+function ask(title,q,opts,correct,fbOk,fbNo,ref,pts=10){
+  return new Promise(res=>{
+    sheet(`<h2>${title}</h2><div class="q">${q}</div><div class="opts">${opts.map((o,i)=>`<button class="opt" data-i="${i}">${o}</button>`).join('')}</div><div id="fbx"></div>`);
+    const btns=[...$('sheet').querySelectorAll('.opt')];
+    btns.forEach(b=>b.onclick=()=>{
+      const i=+b.dataset.i;const ok=i===correct;btns.forEach(x=>x.onclick=null);
+      btns[correct].classList.add('good');if(!ok)b.classList.add('bad');
+      if(ok){addScore(pts);S.good()}else S.bad();
+      $('fbx').innerHTML=`<div class="fb ${ok?'ok':'no'}"><b>${ok?'✅ Correct':'❌ Not quite'}</b>${ok?fbOk:fbNo}${ref?`<div class="ref">${ref}</div>`:''}</div><button class="go">Next</button>`;
+      $('fbx').querySelector('.go').onclick=()=>res(ok);
+      log.push({q:title,ok});
+    });
+  });
+}
+function multi(title,q,items,goodSet,fb,ref){
+  return new Promise(res=>{
+    const sel=new Set();
+    sheet(`<h2>${title}</h2><div class="q">${q}</div><div class="opts">${items.map((o,i)=>`<button class="opt" data-i="${i}">${o}</button>`).join('')}</div><button class="go" id="done">Done</button><div id="fbx"></div>`);
+    const btns=[...$('sheet').querySelectorAll('.opt')];
+    btns.forEach(b=>b.onclick=()=>{const i=+b.dataset.i;sel.has(i)?sel.delete(i):sel.add(i);b.classList.toggle('sel');S.tick()});
+    $('done').onclick=()=>{
+      btns.forEach(b=>b.onclick=null);$('done').remove();
+      let right=0;items.forEach((_,i)=>{const want=goodSet.includes(i),got=sel.has(i);b2=btns[i];if(want)b2.classList.add('good');else if(got)b2.classList.add('bad');if(want===got)right++});
+      const ok=right===items.length;addScore(right*2);ok?S.good():S.bad();
+      $('fbx').innerHTML=`<div class="fb ${ok?'ok':'no'}"><b>${ok?'✅ Spot on':`❌ ${right}/${items.length} right`}</b>${fb}${ref?`<div class="ref">${ref}</div>`:''}</div><button class="go">Next</button>`;
+      $('fbx').querySelector('.go').onclick=()=>res(ok);
+      log.push({q:title,ok});
+    };
+  });
+}
+let b2;
+const log=[];
+
+// ---------- picking ----------
+const ray=new THREE.Raycaster(),mv=new THREE.Vector2();
+let pickHandler=null;
+renderer.domElement.addEventListener('pointerdown',e=>{
+  if(!pickHandler)return;
+  mv.x=e.clientX/innerWidth*2-1;mv.y=-(e.clientY/innerHeight)*2+1;ray.setFromCamera(mv,camera);
+  const objs=[];scene.traverse(o=>{if(o.isMesh&&(o.userData.zone||o.userData.hz)&&(o.visible||o.userData.hz))objs.push(o)});
+  const hit=ray.intersectObjects(objs,false)[0];pickHandler(hit?hit.object:null,e);
+});
+function timer(sec){const bar=$('timerBar'),f=$('timerFill');bar.classList.remove('hide');f.style.transition='none';f.style.width='100%';void f.offsetWidth;f.style.transition=`width ${sec}s linear`;f.style.width='0%'}
+function stopTimer(){$('timerBar').classList.add('hide')}
+
+// ---------- scenario ----------
+async function run(){
+  score=0;addScore(0);log.length=0;
+  hazards.forEach(h=>{h.found=false;h.obj.visible=false});
+  player.position.set(-6,.32,3.0);player.rotation.y=-Math.PI/2;player.userData.pose='stand';
+  mate.position.set(-7,.32,3.0);mate.rotation.y=-Math.PI/2;mate.userData.pose='stand';
+  coss.position.set(-5,.32,3.6);coss.rotation.y=Math.PI;
+  stage('BRIEFING');banner('');
+  camP.set(-2,3.2,8.5);camL.set(-5.5,1.4,3);
+  await info('SCENARIO 1 · OPEN LINE, LOOKOUT WARNING',
+    `<span class="tag">YOU</span>PTS holder in a 3-person group.<br><br>
+     The COSS has set up <b>lookout warning</b> for work on the <b>Up line</b>. The Down line next to it is <b>open to trains</b>. Line speed is <b>20 mph</b>.<br><br><span style="opacity:.75;font-size:13px">Under the current COSS handbook (HB7 Issue 10), lookout warning is only allowed where approaching trains are 25 mph or less, it's planned in advance and authorised at director level.</span><br><br>
+     You'll kit up, walk to site, do the job, react to a warning, and then spot what's wrong on site.
+     <div class="disc">Practice prototype. Not an official assessment. Always follow your COSS briefing and the current Rule Book. <a href="app.html#scenarios" style="color:#ffb020">← Back to Track Ready</a></div>`,'Start shift');
+
+  // 1. Kit
+  stage('1/5 · KIT CHECK');
+  await multi('KIT CHECK','What do you take onto the track? Select everything you need.',
+    ['🪪 Sentinel card & PTS','🦺 The high-vis your employer issued','🥾 Safety boots','👟 Trainers','🎧 Headphones in, music on'],[0,1,2],
+    'Carry your valid PTS certificate, wear the high-vis issued by your employer and proper safety footwear. Never wear anything that stops you seeing or hearing trains, so no headphones.',
+    'HB1 Issue 9 §4.3, §5.1 (in force 6 Dec 2025).');
+
+  // 2. Briefing question
+  stage('2/5 · BRIEFING');
+  await camTo(new THREE.Vector3(-3,2.6,7.5),new THREE.Vector3(-5,1.5,3.4),1);
+  await ask('COSS BRIEFING','The COSS has finished the briefing, but you didn\'t understand where the position of safety is. What do you do?',
+    ['Say nothing, follow the others','Ask the COSS to explain it again before going on the line','Work it out when a train comes','Ask the lookout instead later on'],1,
+    'You must understand the safe system of work before going on or near the line. If anything in the briefing isn\'t clear, ask the COSS there and then.',
+    'Never go on the line without understanding the briefing. If it\'s unclear, ask the COSS before you go anywhere.',
+    'Check against: Rule Book Handbook 1 (briefing / safe system of work).');
+
+  // 3. Walk
+  stage('3/5 · WALK TO SITE');
+  hideSheet();
+  await camTo(new THREE.Vector3(-10,9,14),new THREE.Vector3(0,0,0),1.2);
+  await ask('WALKING ROUTE','Where should you walk to get to the work site?',
+    ['In the cess, beside the line','In the four-foot (between the rails) of the Up line','In the six-foot, between the two lines','Along the Down line, it\'s quieter'],0,
+    'Walk in the cess where one is available, and stay alert. Walking in the four-foot or six-foot puts you in the path of trains on either line.',
+    'The cess is the walking route here. The four-foot and six-foot put you right where trains run, or between two lines with traffic on both.',
+    'Check against: Rule Book Handbook 1 (walking on or near the line).');
+  hideSheet();banner('Walking to site in the cess…');
+  coss.rotation.y=-Math.PI/2;
+  await Promise.all([walkTo(player,-.4,3.0),walkTo(mate,1.8,3.0),walkTo(coss,-3.5,3.4),camTo(new THREE.Vector3(6,4.5,10),new THREE.Vector3(0,.8,0),2.4)]);
+  await Promise.all([walkTo(player,0,UP_Z+.4,1.6),walkTo(mate,2.4,UP_Z+.4,1.6)]);
+  player.rotation.y=Math.PI;mate.rotation.y=Math.PI;
+
+  // 4. Work + warning
+  stage('4/5 · WARNING!');
+  player.userData.pose='kneel';mate.userData.pose='kneel';
+  banner('Tighten the rail clips — tap the button');
+  let clips=0;
+  sheet(`<h2>ON SITE</h2><div class="q">You're on the Up line fitting rail clips. Keep working until you hear a warning.</div><button class="go" id="work">🔧 Tighten clip (0/8)</button>`);
+  const warnAfter=2200+Math.random()*2600;
+  await new Promise(res=>{
+    const w=$('work');w.onclick=()=>{clips++;S.clank();w.textContent=`🔧 Tighten clip (${Math.min(clips,8)}/8)`;player.userData.hammer=.3};
+    setTimeout(res,warnAfter);
+  });
+  // warning!
+  hideSheet();S.lookoutHorn();flash();
+  lookout.userData.arms[1].rotation.x=-2.9;
+  banner('📯 LOOKOUT WARNING — train approaching! TAP WHERE YOU GO');
+  pop('WARNING!','#ffb020');
+  shake=.2;
+  await camTo(new THREE.Vector3(8,9,11),new THREE.Vector3(0,0,-.5),.5);
+  showZones(true);timer(4);
+  const tStart=performance.now();
+  const choice=await new Promise(res=>{
+    const to=setTimeout(()=>{pickHandler=null;res('timeout')},4000);
+    pickHandler=(o)=>{if(o&&o.userData.zone){clearTimeout(to);pickHandler=null;res(o.userData.zone)}};
+  });
+  const react=(performance.now()-tStart)/1000;
+  stopTimer();showZones(false);banner('');
+  player.userData.pose='stand';
+  const dest={cess:[0,3.1],six:[0,-1.7],stay:[0,UP_Z],far:[0,DN_Z-2.6],timeout:[0,UP_Z]}[choice];
+  const mv1=walkTo(player,dest[0],dest[1],3.6);walkTo(mate,2.6,3.1,3.4);
+  camTo(new THREE.Vector3(-7,4.2,10),new THREE.Vector3(14,1.2,0),1.2);
+  // trains: one on the Up line, plus one on the Down line if player is in the six-foot or crossing
+  const trainUp=runTrain(upTrain,330,-260,42);
+  let trainDn=null;
+  if(choice==='six'||choice==='far'){await wait(500);trainDn=runTrain(dnTrain,-300,300,40)}
+  await mv1;
+  if(choice==='cess'){player.rotation.y=Math.PI/2}
+  // wait for train approach
+  await new Promise(r=>{const iv=setInterval(()=>{if(upTrain.position.x<45){clearInterval(iv);r()}},40)});
+  S.trainHorn();S.rumble();
+  let outcome;
+  if(choice==='cess'){
+    outcome='safe';
+    sheet(`<h2>TRAIN APPROACHING</h2><div class="q">You're in your position of safety. The driver sounds the horn. How do you acknowledge it?</div><div class="opts">${['✋ Raise one arm above your head','👋 Wave both arms','👍 Thumbs up','🙈 Turn away and ignore it'].map((o,i)=>`<button class="opt" data-i="${i}">${o}</button>`).join('')}</div><div id="fbx"></div>`);
+    const ackOk=await new Promise(res=>{const btns=[...$('sheet').querySelectorAll('.opt')];btns.forEach(b=>b.onclick=()=>{const i=+b.dataset.i;btns.forEach(x=>x.onclick=null);btns[0].classList.add('good');if(i)b.classList.add('bad');if(i===0){player.userData.arms[1].rotation.x=-3.0;mate.userData.arms[1].rotation.x=-3.0;addScore(10);S.good()}else S.bad();res(i===0)})});
+    log.push({q:'Acknowledge the driver',ok:ackOk});
+    $('fbx').innerHTML=`<div class="fb ${ackOk?'ok':'no'}"><b>${ackOk?'✅ Correct':'❌ Not quite'}</b>Acknowledge the driver's warning by raising one arm above your head, and stay in your position of safety until the train has passed and the COSS says it's safe.<div class="ref">Check against: Rule Book Handbook 1 / PTS handbook.</div></div>`;
+  }else{
+    outcome=choice;
+    await wait(300);flash();shake=.6;S.bad();
+    pop(choice==='stay'||choice==='timeout'?'⚠️ STRUCK':'⚠️ NEAR MISS','#ff5a5a');
+  }
+  await trainUp;if(trainDn)await trainDn;
+  player.userData.arms[1].rotation.x=0;mate.userData.arms[1].rotation.x=0;lookout.userData.arms[1].rotation.x=0;
+  const msgs={
+    cess:['✅ Safe',`You were in a position of safety in ${react.toFixed(1)}s. The cess on your side, well clear of the rail, is the right place. For lines up to 100 mph, a position of safety is at least 1.25 m from the nearest line a train could approach on (2 m above 100 mph).`],
+    six:['❌ Unsafe — the six-foot','The six-foot sits between two lines that can both have trains. It isn\'t a position of safety. A train passed on the Down line while you stood there.'],
+    far:['❌ Unsafe — crossed an open line','You crossed the open Down line to get away, right as a train came. Never cross another line to reach a position of safety. Go to the one you were briefed on, on your side.'],
+    stay:['❌ Unsafe — stayed on the line','When the lookout warns you, stop work immediately and go to your position of safety. No "just finishing this one".'],
+    timeout:['❌ Too slow','You didn\'t move. On a lookout warning you stop work instantly and head to your position of safety. Every second counts.']
+  };
+  addScore(choice==='cess'?Math.max(10,30-Math.round(react*5)):0);
+  log.push({q:'React to the warning',ok:choice==='cess'});
+  await info('WARNING RESULT',`<div class="fb ${choice==='cess'?'ok':'no'}"><b>${msgs[choice][0]}</b>${msgs[choice][1]}<div class="ref">Check against: Rule Book Handbook 1 (position of safety, lookout warning). Real systems must give you enough warning to be in your position of safety at least 10 seconds before the train arrives.</div></div>`,'Continue');
+  player.position.set(1.2,.32,3.1);player.rotation.y=Math.PI;mate.position.set(2.8,.32,3.1);coss.position.set(-.3,.32,3.9);
+
+  // 5. Hazard hunt
+  stage('5/5 · SPOT THE HAZARDS');
+  hazards.forEach(h=>h.obj.visible=true);
+  await camTo(new THREE.Vector3(0,15,15),new THREE.Vector3(0,0,.6),1.4);
+  sheet(`<h2>SPOT THE HAZARDS</h2><div class="q">Something's not right on this site. Tap the <b>4 hazards</b> in the scene. You've got 25 seconds.</div><div class="body" id="found">Found: 0/4</div>`);
+  banner('Tap the hazards in the scene 👆');
+  timer(25);
+  await new Promise(res=>{
+    const to=setTimeout(()=>{pickHandler=null;res()},25000);
+    pickHandler=(o)=>{
+      if(o&&o.userData.hz){const h=hazards.find(x=>x.id===o.userData.hz);if(h&&!h.found){h.found=true;addScore(8);S.good();const mk=label('✓ '+h.name,'#57d27a','#111',4);mk.position.copy(o.position);mk.position.y+=1.6;scene.add(mk);h.marker=mk;pop('✓','#57d27a')}}
+      else{S.bad()}
+      const n=hazards.filter(h=>h.found).length;const f=$('found');if(f)f.textContent=`Found: ${n}/4`;
+      if(n===4){clearTimeout(to);pickHandler=null;res()}
+    };
+  });
+  stopTimer();banner('');
+  const nf=hazards.filter(h=>h.found).length;
+  log.push({q:'Spot the hazards',ok:nf===4});
+  await info('HAZARDS',hazards.map(h=>`<div class="fb ${h.found?'ok':'no'}"><b>${h.found?'✅':'❌ Missed:'} ${h.name}</b>${h.why}</div>`).join(''),'See my result');
+  hazards.forEach(h=>{if(h.marker){scene.remove(h.marker);h.marker=null}});
+
+  // results
+  stage('RESULT');
+  const allSafe=log.find(l=>l.q==='React to the warning').ok;
+  const right=log.filter(l=>l.ok).length;
+  const grade=!allSafe?'❌ NOT SAFE':score>=100?'🏆 TRACK SAFE':score>=75?'✅ SAFE':'⚠️ NEEDS WORK';
+  await camTo(new THREE.Vector3(14,7,16),new THREE.Vector3(0,1,-1),1.2);
+  sheet(`<h2>SCENARIO 1 COMPLETE</h2><div class="q" style="font-size:28px">${grade}</div>
+    <div class="body"><b>${score} pts</b> · ${right}/${log.length} sections right${allSafe?'':'<br>Getting to a position of safety is the one that matters most. You\'d fail a real assessment on that.'}</div>
+    <div class="body">${log.map(l=>`${l.ok?'✅':'❌'} ${l.q}`).join('<br>')}</div>
+    <button class="go" id="again">Play again</button>
+    <a href="app.html#scenarios" class="go" style="display:block;text-align:center;text-decoration:none;background:#1d2836;color:#fff;box-shadow:none">Back to Track Ready</a>
+    <div class="disc">Prototype by an ex-railman. Not official training or an assessment. Rules are summarised in plain English. Always follow your COSS briefing and the current Rule Book handbooks.</div>`);
+  $('again').onclick=()=>{hideSheet();run()};
+}
+
+// ---------- loop ----------
+let last=performance.now(),T=0;
+function frame(ts){
+  const dt=Math.min(.05,(ts-last)/1000);last=ts;T+=dt;
+  for(let i=tweens.length-1;i>=0;i--){const tw=tweens[i];tw.t+=dt;const k=Math.min(1,tw.t/tw.dur);tw.fn(k);if(k>=1){tweens.splice(i,1);tw.res()}}
+  for(const p of people){
+    const u=p.userData;if(!u.legs)continue;
+    if(u.pose==='walk'){u.walk+=dt*9;const s=Math.sin(u.walk);u.legs[0].rotation.x=s*.7;u.legs[1].rotation.x=-s*.7;u.arms[0].rotation.x=-s*.6;if(Math.abs(u.arms[1].rotation.x)<1.5)u.arms[1].rotation.x=s*.6;u.body.position.y=0}
+    else if(u.pose==='kneel'){u.legs[0].rotation.x=-1.4;u.legs[1].rotation.x=.2;u.body.position.y=-.38;u.body.rotation.x=.35;u.hammer=Math.max(0,(u.hammer||0)-dt);u.arms[1].rotation.x=-.9-Math.sin(T*(u.hammer>0?30:6))*.4;u.arms[0].rotation.x=-.6}
+    else{u.legs[0].rotation.x*=.8;u.legs[1].rotation.x*=.8;u.body.position.y=0;u.body.rotation.x=0;if(p!==player&&p!==mate&&p!==lookout&&p!==lo2){}}
+  }
+  ring.rotation.y+=dt;
+  shake=Math.max(0,shake-dt*.6);
+  camera.position.set(camP.x+(Math.random()-.5)*shake,camP.y+(Math.random()-.5)*shake,camP.z);
+  camera.lookAt(camL);
+  renderer.render(scene,camera);
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+run();
+})();
+</script>
+</body>
+</html>

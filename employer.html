@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Employer dashboard · Track Ready</title>
+<style>
+  :root{--bg:#0e141c;--card:#161f2b;--card2:#1d2836;--line:#273546;--tx:#eef2f6;--mut:#93a3b5;--or:#ff7a00;--or2:#ffb020;--gr:#3ccf7a;--rd:#ff5a5a;--bl:#3d8bff}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--tx);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;padding-bottom:40px}
+  .wrap{max-width:1100px;margin:0 auto;padding:0 16px}
+  header{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:16px 0;flex-wrap:wrap}
+  .brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit}
+  .logo{width:34px;height:34px;border-radius:9px;background:var(--or);display:grid;place-items:center;font-weight:900;color:#111;font-size:15px}
+  .brand b{font-size:19px;font-weight:900}
+  .demo{background:#3a2a10;color:var(--or2);border:1px solid var(--or);font-weight:900;font-size:12px;letter-spacing:.8px;padding:6px 10px;border-radius:8px}
+  h1{font-size:24px;font-weight:900;letter-spacing:-.4px}
+  .sub{color:var(--mut);font-size:14px;margin-top:3px}
+  h2{font-size:12.5px;letter-spacing:1.4px;color:var(--or2);margin:24px 0 10px;font-weight:900}
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:16px}
+  .k{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px}
+  .k .v{font-size:30px;font-weight:900;letter-spacing:-1px}
+  .k .l{font-size:12.5px;color:var(--mut);font-weight:700;margin-top:2px}
+  .k .s{font-size:12px;margin-top:6px;font-weight:800}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px}
+  .alert{display:flex;gap:12px;align-items:center;justify-content:space-between;background:rgba(255,122,0,.1);border:1px solid rgba(255,122,0,.5);border-radius:14px;padding:12px 14px;margin-top:14px;flex-wrap:wrap}
+  .alert p{font-size:14px;line-height:1.45}
+  .btn{font:inherit;font-weight:900;font-size:14px;border:0;border-radius:10px;padding:10px 14px;cursor:pointer;background:var(--or);color:#111}
+  .btn.sec{background:var(--card2);color:var(--tx);border:1px solid var(--line)}
+  .two{display:grid;grid-template-columns:1.1fr .9fr;gap:12px}
+  .bars .r{display:grid;grid-template-columns:1fr 46px;gap:8px;align-items:center;margin-bottom:10px}
+  .bars .n{font-size:13.5px;font-weight:700;margin-bottom:4px}
+  .bars .n small{color:var(--or2);font-weight:800;margin-left:4px}
+  .track{height:8px;background:var(--card2);border-radius:5px;overflow:hidden}
+  .track>div{height:100%;border-radius:5px}
+  .pctv{font-size:13px;font-weight:900;text-align:right}
+  .filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+  .f{font:inherit;font-size:12.5px;font-weight:800;padding:7px 11px;border-radius:999px;border:1px solid var(--line);background:var(--card2);color:var(--mut);cursor:pointer}
+  .f.on{background:var(--or);color:#111;border-color:var(--or)}
+  .tw{overflow-x:auto}
+  table{width:100%;border-collapse:collapse;font-size:13.5px;min-width:720px}
+  th{text-align:left;font-size:11px;letter-spacing:.7px;color:var(--mut);padding:9px 8px;border-bottom:1px solid var(--line);cursor:pointer;white-space:nowrap}
+  td{padding:10px 8px;border-bottom:1px solid var(--line);vertical-align:middle}
+  .chip{display:inline-block;font-size:11px;font-weight:800;background:var(--card2);border:1px solid var(--line);border-radius:6px;padding:2px 6px;margin:1px 2px 1px 0}
+  .ok{color:var(--gr);font-weight:900}.no{color:var(--rd);font-weight:900}.warn{color:var(--or2);font-weight:900}
+  .mini{display:inline-block;width:70px;height:6px;background:var(--card2);border-radius:4px;overflow:hidden;vertical-align:middle;margin-right:6px}
+  .mini>div{height:100%}
+  .scen{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--line);font-size:14px}
+  .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#111;border:1px solid var(--line);color:#fff;padding:10px 16px;border-radius:10px;font-weight:800;font-size:14px;opacity:0;transition:opacity .2s;pointer-events:none}
+  .toast.on{opacity:1}
+  textarea{width:100%;height:120px;margin-top:10px;background:var(--card2);color:var(--tx);border:1px solid var(--line);border-radius:10px;padding:10px;font-size:12px}
+  .foot{color:var(--mut);font-size:12.5px;line-height:1.5;margin-top:22px}
+  @media(max-width:760px){.kpis{grid-template-columns:1fr 1fr}.two{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <a class="brand" href="index.html"><div class="logo">TR</div><b>Track Ready</b></a>
+    <span class="demo">DEMO DATA · EXAMPLE COMPANY</span>
+  </header>
+  <h1>Example Rail Services</h1>
+  <div class="sub">Team overview · Rule Book issue: June 2026 · <span id="today"></span></div>
+
+  <div class="kpis" id="kpis"></div>
+  <div class="alert" id="alert"></div>
+
+  <div class="two">
+    <div>
+      <h2>WEAKEST TOPICS ACROSS THE TEAM</h2>
+      <div class="card bars" id="topics"></div>
+    </div>
+    <div>
+      <h2>COMPETENCY COVERAGE</h2>
+      <div class="card bars" id="cover"></div>
+      <h2>SCENARIOS COMPLETED</h2>
+      <div class="card" id="scen"></div>
+    </div>
+  </div>
+
+  <h2>TEAM</h2>
+  <div class="card">
+    <div class="filters" id="filters"></div>
+    <div class="tw"><table id="tbl"></table></div>
+    <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap"><button class="btn sec" id="csv">Copy as CSV (for audits)</button></div>
+    <textarea id="csvOut" class="hide" style="display:none" readonly></textarea>
+  </div>
+
+  <p class="foot">This dashboard uses made-up demo data to show what an employer account would look like. It isn't connected to real staff records. In the live product each worker's practice, mock tests and scenarios would feed in automatically.</p>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+(()=>{
+const $=id=>document.getElementById(id);
+function rng(a){return()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+const r=rng(20260612);
+const FIRST=['J.','A.','M.','K.','S.','D.','T.','R.','L.','O.','B.','C.','E.','P.','N.','F.'];
+const LAST=['Okafor','Patel','Walsh','Nowak','Hughes','Mensah','Clarke','Ahmed','Byrne','Silva','Reid','Kowalski','Adeyemi','Foster','Murphy','Grant','Hussain','Lewis','Owusu','Turner','Nash','Bell','Kaur','Doyle'];
+const ROLES=[['Track Operative',['PTS','AC']],['Track Operative',['PTS','DC']],['Lookout',['PTS','Lookout']],['COSS',['PTS','COSS','AC']],['COSS',['PTS','COSS','IWA']],['Machine Controller',['PTS','MC']],['Engineering Supervisor',['PTS','ES','COSS']],['Protection Controller',['PTS','PC','COSS']]];
+const staff=[];
+for(let i=0;i<24;i++){
+  const role=ROLES[Math.floor(r()*ROLES.length)];
+  const mastery=Math.round(45+r()*55);
+  const mock=Math.round(Math.max(40,Math.min(100,mastery+(r()-.5)*24)));
+  const june=r()<.62;
+  const days=Math.round(r()*420)-20;
+  const scen=[r()<.8,role[1].includes('COSS')?r()<.6:r()<.25,role[1].includes('AC')?r()<.55:r()<.2];
+  staff.push({name:FIRST[i%FIRST.length]+' '+LAST[i],role:role[0],comps:role[1],mastery,mock,june,days,scen,last:Math.round(r()*30)});
+}
+const now=new Date();$('today').textContent=now.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
+const exp=d=>{const t=new Date(now.getTime()+d*864e5);return t.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'2-digit'})};
+const col=v=>v>=85?'var(--gr)':v>=70?'var(--or2)':'var(--rd)';
+
+// KPIs
+const upd=staff.filter(s=>s.june).length,avgMock=Math.round(staff.reduce((a,s)=>a+s.mock,0)/staff.length),expiring=staff.filter(s=>s.days<=60).length,below=staff.filter(s=>s.mock<75).length;
+$('kpis').innerHTML=[
+  [staff.length,'Staff on Track Ready','',''],
+  [Math.round(upd/staff.length*100)+'%','Done the June 2026 changes',`${staff.length-upd} still to do`,'warn'],
+  [avgMock+'%','Average mock test score',`${below} below 75%`,below?'no':'ok'],
+  [expiring,'Competencies expiring ≤ 60 days',staff.filter(s=>s.days<0).length+' already expired','no'],
+].map(([v,l,s,c])=>`<div class="k"><div class="v">${v}</div><div class="l">${l}</div>${s?`<div class="s ${c}">${s}</div>`:''}</div>`).join('');
+$('alert').innerHTML=`<p><b style="color:var(--or2)">${staff.length-upd} staff haven't done the June 2026 Rule Book changes</b> (AC/DC electrified lines, M1, TW1). These came into force on 6 June 2026.</p><button class="btn" id="remind">Send reminder</button>`;
+$('remind').onclick=()=>toast('Demo only. No reminders were sent.');
+
+// topics
+const TOPICS=[['Lookout warning limits','HB7 §6.8',38],['Barrier & tape distances','HB7 §6.5',54],['Detonator protection layout','HB8 §2.8',61],['Required warning time','HB7 §6.8',63],['Conductor rail 1.5 m clearance','HB17 §4.1',70],['OLE 2.75 m rule','HB16 §4.1',74],['Acknowledging the driver','HB1 §3.1',88],['Position of safety distances','HB1 §1',91]];
+$('topics').innerHTML=TOPICS.map(([n,ref,p])=>`<div class="r"><div><div class="n">${n}<small>${ref}</small></div><div class="track"><div style="width:${p}%;background:${col(p)}"></div></div></div><div class="pctv" style="color:${col(p)}">${p}%</div></div>`).join('')+`<p style="color:var(--mut);font-size:12.5px;margin-top:4px">% of answers correct across the team. Lowest first, so you know what to cover in toolbox talks.</p>`;
+// coverage
+const comps=['PTS','AC','DC','Lookout','COSS','IWA','PC','ES','MC'];
+$('cover').innerHTML=comps.map(c=>{const holders=staff.filter(s=>s.comps.includes(c));if(!holders.length)return'';const m=Math.round(holders.reduce((a,s)=>a+s.mastery,0)/holders.length);return `<div class="r"><div><div class="n">${c}<small>${holders.length} staff</small></div><div class="track"><div style="width:${m}%;background:${col(m)}"></div></div></div><div class="pctv" style="color:${col(m)}">${m}%</div></div>`}).join('');
+const SC=['1 · Open line, lookout warning','2 · COSS: set up the safe system','3 · AC: ladder under the wires'];
+$('scen').innerHTML=SC.map((n,i)=>{const d=staff.filter(s=>s.scen[i]).length;return `<div class="scen"><span>${n}</span><b>${d}/${staff.length}</b></div>`}).join('');
+
+// table
+let filter='all',sortK='name',sortDir=1;
+const F=[['all','All'],['june','Not done June 2026'],['exp','Expiring soon'],['low','Mock below 75%']];
+$('filters').innerHTML=F.map(([k,n])=>`<button class="f ${k===filter?'on':''}" data-f="${k}">${n}</button>`).join('');
+$('filters').querySelectorAll('.f').forEach(b=>b.onclick=()=>{filter=b.dataset.f;$('filters').querySelectorAll('.f').forEach(x=>x.classList.toggle('on',x===b));table()});
+function rows(){let s=staff.slice();if(filter==='june')s=s.filter(x=>!x.june);if(filter==='exp')s=s.filter(x=>x.days<=60);if(filter==='low')s=s.filter(x=>x.mock<75);s.sort((a,b)=>(a[sortK]>b[sortK]?1:a[sortK]<b[sortK]?-1:0)*sortDir);return s}
+function table(){
+  const H=[['name','NAME'],['role','ROLE'],[null,'COMPETENCIES'],['mastery','MASTERY'],['mock','LAST MOCK'],['june','JUNE 2026'],['days','NEXT EXPIRY'],['last','LAST ACTIVE']];
+  $('tbl').innerHTML=`<tr>${H.map(([k,n])=>`<th data-k="${k||''}">${n}${k===sortK?(sortDir>0?' ▲':' ▼'):''}</th>`).join('')}</tr>`+rows().map(s=>`<tr>
+    <td><b>${s.name}</b></td><td>${s.role}</td><td>${s.comps.map(c=>`<span class="chip">${c}</span>`).join('')}</td>
+    <td><span class="mini"><div style="width:${s.mastery}%;background:${col(s.mastery)}"></div></span>${s.mastery}%</td>
+    <td style="color:${col(s.mock)};font-weight:900">${s.mock}%</td>
+    <td>${s.june?'<span class="ok">✓ Done</span>':'<span class="no">✗ Not yet</span>'}</td>
+    <td class="${s.days<0?'no':s.days<=60?'warn':''}">${s.days<0?'Expired':exp(s.days)}</td>
+    <td style="color:var(--mut)">${s.last===0?'Today':s.last+'d ago'}</td></tr>`).join('');
+  $('tbl').querySelectorAll('th[data-k]').forEach(th=>{if(!th.dataset.k)return;th.onclick=()=>{const k=th.dataset.k;if(sortK===k)sortDir*=-1;else{sortK=k;sortDir=1}table()}});
+}
+table();
+$('csv').onclick=async()=>{
+  const lines=[['Name','Role','Competencies','Mastery %','Last mock %','June 2026 changes','Next expiry'].join(',')].concat(rows().map(s=>[s.name,s.role,s.comps.join(' '),s.mastery,s.mock,s.june?'Done':'Not done',s.days<0?'Expired':exp(s.days)].join(',')));
+  const txt=lines.join('\n');
+  try{await navigator.clipboard.writeText(txt);toast('CSV copied to clipboard')}catch(e){const t=$('csvOut');t.style.display='block';t.value=txt;t.select();toast('Copy the CSV below')}
+};
+function toast(m){const t=$('toast');t.textContent=m;t.classList.add('on');clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('on'),2200)}
+})();
+</script>
+</body>
+</html>

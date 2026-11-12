@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Track Ready · Rule Book revision for track workers</title>
+<style>
+  :root{--bg:#0b1118;--bg2:#0e151e;--card:#151e2a;--card2:#1c2734;--line:#263445;--tx:#eef2f6;--mut:#9aabbd;--or:#ff7a00;--or2:#ffb020;--gr:#3ccf7a;--rd:#ff5a5a}
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--tx);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.5}
+  a{color:inherit}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 20px}
+  nav{display:flex;justify-content:space-between;align-items:center;padding:18px 0}
+  .brand{display:flex;align-items:center;gap:10px;text-decoration:none}
+  .logo{width:36px;height:36px;border-radius:10px;background:var(--or);display:grid;place-items:center;font-weight:900;color:#111;letter-spacing:-1px}
+  .brand b{font-size:20px;font-weight:900;letter-spacing:-.4px}
+  .nl{display:flex;gap:18px;font-weight:700;font-size:14px;color:var(--mut)}
+  .nl a{text-decoration:none}.nl a:hover{color:var(--tx)}
+  .hero{display:grid;grid-template-columns:1.15fr .85fr;gap:40px;align-items:center;padding:36px 0 56px}
+  .eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:12.5px;font-weight:900;letter-spacing:.8px;color:var(--or2);background:rgba(255,176,32,.1);border:1px solid rgba(255,176,32,.35);padding:6px 10px;border-radius:999px}
+  .dot{width:7px;height:7px;border-radius:50%;background:var(--gr);box-shadow:0 0 0 3px rgba(60,207,122,.2)}
+  h1{font-size:54px;line-height:1.02;letter-spacing:-2px;font-weight:900;margin:18px 0 16px}
+  h1 em{font-style:normal;color:var(--or)}
+  .lead{font-size:18.5px;color:#c9d4df;max-width:560px}
+  .cta{display:flex;gap:12px;margin-top:26px;flex-wrap:wrap}
+  .btn{display:inline-block;text-decoration:none;font-weight:900;font-size:16px;padding:15px 22px;border-radius:13px;background:var(--or);color:#111;box-shadow:0 5px 0 #a84f00}
+  .btn.sec{background:var(--card2);color:var(--tx);box-shadow:none;border:1px solid var(--line)}
+  .trust{display:flex;gap:18px;margin-top:22px;color:var(--mut);font-size:13.5px;font-weight:700;flex-wrap:wrap}
+  .trust span::before{content:"✓ ";color:var(--gr);font-weight:900}
+  /* phone mock */
+  .phone{width:300px;margin:0 auto;border-radius:38px;background:#05080c;padding:12px;border:1px solid #2a3646;box-shadow:0 40px 80px rgba(0,0,0,.5),0 0 0 6px #121a24}
+  .screen{border-radius:28px;background:#0e141c;padding:18px 14px;min-height:540px}
+  .ph-meta{display:flex;justify-content:space-between;font-size:11px;font-weight:800;color:var(--mut)}
+  .ph-bar{height:5px;background:var(--card2);border-radius:4px;margin:8px 0 12px;overflow:hidden}.ph-bar div{width:40%;height:100%;background:var(--or)}
+  .ph-q{font-size:16px;font-weight:800;line-height:1.35;margin-bottom:12px}
+  .ph-o{font-size:13px;font-weight:650;border:2px solid var(--line);background:var(--card);border-radius:11px;padding:10px 11px;margin-bottom:7px}
+  .ph-o.g{border-color:var(--gr);background:rgba(60,207,122,.12)}
+  .ph-fb{border:1px solid rgba(60,207,122,.45);background:rgba(60,207,122,.1);border-radius:11px;padding:10px;font-size:12.5px;margin-top:4px}
+  .ph-ref{display:inline-block;margin-top:6px;font-size:10.5px;font-weight:800;color:var(--or2);background:rgba(255,176,32,.1);border-radius:5px;padding:2px 6px}
+  section{padding:56px 0;border-top:1px solid var(--line)}
+  h2{font-size:36px;letter-spacing:-1.2px;line-height:1.1;font-weight:900;margin-bottom:10px}
+  .sh{color:var(--mut);font-size:17px;max-width:640px;margin-bottom:28px}
+  .feat{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  .fc{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:20px}
+  .fc .i{font-size:28px}
+  .fc h3{font-size:18px;font-weight:900;margin:10px 0 6px}
+  .fc p{color:#c3cfdb;font-size:14.5px}
+  .chips{display:flex;flex-wrap:wrap;gap:8px}
+  .chip{background:var(--card);border:1px solid var(--line);border-radius:999px;padding:8px 13px;font-weight:800;font-size:14px}
+  .chip small{color:var(--or2);font-weight:900;margin-left:5px}
+  .callout{background:linear-gradient(135deg,rgba(255,122,0,.16),rgba(255,122,0,.04));border:1px solid rgba(255,122,0,.45);border-radius:20px;padding:24px;display:grid;grid-template-columns:auto 1fr;gap:18px;align-items:center}
+  .callout .big{font-size:56px;font-weight:900;letter-spacing:-2px;color:var(--or)}
+  .callout p{font-size:16px;color:#d6dee7}
+  .callout b{color:#fff}
+  .scs{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  .sc{background:var(--card);border:1px solid var(--line);border-radius:18px;overflow:hidden;text-decoration:none;display:block}
+  .sc .art{height:120px;display:grid;place-items:center;font-size:52px}
+  .sc .t{padding:14px 16px 16px}
+  .sc b{display:block;font-size:16.5px;font-weight:900}
+  .sc span{color:var(--mut);font-size:13.5px}
+  .emp{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:center}
+  .emp ul{list-style:none}
+  .emp li{padding:9px 0;border-bottom:1px solid var(--line);font-size:15.5px}
+  .emp li::before{content:"→ ";color:var(--or);font-weight:900}
+  .dash{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px}
+  .dk{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .dk div{background:var(--card2);border-radius:12px;padding:12px}
+  .dk b{display:block;font-size:24px;font-weight:900}
+  .dk span{font-size:12px;color:var(--mut);font-weight:700}
+  .bar{height:7px;background:var(--card2);border-radius:5px;overflow:hidden;margin:6px 0 10px}.bar div{height:100%}
+  .price{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  .pc{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:22px;display:flex;flex-direction:column}
+  .pc.hot{border-color:var(--or);box-shadow:0 0 0 1px var(--or)}
+  .pc .tag{align-self:flex-start;background:var(--or);color:#111;font-size:11px;font-weight:900;border-radius:6px;padding:3px 8px;margin-bottom:10px}
+  .pc h3{font-size:18px;font-weight:900}
+  .pc .amt{font-size:40px;font-weight:900;letter-spacing:-1.5px;margin:8px 0 2px}
+  .pc .amt small{font-size:15px;color:var(--mut);font-weight:700;letter-spacing:0}
+  .pc .per{color:var(--mut);font-size:13.5px;margin-bottom:12px}
+  .pc ul{list-style:none;margin-bottom:16px;flex:1}
+  .pc li{font-size:14.5px;padding:5px 0}
+  .pc li::before{content:"✓ ";color:var(--gr);font-weight:900}
+  .pc .btn{text-align:center}
+  .faq details{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin-bottom:10px}
+  .faq summary{font-weight:900;cursor:pointer;font-size:16px}
+  .faq p{color:#c3cfdb;margin-top:8px;font-size:15px}
+  footer{padding:30px 0 50px;border-top:1px solid var(--line);color:var(--mut);font-size:13px}
+  @media(max-width:860px){.hero,.emp{grid-template-columns:1fr}h1{font-size:40px}.feat,.scs,.price{grid-template-columns:1fr}.nl{display:none}.callout{grid-template-columns:1fr}h2{font-size:29px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav>
+    <a class="brand" href="index.html"><div class="logo">TR</div><b>Track Ready</b></a>
+    <div class="nl"><a href="#how">How it works</a><a href="#scenarios">Scenarios</a><a href="#employers">For employers</a><a href="#pricing">Pricing</a></div>
+  </nav>
+
+  <div class="hero">
+    <div>
+      <span class="eyebrow"><span class="dot"></span>UPDATED FOR THE JUNE 2026 RULE BOOK</span>
+      <h1>Know the rules <em>before</em> you're on the ballast.</h1>
+      <p class="lead">Track Ready is Rule Book revision for track workers: quick questions on your phone, plus 3D site scenarios where you make the call and see what happens. PTS, COSS, Lookout, AC/DC lines and more.</p>
+      <div class="cta"><a class="btn" href="app.html">Try it free</a><a class="btn sec" href="employer.html">See the employer dashboard</a></div>
+      <div class="trust"><span>Every answer referenced to the current handbook</span><span>Built by an ex-railman</span><span>Works on any phone</span></div>
+    </div>
+    <div class="phone"><div class="screen">
+      <div class="ph-meta"><span>🧢 COSS</span><span>4 / 18</span></div>
+      <div class="ph-bar"><div></div></div>
+      <div class="ph-q">You want to use lookout warning. What's the maximum permissible speed of an approaching train?</div>
+      <div class="ph-o g">25 mph</div><div class="ph-o">40 mph</div><div class="ph-o">60 mph</div><div class="ph-o">No limit if sighting is good</div>
+      <div class="ph-fb"><b style="color:var(--gr)">✅ Correct</b><br>Not more than 25 mph, and it must be planned in advance and authorised at director level.<br><span class="ph-ref">📖 HB7 Iss 10 §6.8</span></div>
+    </div></div>
+  </div>
+
+  <section id="how">
+    <h2>Revision that matches the real job</h2>
+    <p class="sh">Free quiz sites give you a list of questions. Track Ready puts you on site, keeps you current, and shows exactly where every answer comes from.</p>
+    <div class="feat">
+      <div class="fc"><div class="i">📖</div><h3>110+ questions, 10 competencies</h3><p>Written in plain English from the current handbooks. Every answer tells you the handbook, issue and section, so you can check it yourself.</p></div>
+      <div class="fc"><div class="i">🎮</div><h3>3D site scenarios</h3><p>Lay the detonators, place the barrier, carry the ladder under live wires, react to a warning in 4 seconds. Make the call and watch what happens.</p></div>
+      <div class="fc"><div class="i">🔄</div><h3>Always on the current issue</h3><p>The Rule Book changes every June and December. We update the questions and explain what changed in plain English, so nobody's working off last year's rules.</p></div>
+    </div>
+    <div style="margin-top:26px" class="chips">
+      <span class="chip">🦺 PTS<small>HB1</small></span><span class="chip">⚡ AC lines<small>HB16</small></span><span class="chip">🔌 DC lines<small>HB17</small></span><span class="chip">📯 Lookout / Site Warden<small>HB3</small></span><span class="chip">🧢 COSS<small>HB7</small></span><span class="chip">🚶 IWA<small>HB6</small></span><span class="chip">🛑 PC / Blockages<small>HB8</small></span><span class="chip">🚩 Handsignaller<small>HB5</small></span><span class="chip">🏗️ ES<small>HB12</small></span><span class="chip">🚜 MC / OTP<small>HB15</small></span>
+    </div>
+  </section>
+
+  <section>
+    <div class="callout">
+      <div class="big">25 mph</div>
+      <p><b>Did you know?</b> Under the current COSS handbook (HB7 Issue 10, in force since 6 December 2025), lookout warning can only be used if approaching trains are 25 mph or less, it's planned in advance and authorised at director level. A lot of people on track still have the old rules in their heads. Track Ready keeps them current.</p>
+    </div>
+  </section>
+
+  <section id="scenarios">
+    <h2>Put on site. Make the call.</h2>
+    <p class="sh">Three scenarios available now, with more on the way for PC, MC and ES.</p>
+    <div class="scs">
+      <a class="sc" href="scenario1.html"><div class="art" style="background:linear-gradient(135deg,#2a3a20,#4b6b35)">📯</div><div class="t"><b>Open line, lookout warning</b><span>PTS · Kit up, walk in the cess, react to the warning in 4 seconds, spot the hazards.</span></div></a>
+      <a class="sc" href="scenario2.html"><div class="art" style="background:linear-gradient(135deg,#1b2a4a,#2b5fd6)">🧢</div><div class="t"><b>Set up the safe system</b><span>COSS · Take the blockage, lay the detonators, fence the open line, brief the group.</span></div></a>
+      <a class="sc" href="scenario3.html"><div class="art" style="background:linear-gradient(135deg,#4a1b1b,#c64a3a)">⚡</div><div class="t"><b>Long ladder under the wires</b><span>AC lines · Keep 2.75 m from live OLE, report to the ECO, handle a wire down.</span></div></a>
+    </div>
+  </section>
+
+  <section id="employers">
+    <div class="emp">
+      <div>
+        <h2>For employers and training providers</h2>
+        <p class="sh">See who's ready and who isn't, before they're on site.</p>
+        <ul>
+          <li>Who's done the latest Rule Book changes, and who hasn't</li>
+          <li>Mock test scores and mastery for every competency</li>
+          <li>The topics your team gets wrong most, for toolbox talks</li>
+          <li>Upcoming competency expiries</li>
+          <li>Export for audits</li>
+        </ul>
+        <div class="cta"><a class="btn" href="employer.html">Open the demo dashboard</a></div>
+      </div>
+      <div class="dash">
+        <div class="dk"><div><b>58%</b><span>Done June 2026 changes</span></div><div><b>71%</b><span>Avg mock score</span></div></div>
+        <div style="margin-top:14px;font-size:13px;font-weight:800">Lookout warning limits <span style="color:var(--rd);float:right">38%</span></div><div class="bar"><div style="width:38%;background:var(--rd)"></div></div>
+        <div style="font-size:13px;font-weight:800">Barrier & tape distances <span style="color:var(--rd);float:right">54%</span></div><div class="bar"><div style="width:54%;background:var(--rd)"></div></div>
+        <div style="font-size:13px;font-weight:800">OLE 2.75 m rule <span style="color:var(--or2);float:right">74%</span></div><div class="bar"><div style="width:74%;background:var(--or2)"></div></div>
+        <div style="font-size:11.5px;color:var(--mut)">Demo data</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="pricing">
+    <h2>Simple pricing</h2>
+    <p class="sh">Start free. Pay when it's earning its keep.</p>
+    <div class="price">
+      <div class="pc"><h3>Individual</h3><div class="amt">£4.99<small>/month</small></div><div class="per">or £29 a year</div>
+        <ul><li>All competencies & questions</li><li>All 3D scenarios</li><li>Mock tests & weak spots</li><li>Updated every June & December</li></ul>
+        <a class="btn sec" href="app.html">Try it free</a></div>
+      <div class="pc hot"><span class="tag">MOST POPULAR</span><h3>Team</h3><div class="amt">£3<small>/worker/month</small></div><div class="per">minimum 10 workers</div>
+        <ul><li>Everything in Individual</li><li>Employer dashboard</li><li>Rule change completion tracking</li><li>Expiry reminders & audit export</li></ul>
+        <a class="btn" href="employer.html">See the dashboard</a></div>
+      <div class="pc"><h3>Training providers</h3><div class="amt">Custom</div><div class="per">licence for your candidates</div>
+        <ul><li>Pre-course and post-course revision</li><li>Your branding</li><li>Candidate progress for trainers</li><li>Scenarios for classroom use</li></ul>
+        <a class="btn sec" href="app.html">Explore the app</a></div>
+    </div>
+    <p style="color:var(--mut);font-size:13.5px;margin-top:14px">Team trials available on request.</p>
+  </section>
+
+  <section class="faq">
+    <h2>Questions</h2>
+    <details><summary>Is this official training?</summary><p>No. Track Ready is a revision and practice tool. It doesn't replace your accredited course, assessment or your COSS briefing. Always follow the current Rule Book handbooks.</p></details>
+    <details><summary>Where do the answers come from?</summary><p>Every question is written in our own words from the current Rule Book handbooks, and each answer shows the handbook, issue and section, so you can check it against your own copy.</p></details>
+    <details><summary>How do you keep up with rule changes?</summary><p>The Rule Book is updated every June and December. We review the briefing leaflet each time, update the questions and scenarios, and add a plain-English "what's changed" summary.</p></details>
+    <details><summary>Does it work on my phone?</summary><p>Yes. It runs in the browser on any phone, tablet or laptop. Nothing to install.</p></details>
+  </section>
+</div>
+<footer><div class="wrap">Track Ready is an independent revision tool. It isn't affiliated with or endorsed by Network Rail or RSSB. The Rule Book is published by RSSB. Questions are original and reference the handbooks.</div></footer>
+</body>
+</html>
