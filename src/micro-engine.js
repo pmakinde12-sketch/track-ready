@@ -22,7 +22,8 @@ mate.visible=false;lookout.visible=false;coss.visible=false;
 [upTrain,dnTrain].forEach(t=>t.visible=false);
 
 // ---------- props ----------
-function plate(lines,o={}){const w=o.w||1.2,h=o.h||.8;const c=document.createElement('canvas');c.width=512;c.height=Math.round(512*h/w);const x=c.getContext('2d');x.fillStyle=o.bg||'#fff';x.fillRect(0,0,c.width,c.height);if(o.border){x.strokeStyle=o.border;x.lineWidth=c.width*.06;x.strokeRect(x.lineWidth/2,x.lineWidth/2,c.width-x.lineWidth,c.height-x.lineWidth)}x.fillStyle=o.fg||'#111';x.textAlign='center';x.textBaseline='middle';const n=lines.length;lines.forEach((t,i)=>{let f=(o.fs||(c.height*.62/n));x.font=`900 ${f}px system-ui,sans-serif`;while(x.measureText(t).width>c.width*.86){f-=2;x.font=`900 ${f}px system-ui,sans-serif`}x.fillText(t,c.width/2,c.height*(i+.5)/n+c.height*.02)});const t=new THREE.CanvasTexture(c);t.anisotropy=8;return new THREE.Mesh(new THREE.PlaneGeometry(w,h),new THREE.MeshBasicMaterial({map:t,side:THREE.DoubleSide}))}
+function plate(lines,o={}){const w=o.w||1.2,h=o.h||.8;const c=document.createElement('canvas');c.width=512;c.height=Math.round(512*h/w);const x=c.getContext('2d');x.fillStyle=o.bg||'#fff';x.fillRect(0,0,c.width,c.height);if(o.chq){const q=c.width/10;for(let i=0;i*q<c.width;i++)for(const yy of[0,c.height-q]){x.fillStyle=i%2?'#fff':'#d02020';x.fillRect(i*q,yy,q,q)}for(let j=0;j*q<c.height;j++)for(const xx of[0,c.width-q]){x.fillStyle=j%2?'#d02020':'#fff';x.fillRect(xx,j*q,q,q)}}
+  if(o.border){x.strokeStyle=o.border;x.lineWidth=c.width*.06;x.strokeRect(x.lineWidth/2,x.lineWidth/2,c.width-x.lineWidth,c.height-x.lineWidth)}x.fillStyle=o.fg||'#111';x.textAlign='center';x.textBaseline='middle';const n=lines.length;lines.forEach((t,i)=>{let f=(o.fs||(c.height*.62/n));x.font=`900 ${f}px system-ui,sans-serif`;while(x.measureText(t).width>c.width*.86){f-=2;x.font=`900 ${f}px system-ui,sans-serif`}x.fillText(t,c.width/2,c.height*(i+.5)/n+c.height*.02)});const t=new THREE.CanvasTexture(c);t.anisotropy=8;return new THREE.Mesh(new THREE.PlaneGeometry(w,h),new THREE.MeshBasicMaterial({map:t,side:THREE.DoubleSide}))}
 const P={
   add(o){extras.add(o);return o},
   box(x,y,z,w,h,d,col){const m=new THREE.Mesh(bx(w,h,d),lm(col));m.position.set(x,y,z);return P.add(m)},
@@ -70,12 +71,12 @@ const P={
 const anims=[];
 
 // ---------- world API for scenes ----------
-let speedSign=null;
+let speedSign=null;let camTok=0;
 const W={
   P,
   speed(n){if(speedSign){scene.remove(speedSign);speedSign=null}if(n==null)return;const g=new THREE.Group();const p=new THREE.Mesh(bx(.09,1.7,.09),lm(0x222222));p.position.y=.85;g.add(p);const pl=plate([String(n)],{w:.75,h:.6,bg:'#fff',fg:'#111',border:'#111'});pl.position.y=1.95;pl.rotation.y=-Math.PI/2;g.add(pl);g.position.set(9,0,2.05);scene.add(g);speedSign=g},
   night(on){if(on){scene.background=new THREE.Color(0x142034);scene.fog.color.set(0x142034);scene.fog.near=12;scene.fog.far=95;HEMI.intensity=.55;sun.intensity=.12}else{scene.background=SKY;scene.fog.color.set(0xa9c3d6);scene.fog.near=60;scene.fog.far=260;HEMI.intensity=1.05;sun.intensity=.75}},
-  cam(p,l,d=1.1){return camTo(new THREE.Vector3(...p),new THREE.Vector3(...l),d)},
+  cam(p,l,d=1.1){const tok=++camTok;const p0=camP.clone(),l0=camL.clone(),P1=new THREE.Vector3(...p),L1=new THREE.Vector3(...l);return tween(d,k=>{if(tok!==camTok)return;const e=ease(k);camP.lerpVectors(p0,P1,e);camL.lerpVectors(l0,L1,e)})},
   me(x,z,face=-Math.PI/2,y=.32){player.visible=true;player.position.set(x,y,z);player.rotation.y=face;W.pose(player,null)},
   addGuy(p,x,z,face=0,y=.32){p.position.set(x,y,z);p.rotation.y=face;scene.add(p);people.push(p);tmpPeople.push(p);return p},
   guy(o={}){const p=makePerson(o.vest!=null?o.vest:0xff7a00,o.pants||0x1f2a44,o.skin||[0xf1c9a5,0xa86b45,0x7a4a2c,0xd9a27a][Math.floor(Math.random()*4)],o.helmet===undefined?0xffffff:o.helmet);if(o.coss)armband(p,0x2b5fd6);if(o.tag){const t=label(o.tag,o.tagBg||'#111',o.tagFg||'#ffb020',Math.max(1.3,o.tag.length*.17));t.position.set(0,2.4,0);p.add(t)}if(o.phones){for(const s of[-1,1]){const e=new THREE.Mesh(bx(.06,.16,.16),basic(0x111111));e.position.set(.17*s,1.62,0);p.userData.body.add(e)}const bnd=new THREE.Mesh(bx(.38,.05,.06),basic(0x111111));bnd.position.set(0,1.95,0);p.userData.body.add(bnd)}if(o.hood){const h=new THREE.Mesh(bx(.38,.42,.38),lm(0x2c3440));h.position.set(0,1.66,.03);p.userData.body.add(h)}return W.addGuy(p,o.x||0,o.z||3,o.face!=null?o.face:0,o.y||.32)},
@@ -104,7 +105,7 @@ function reset(){
   for(const f of FX){f.parts.forEach(p=>f.group.remove(p))}FX.length=0;tickFn=null;
   [upTrain,dnTrain].forEach(t=>t.visible=false);
   [coss,lookout,mate].forEach(p=>{p.visible=false;W.pose(p,null);p.userData.pose='stand'});
-  player.children.filter(c=>c.isSprite&&c!==youTag).forEach(c=>player.remove(c));W.me(0,3.0);player.userData.pose='stand';$('sheet').classList.remove('compact');ring.visible=true;youTag.visible=true;
+  player.children.filter(c=>c.isSprite&&c!==youTag).forEach(c=>player.remove(c));roleMeshes.forEach(m=>m.parent&&m.parent.remove(m));roleMeshes.length=0;youTag.visible=true;W.me(0,3.0);player.userData.pose='stand';$('sheet').classList.remove('compact');ring.visible=true;youTag.visible=true;
   W.night(false);W.speed(null);W.uncard();stopTimer();banner('');hideSheet();
   $('lookBtn').classList.add('hide');$('lookMeter').classList.add('hide');$('dim').style.opacity=0;
 }
@@ -113,7 +114,10 @@ function cast(p,x,z,face){p.visible=true;p.position.set(x,.32,z);p.rotation.y=fa
 // ---------- UI helpers ----------
 function shuffleIdx(n){const a=[...Array(n).keys()];for(let i=n-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
 function chatHtml(ch){return ch?`<div class="chat">${ch.map(([w,t])=>`<div class="m ${w==='You'?'me':''}"><i>${w}</i>${t}</div>`).join('')}</div>`:''}
-function pickUI(sc,q){return new Promise(res=>{const ord=shuffleIdx(q.o.length);
+function trimOpts(q){const o=q.o.slice();const c=o[q.a];const others=o.filter((_,i)=>i!==q.a);
+  if(!others.some(t=>/: /.test(t))){const m=c.match(/^(.{2,40}?): (.{20,})$/);if(m)o[q.a]=m[1]}
+  return o}
+function pickUI(sc,q){q={...q,o:trimOpts(q)};return new Promise(res=>{const ord=shuffleIdx(q.o.length);
   sheet(`<h2>${sc.t.toUpperCase()}</h2>${chatHtml(q.chat)}<div class="q">${q.p}</div><div class="opts">${ord.map(i=>`<button class="opt" data-i="${i}">${q.o[i]}</button>`).join('')}</div><div id="fbx"></div>`);
   const btns=[...$('sheet').querySelectorAll('.opt')];
   btns.forEach(b=>b.onclick=()=>{btns.forEach(x=>x.onclick=null);const i=+b.dataset.i;const ok=i===q.a;btns.forEach(x=>{if(+x.dataset.i===q.a)x.classList.add('good')});if(!ok)b.classList.add('bad');res({ok,ans:i})})})}
@@ -160,16 +164,22 @@ const COVK='tr_rules';
 function covGet(){try{return JSON.parse(localStorage.getItem(COVK)||'{}')}catch(e){return {}}}
 function covSet(rules,ok){try{const c=covGet();const now=Date.now();for(const r of rules){const o=c[r]||{n:0,w:0};o.n++;if(!ok)o.w++;o.ok=ok?1:0;o.t=now;c[r]=o}localStorage.setItem(COVK,JSON.stringify(c))}catch(e){}}
 function feedback(sc,ok){return new Promise(res=>{const fb=$('fbx')||(()=>{sheet('<div id="fbx"></div>');return $('fbx')})();$('sheet').classList.remove('compact');
-  fb.innerHTML=`<div class="fb ${ok?'ok':'no'}"><b>${ok?'✅ Right call':'❌ Not quite'}</b>${sc.why}<div class="ref">📖 ${sc.ref} · rule ${sc.r.join(', ')}</div></div><button class="go">${idx+1<list.length?'Next scene':'See results'}</button>`;
+  fb.innerHTML=`<div class="fb ${ok?'ok':'no'}"><b>${ok?'✅ Right call':'❌ Not quite'}</b>${sc.why}<div class="ref">📖 ${sc.ref}${COMP==='pts'?' · rule '+sc.r.join(', '):''}</div></div><button class="go">${idx+1<list.length?'Next scene':'See results'}</button>`;
   fb.querySelector('.go').onclick=()=>res();$('sheet').scrollTop=9999})}
 
 // ---------- runner ----------
 let list=[],idx=0;const results=[];
-function pickList(){const qs=new URLSearchParams(location.search);const ids=(qs.get('ids')||'').split(',').filter(Boolean);
-  if(ids.length)return SCENES.filter(s=>ids.includes(s.id)||s.r.some(r=>ids.includes(r)));
-  const sec=qs.get('sec');if(sec)return SCENES.filter(s=>s.sec===sec);return SCENES.slice()}
+const QS=new URLSearchParams(location.search);
+const COMP=QS.get('c')||'pts';
+const CINFO=COMPINFO[COMP]||COMPINFO.pts;
+const CSCENES=COMP==='pts'?SCENES:XSCENES.filter(s=>s.c===COMP);
+if(COMP!=='pts')CSCENES.forEach((s,i)=>{s.r=s.r||[s.id];s.ref=s.ref||CINFO.hb});
+const CRULES=COMP==='pts'?RULES:Object.fromEntries(CSCENES.map(s=>[s.id,s.rt]));
+function pickList(){const ids=(QS.get('ids')||'').split(',').filter(Boolean);
+  if(ids.length)return CSCENES.filter(s=>ids.includes(s.id)||s.r.some(r=>ids.includes(r)));
+  const sec=QS.get('sec');if(sec)return CSCENES.filter(s=>s.sec===sec);return CSCENES.slice()}
 async function playScene(sc){
-  reset();stage(`PTS · ${idx+1}/${list.length}`);
+  reset();stage(`${CINFO.n} · ${idx+1}/${list.length}`);
   W.cam([-6,3.6,10.5],[2,1,.5],.01);
   if(sc.set)sc.set(W);
   if(sc.play){banner(sc.t);await sc.play(W);banner('')}
@@ -183,17 +193,53 @@ async function playScene(sc){
 }
 async function run(){
   window.__ready=1;
-  list=pickList();if(window.__only)list=SCENES.filter(s=>window.__only.includes(s.id));
+  list=pickList();if(window.__only)list=CSCENES.filter(s=>window.__only.includes(s.id));
   W.cam([-6,3.6,10.5],[2,1,.5],.01);
-  await info('PTS · SCENE MODE',`<b>${list.length} scene${list.length>1?'s':''}.</b> Each one is a real moment on the track: watch, then make the call. Every scene proves a rule in Handbook 1 (Issue 9).<br><br><span style="opacity:.7">Sound on for horns and warnings. Signs are simplified.</span>`,'Start');
+  document.title=CINFO.n+' scenes · Track Ready';
+  await info(CINFO.n.toUpperCase()+' · SCENE MODE',`<b>${list.length} scene${list.length>1?'s':''}.</b> Each one is a real moment on the job: watch, then make the call. Every scene proves a rule in ${CINFO.full}.<br><br><span style="opacity:.7">Sound on for horns and warnings. Signs and kit are simplified.</span>`,'Start');
   for(idx=0;idx<list.length;idx++)await playScene(list[idx]);
   reset();player.visible=true;W.cam([-5,3,8],[0,1.2,3]);
   const ok=results.filter(r=>r.ok).length,miss=results.filter(r=>!r.ok);
-  const cov=covGet();const proven=Object.keys(RULES).filter(k=>cov[k]&&cov[k].ok).length;
+  const cov=covGet();const proven=Object.keys(CRULES).filter(k=>cov[k]&&cov[k].ok).length;
   sheet(`<h2>RESULTS</h2><div class="q">${ok} / ${results.length} right calls</div>
-   <div class="body">PTS rules proven so far: <b>${proven} / ${Object.keys(RULES).length}</b></div>
-   ${miss.length?`<div class="body"><b>Go over these again:</b><ul class="miss">${miss.map(m=>`<li>${m.r.map(r=>RULES[r]).join('; ')}</li>`).join('')}</ul></div><a class="go" style="display:block;text-align:center;text-decoration:none" href="?ids=${miss.map(m=>m.id).join(',')}">Retry the ${miss.length} I missed</a>`:'<div class="body">Clean sheet. 👏</div>'}
+   <div class="body">${CINFO.n} rules proven so far: <b>${proven} / ${Object.keys(CRULES).length}</b></div>
+   ${miss.length?`<div class="body"><b>Go over these again:</b><ul class="miss">${miss.map(m=>`<li>${m.r.map(r=>CRULES[r]).join('; ')}</li>`).join('')}</ul></div><a class="go" style="display:block;text-align:center;text-decoration:none" href="?c=${COMP}&ids=${miss.map(m=>m.id).join(',')}">Retry the ${miss.length} I missed</a>`:'<div class="body">Clean sheet. 👏</div>'}
    <a class="go" style="display:block;text-align:center;text-decoration:none;background:#2a3442;color:#fff;box-shadow:none" href="app.html">Back to Track Ready</a>`);
   window.__done=1;
 }
 window.__dbg={camP,camL,camera,W,P};
+
+// ================= EXTRA KIT FOR ALL COMPETENCIES =================
+const roleMeshes=[];
+const ARM={coss:[0x2b5fd6,0xffffff,'COSS'],lo:[0xffffff,0xd02020,'LOOKOUT'],sw:[0xffffff,0x2b5fd6,'SITE WARDEN'],pc:[0xffffff,0x1f9d4a,'PC'],mc:[0xffffff,0x111111,'MC'],es:[0xf5d000,0x2b5fd6,'ES'],picop:[0xf5d000,0xd02020,'PICOP'],iwa:[0xff7a00,0x111111,'IWA'],hs:[0xff7a00,0x111111,'HANDSIGNALLER']};
+function armlet(p,role){const a=ARM[role];const b=new THREE.Mesh(bx(.165,.13,.175),basic(a[0]));b.position.set(0,-.13,0);p.userData.arms[0].add(b);const st=new THREE.Mesh(bx(.168,.045,.178),basic(a[1]));st.position.set(0,-.13,0);p.userData.arms[0].add(st);return [b,st]}
+W.role=(role,txt)=>{const ms=armlet(player,role);roleMeshes.push(...ms);youTag.visible=false;const a=ARM[role];const t=label(txt||('YOU · '+a[2]),'#'+a[0].toString(16).padStart(6,'0'),'#'+(a[0]===0xffffff||a[0]===0xf5d000?'111111':'ffffff'),Math.min(3.4,1.8+(txt||a[2]).length*.09));t.position.set(0,2.4,0);player.add(t)};
+W.worker=(role,o={})=>{const a=ARM[role];const p=W.guy(Object.assign({tag:o.tag||a[2],tagBg:'#'+a[0].toString(16).padStart(6,'0'),tagFg:'#'+(a[0]===0xffffff||a[0]===0xf5d000?'111111':'ffffff')},o));armlet(p,role);return p};
+W.group=(n=3,x=2,z=0,face=-Math.PI/2)=>{const g=[];for(let i=0;i<n;i++){const p=W.guy({x:x+i*1.3,z,face});p.userData.pose='kneel';g.push(p)}return g};
+Object.assign(P,{
+  conductor(x0=-150,x1=150,z=R1+.45,lab=true){const len=x1-x0;P.box(x0+len/2,.64,z,len,.12,.14,0xeceff2);P.add(new THREE.Mesh(bx(len,.02,.15),basic(0xffffff))).position.set(x0+len/2,.71,z);for(let x=x0;x<x1;x+=3)P.box(x,.5,z,.16,.16,.16,0xd8c27a);if(lab&&z>0){const l=label('CONDUCTOR RAIL','#fff','#c00',2.4);l.position.set(3,1.1,z);P.add(l)}return z},
+  guard(x0,x1,z){const len=x1-x0;P.box(x0+len/2,.62,z,len,.22,.05,0x7a5a3a)},
+  det(x,z){const d=new THREE.Mesh(bx(.14,.06,.1),lm(0xc23b22));d.position.set(x,.6,z);return P.add(d)},
+  dets(x0,z,dir=1){for(let i=0;i<3;i++)P.det(x0+dir*i*20,z)},
+  plb(x,z=0){const g=new THREE.Group();const p=new THREE.Mesh(bx(.06,1.1,.06),lm(0x333333));p.position.y=.55;g.add(p);const b=plate(['P','LIMIT'],{w:.55,h:.55,bg:'#d02020',fg:'#fff'});b.position.y=1.3;b.rotation.y=-Math.PI/2;g.add(b);g.position.set(x,.3,z);return P.add(g)},
+  wsmb(x,z=0){const g=new THREE.Group();const p=new THREE.Mesh(bx(.06,1.2,.06),lm(0x333333));p.position.y=.6;g.add(p);const b=new THREE.Mesh(bx(.05,.5,.8),lm(0x222222));b.position.y=1.3;g.add(b);const ls=[];for(const dz of[-.22,.22]){const r=flameSprite(0xff2020,.5);r.position.set(-.08,1.3,dz);g.add(r);ls.push(r);const y=flameSprite(0xffc020,.5);y.position.set(.08,1.3,dz);g.add(y);ls.push(y)}anims.push(()=>{const on=Math.floor(T*2)%2===0;ls.forEach(l=>l.visible=on)});const t=label('WSMB','#111','#ffb020',1.2);t.position.y=2;g.add(t);g.position.set(x,.3,z);return P.add(g)},
+  redflag(x,z=0){const g=new THREE.Group();const p=new THREE.Mesh(bx(.04,1,.04),lm(0x8a5a2b));p.position.y=.5;g.add(p);const f=new THREE.Mesh(bx(.02,.35,.5),basic(0xe02020));f.position.set(0,.85,.25);g.add(f);g.position.set(x,.3,z);anims.push(()=>{f.rotation.y=Math.sin(T*4)*.2});return P.add(g)},
+  signal(x,z=2.0,asp='red'){P.box(x,2.1,z,.18,4.2,.18,0x222222);P.box(x,4.3,z,.5,1.2,.4,0x111111);const l=new THREE.Mesh(new THREE.SphereGeometry(.13,10,8),basic({red:0xff2020,green:0x57f287,yellow:0xffc020}[asp]));l.position.set(x-.22,4.5,z);P.add(l);const g=flameSprite({red:0xff2020,green:0x57f287,yellow:0xffc020}[asp],.9);g.position.set(x-.3,4.5,z);P.add(g)},
+  otp(x,z=0,o={}){const g=new THREE.Group();const b=new THREE.Mesh(bx(5,1.6,2.3),lm(0xf5d000));b.position.y=1.5;g.add(b);const cab=new THREE.Mesh(bx(1.6,1.3,2.1),lm(0xf5d000));cab.position.set(-1.6,2.9,0);g.add(cab);const w=new THREE.Mesh(bx(.05,.8,1.8),lm(0x14171c));w.position.set(-2.42,2.95,0);g.add(w);
+    for(const dx of[-1.7,1.7])for(const dz of[-1.05,1.05]){const t=new THREE.Mesh(new THREE.CylinderGeometry(.55,.55,.4,14).rotateX(Math.PI/2),lm(0x222222));t.position.set(dx,.75,dz);g.add(t)}for(const dx of[-2.1,2.1])for(const dz of[-.72,.72]){const r=new THREE.Mesh(new THREE.CylinderGeometry(.25,.25,.1,12).rotateX(Math.PI/2),lm(0x555555));r.position.set(dx,.55,dz);g.add(r)}
+    if(o.boom){const bm=new THREE.Mesh(bx(4.5,.3,.3),lm(0xe0b000));bm.position.set(2.6,3.4,0);bm.rotation.z=.5;g.add(bm)}
+    for(const s of[-.7,.7]){const hl=flameSprite(0xfff2c0,.5);hl.position.set(-2.6,1.4,s);g.add(hl)}const rl=flameSprite(0xff2020,.5);rl.position.set(2.6,1.4,0);g.add(rl);
+    const t=label('OTP / RRV','#111','#ffb020',1.8);t.position.y=4.3;g.add(t);g.position.set(x,.3,z);return P.add(g)},
+  tent(x,z){const m=new THREE.Mesh(new THREE.ConeGeometry(1.1,1.6,4),lm(0xff7a00));m.position.set(x,.8,z);m.rotation.y=Math.PI/4;return P.add(m)},
+  ladder(x,z,up){const g=new THREE.Group();for(const s of[-.22,.22]){const r=new THREE.Mesh(bx(.05,4,.05),lm(0xc8c8c8));r.position.set(0,2,s);g.add(r)}for(let i=0;i<11;i++){const r=new THREE.Mesh(bx(.04,.04,.44),lm(0xc8c8c8));r.position.set(0,.2+i*.36,0);g.add(r)}g.position.set(x,.3,z);if(!up){g.rotation.z=Math.PI/2;g.position.y=1.2}return P.add(g)},
+  bond(x,z=R1,col=0xd02020){const c=new THREE.Mesh(bx(.08,.08,1.4),basic(col));c.position.set(x,.5,z+.7);P.add(c);const l=label(col===0xd02020?'RED BOND':'BOND','#d02020','#fff',1.4);l.position.set(x,1.1,z+.9);return P.add(l)},
+  sprs(x,z=2.6){P.box(x,.6,z,.1,1.2,.1,0x333333);P.box(x,1.3,z,.35,.45,.25,0xe0e0e0);const l=label('SPRS','#111','#fff',1);l.position.set(x,1.9,z);P.add(l)},
+  edw(x,z=2.3){P.sign(x,z,['END OF','DEGRADED','WORKING'],{y:1.6,w:.9,h:.8,bg:'#fff',fg:'#111',border:'#111'})},
+  structPlate(x,txt='LN1 / 45'){const pl=plate([txt],{w:.7,h:.3,bg:'#fff',fg:'#111',border:'#111'});pl.position.set(x-.2,2.4,2.3);pl.rotation.y=-Math.PI/2;P.add(pl)},
+  bag(x,z,col=0xff7a00){const g=new THREE.Group();const b=new THREE.Mesh(bx(.7,.4,.35),lm(col));b.position.y=.2;g.add(b);g.position.set(x,.3,z);return P.add(g)},
+  tcod(x,z=0){const b=new THREE.Mesh(bx(.25,.15,.2),lm(0xf5d000));b.position.set(x,.62,z-R1);P.add(b);const c=new THREE.Mesh(bx(.04,.04,1.45),basic(0x111111));c.position.set(x,.6,z);P.add(c);const l=label('T-COD','#111','#ffb020',1.2);l.position.set(x,1.2,z);P.add(l)},
+  slw(x,z=2.6){P.sign(x,z,['SLW'],{y:1.4,w:.6,h:.4,bg:'#fff',fg:'#111',border:'#111'})},
+});
+// form cards
+W.form=(code,title,lines=[])=>W.card(`<div class="form"><b>${code}</b><span>${title}</span>${lines.map(l=>`<i>${l}</i>`).join('')}</div>`);
+W.chat=null;

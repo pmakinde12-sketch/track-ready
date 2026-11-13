@@ -375,9 +375,9 @@ const SCENES=[
  why:'<b>No group or conference calls</b> for safety-critical instructions, except in an emergency.'},
 // ---------- SIGNS ----------
 {id:'S1',r:['S1'],sec:'S',t:'Sign under the bridge',ref:'HB1 §11',
- set(W){W.P.bridge(20);W.P.sign(17.4,2.25,['LIMITED','CLEARANCE'],{wall:1,y:1.3,w:1.8,h:1.1,bg:'#fff',fg:'#111',border:'#d02020'});player.visible=false;W.cam([8,2.6,4.6],[17.4,1.9,2.25])},
+ set(W){W.P.bridge(20);W.P.sign(17.4,2.25,['WARNING','LIMITED','CLEARANCE'],{wall:1,y:1.2,w:1.9,h:1.3,bg:'#fff',fg:'#d02020',chq:1});player.visible=false;W.cam([8,2.6,4.6],[17.4,1.9,2.25])},
  q:{t:'pick',p:'You\'re walking towards the bridge and see this sign.',o:['There\'s no position of safety on this side: don\'t be here when trains are running','Low bridge, mind your head','Trains slow down here','Speed restriction ahead'],a:0},
- why:'Limited clearance: <b>no position of safety on this side</b>. Don\'t stand there while trains are running.'},
+ why:'The red and white chequered <b>Warning: limited clearance</b> board means <b>no position of safety on this side</b>. Don\'t stand there while trains are running.'},
 {id:'S2',r:['S2'],sec:'S',t:'Refuges sign',ref:'HB1 §11',
  set(W){W.P.bridge(20);W.P.sign(17.4,2.25,['NO REFUGES','THIS SIDE','→ OTHER SIDE'],{wall:1,y:1.2,w:1.8,h:1.3,bg:'#fff',fg:'#111',border:'#111'});player.visible=false;W.cam([8,2.6,4.6],[17.4,1.9,2.25])},
  q:{t:'pick',p:'What does this sign tell you?',o:['The refuges are on the other side of the line','There are no refuges anywhere here','A refuge is coming up shortly','Don\'t walk any further'],a:0},
@@ -387,7 +387,7 @@ const SCENES=[
  q:{t:'pick',p:'You reach this prohibition sign. What does it mean?',o:['Don\'t pass it while trains are running (except to protect a train in an emergency)','No smoking','No stopping','Staff only, carry on'],a:0},
  why:'A prohibition sign means <b>don\'t pass it while trains are running</b>, except to give emergency protection.'},
 {id:'S4',r:['S4'],sec:'S',t:'Phone under the bridge',ref:'HB1 §11',
- set(W){W.P.bridge(20);W.P.box(17.3,1.3,2.25,.3,.5,.4,0xf5d000);W.P.sign(17.4,2.25,['LC PHONE'],{wall:1,y:1.7,w:.8,h:.3,bg:'#111',fg:'#ffb020'});player.visible=false;W.cam([9,2.4,4.6],[17.4,1.6,2.25])},
+ set(W){W.P.bridge(20);W.P.box(17.3,1.3,2.25,.3,.6,.5,0x6b7078);{const r=new THREE.Mesh(new THREE.CircleGeometry(.16,24),basic(0xf5d000));r.position.set(17.13,1.42,2.25);r.rotation.y=-Math.PI/2;W.P.add(r)}W.P.sign(17.4,2.25,['TELEPHONE'],{wall:1,y:1.75,w:.8,h:.25,bg:'#fff',fg:'#111'});player.visible=false;W.cam([9,2.4,4.6],[17.4,1.6,2.25])},
  q:{t:'pick',p:'There\'s a telephone in this limited-clearance area. When can you use it?',o:['Only in an emergency, if nothing else is available','For routine calls to the signaller','To phone home','Any time'],a:0},
- why:'Limited-clearance telephones are for <b>emergency use only</b>, when nothing else is available.'},
+ why:'A <b>yellow roundel</b> on the phone cabinet marks a limited-clearance telephone: <b>emergency use only</b>, when nothing else is available.'},
 ];
