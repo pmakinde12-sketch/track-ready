@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>PTS scenes · Track Ready</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%;background:#9fb8c9;color:#f4f1ea;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow:hidden;touch-action:none;user-select:none;-webkit-user-select:none}
+  #game{position:fixed;inset:0}
+  .hide{display:none!important}
+  #top{position:fixed;top:0;left:0;right:0;display:flex;justify-content:space-between;align-items:center;padding:10px 14px;font-weight:900;font-size:14px;background:linear-gradient(rgba(0,0,0,.55),rgba(0,0,0,0));z-index:5;pointer-events:none}
+  #stage{letter-spacing:.5px}
+  #score{color:#ffb020}
+  #banner{position:fixed;top:44px;left:12px;right:12px;text-align:center;font-weight:900;font-size:17px;z-index:5;pointer-events:none;text-shadow:0 2px 8px #000}
+  #timerBar{position:fixed;top:100px;left:20%;right:20%;height:8px;background:rgba(0,0,0,.4);border-radius:6px;z-index:5;overflow:hidden}
+  #timerFill{height:100%;background:#ff4d4d;width:100%}
+  #sheet{position:fixed;left:0;right:0;bottom:0;z-index:6;padding:16px 16px 20px;background:rgba(14,16,20,.94);border-radius:20px 20px 0 0;max-height:62vh;overflow-y:auto;box-shadow:0 -10px 40px rgba(0,0,0,.4)}
+  #sheet h2{font-size:13px;letter-spacing:1.5px;color:#ffb020;margin-bottom:6px}
+  #sheet .q{font-size:18px;font-weight:800;line-height:1.35;margin-bottom:12px}
+  #sheet .body{font-size:14.5px;line-height:1.55;opacity:.9;margin-bottom:12px}
+  .opts{display:flex;flex-direction:column;gap:8px}
+  .opt{font:inherit;font-weight:700;font-size:15.5px;text-align:left;border:2px solid rgba(255,255,255,.12);background:rgba(255,255,255,.06);color:#fff;border-radius:12px;padding:12px 14px;cursor:pointer}
+  .opt.sel{border-color:#ffb020;background:rgba(255,176,32,.15)}
+  .opt.good{border-color:#57d27a;background:rgba(87,210,122,.18)}
+  .opt.bad{border-color:#ff5a5a;background:rgba(255,90,90,.15)}
+  .go{font:inherit;font-weight:900;font-size:17px;border:0;border-radius:12px;padding:14px;width:100%;background:#ff7a00;color:#111;margin-top:12px;cursor:pointer;box-shadow:0 4px 0 #a84f00}
+  .fb{border-radius:12px;padding:12px 14px;margin-top:10px;font-size:14.5px;line-height:1.5}
+  .fb.ok{background:rgba(87,210,122,.15);border:1px solid rgba(87,210,122,.5)}
+  .fb.no{background:rgba(255,90,90,.12);border:1px solid rgba(255,90,90,.5)}
+  .fb>b:first-child{display:block;font-size:16px;margin-bottom:3px}
+  .ref{font-size:12px;opacity:.6;margin-top:6px}
+  #pop{position:fixed;top:40%;left:0;right:0;text-align:center;font-size:40px;font-weight:900;z-index:7;pointer-events:none;opacity:0;text-shadow:0 4px 20px rgba(0,0,0,.7)}
+  #pop.on{animation:pp 1.2s ease-out}
+  @keyframes pp{0%{opacity:0;transform:scale(1.4)}15%{opacity:1;transform:scale(1)}80%{opacity:1}100%{opacity:0}}
+  #flash{position:fixed;inset:0;background:#ff2020;opacity:0;z-index:4;pointer-events:none}
+  #flash.on{animation:fl .9s ease-out}
+  @keyframes fl{0%{opacity:.45}100%{opacity:0}}
+  .tag{display:inline-block;background:#ff7a00;color:#111;font-weight:900;border-radius:6px;padding:2px 7px;font-size:12px;margin-right:6px}
+  .disc{font-size:12px;opacity:.6;margin-top:10px;line-height:1.4}
+  #sheet.compact{max-height:34vh}
+  #sheet.compact .q{font-size:16px;margin-bottom:8px}
+  .hint{font-size:12.5px;opacity:.65;margin:-4px 0 10px}
+  .zbtns{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+  .zb{font:inherit;font-weight:900;font-size:15px;border:2px solid rgba(255,176,32,.7);background:rgba(255,176,32,.12);color:#fff;border-radius:10px;padding:9px 14px;cursor:pointer}
+  .zb.good{border-color:#57d27a;background:rgba(87,210,122,.25)} .zb.bad{border-color:#ff5a5a;background:rgba(255,90,90,.2)}
+  .chat{display:flex;flex-direction:column;gap:6px;margin:4px 0 10px}
+  .chat .m{background:#243042;border-radius:12px 12px 12px 4px;padding:8px 11px;font-size:14.5px;max-width:88%;line-height:1.4}
+  .chat .m.me{align-self:flex-end;background:#5a3a10;border-radius:12px 12px 4px 12px}
+  .chat i{display:block;font-style:normal;font-size:11px;font-weight:900;opacity:.6;letter-spacing:.5px}
+  #card{position:fixed;top:120px;left:50%;transform:translateX(-50%);z-index:5;pointer-events:none}
+  .idc{background:#f4f6f8;color:#111;border-radius:14px;padding:14px 16px;width:230px;box-shadow:0 8px 30px rgba(0,0,0,.4)}
+  .idc b{display:block;color:#0b4a9e;letter-spacing:2px}.idc span{font-size:13px;font-weight:700}
+  .idc .exp{margin-top:10px;color:#d02020;font-weight:900;font-size:20px;border:3px solid #d02020;border-radius:8px;display:inline-block;padding:2px 8px;transform:rotate(-6deg);line-height:1.1}
+  .form{background:#fffdf4;color:#111;border-radius:6px;padding:14px 16px;width:230px;box-shadow:0 8px 30px rgba(0,0,0,.4);font-size:13px}
+  .form b{display:block;font-size:20px}.form i{display:block;margin-top:14px;font-style:normal;opacity:.7}
+  .ring{background:rgba(14,16,20,.92);border:2px solid #57d27a;border-radius:16px;padding:10px 16px;font-size:26px;display:flex;align-items:center;gap:10px;animation:rg .5s ease-in-out infinite alternate;white-space:nowrap}
+  .ring b{font-size:15px}.ring small{display:block;font-size:12px;opacity:.7}
+  @keyframes rg{from{transform:rotate(-2deg)}to{transform:rotate(2deg)}}
+  #lookBtn{position:fixed;right:16px;bottom:calc(34vh + 14px);z-index:7;font:inherit;font-weight:900;font-size:18px;border:0;border-radius:50px;padding:18px 22px;background:#ffb020;color:#111;box-shadow:0 5px 0 #a86a00;cursor:pointer}
+  #lookMeter{position:fixed;left:16px;right:170px;bottom:calc(34vh + 34px);height:12px;background:rgba(0,0,0,.45);border-radius:8px;z-index:7;overflow:hidden}
+  #lookFill{height:100%;width:0%}
+  #dim{position:fixed;inset:0;background:linear-gradient(#000 0%,#000 45%,rgba(0,0,0,0) 75%);opacity:0;z-index:3;pointer-events:none;transition:opacity .15s}
+  ul.miss{margin:6px 0 0 18px;font-size:14px;line-height:1.5}
+</style>
+</head>
+<body>
+<div id="game"></div>
+<div id="top"><div id="stage">PTS</div><div id="score">✓ 0</div></div>
+<div id="banner"></div>
+<div id="timerBar" class="hide"><div id="timerFill"></div></div>
+<div id="sheet"></div>
+<div id="pop"></div>
+<div id="flash"></div>
+<div id="card" class="hide"></div>
+<div id="dim"></div>
+<button id="lookBtn" class="hide">👀 LOOK UP</button><div id="lookMeter" class="hide"><div id="lookFill"></div></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(()=>{
+const $=id=>document.getElementById(id);
+if(typeof THREE==='undefined'){$('sheet').innerHTML='<div class="q">Couldn\'t load the 3D engine. Check your connection and refresh.</div>';return}
+
+// ---------- audio ----------
+let ac=null;
+function tone(f,d,type='sine',v=.07,delay=0,f2){try{ac=ac||new (window.AudioContext||window.webkitAudioContext)();const t=ac.currentTime+delay,o=ac.createOscillator(),g=ac.createGain();o.type=type;o.frequency.setValueAtTime(f,t);if(f2)o.frequency.exponentialRampToValueAtTime(f2,t+d);g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g).connect(ac.destination);o.start(t);o.stop(t+d+.02)}catch(e){}}
+const S={
+  lookoutHorn(){for(let i=0;i<3;i++){tone(520,.45,'square',.06,i*.6);tone(660,.45,'square',.04,i*.6)}},
+  trainHorn(){tone(311,.9,'sawtooth',.06);tone(392,.9,'sawtooth',.05);tone(311,.9,'sawtooth',.06,1.0);tone(370,.9,'sawtooth',.05,1.0)},
+  rumble(){tone(55,2.4,'sawtooth',.06,0,40)},
+  good(){tone(660,.12,'triangle',.08);tone(990,.2,'triangle',.08,.1)},
+  bad(){tone(180,.4,'square',.06,0,90)},
+  tick(){tone(1200,.05,'square',.03)},
+  clank(){tone(900,.06,'square',.03,0,600)}
+};
+
+// ---------- renderer ----------
+const renderer=new THREE.WebGLRenderer({antialias:true,preserveDrawingBuffer:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio||1,2));
+$('game').appendChild(renderer.domElement);
+const scene=new THREE.Scene();
+scene.background=new THREE.Color(0xa9c3d6);
+scene.fog=new THREE.Fog(0xa9c3d6,60,260);
+const camera=new THREE.PerspectiveCamera(55,1,.1,600);
+function resize(){renderer.setSize(innerWidth,innerHeight);camera.aspect=innerWidth/innerHeight;camera.fov=innerWidth/innerHeight<.75?70:55;camera.updateProjectionMatrix()}
+addEventListener('resize',resize);resize();
+scene.add(new THREE.HemisphereLight(0xffffff,0x6b6a55,1.05));
+const sun=new THREE.DirectionalLight(0xfff2dc,.75);sun.position.set(-30,50,40);scene.add(sun);
+
+function ctex(w,h,fn,rx=1,ry=1){const c=document.createElement('canvas');c.width=w;c.height=h;const x=c.getContext('2d');fn(x,w,h);const t=new THREE.CanvasTexture(c);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(rx,ry);t.anisotropy=Math.min(8,renderer.capabilities.getMaxAnisotropy());return t}
+const gc={};const bx=(w,h,d)=>gc[w+'_'+h+'_'+d]||(gc[w+'_'+h+'_'+d]=new THREE.BoxGeometry(w,h,d));
+const mc={};const lm=c=>mc[c]||(mc[c]=new THREE.MeshLambertMaterial({color:c}));
+const basic=c=>new THREE.MeshBasicMaterial({color:c});
+function label(txt,bg='#111',fg='#fff',w=3.2){const c=document.createElement('canvas');c.width=512;c.height=128;const x=c.getContext('2d');x.fillStyle=bg;x.beginPath();x.roundRect?x.roundRect(4,4,504,120,28):x.rect(4,4,504,120);x.fill();x.fillStyle=fg;x.textAlign='center';x.textBaseline='middle';let f=60;x.font=`900 ${f}px system-ui,sans-serif`;while(x.measureText(txt).width>470){f-=3;x.font=`900 ${f}px system-ui,sans-serif`}x.fillText(txt,256,68);const t=new THREE.CanvasTexture(c);const s=new THREE.Sprite(new THREE.SpriteMaterial({map:t,depthTest:false,transparent:true}));s.scale.set(w,w/4,1);s.renderOrder=10;return s}
+
+// ---------- world (1 unit = 1 metre; track runs along X) ----------
+const UP_Z=0, DN_Z=-3.4, GAUGE=1.435, RAIL_Z=GAUGE/2;
+const LEN=700;
+const grass=ctex(128,128,(x,w,h)=>{x.fillStyle='#6f8a4a';x.fillRect(0,0,w,h);for(let i=0;i<1500;i++){x.fillStyle=Math.random()<.5?'#5f7a3d':'#86a05a';x.fillRect(Math.random()*w,Math.random()*h,2,3)}},120,40);
+const gr=new THREE.Mesh(new THREE.PlaneGeometry(LEN,160).rotateX(-Math.PI/2),new THREE.MeshLambertMaterial({map:grass}));gr.position.y=-.02;scene.add(gr);
+const ballastT=ctex(128,64,(x,w,h)=>{x.fillStyle='#8c8780';x.fillRect(0,0,w,h);for(let i=0;i<1400;i++){const c=110+Math.random()*80|0;x.fillStyle=`rgb(${c},${c-4},${c-10})`;x.fillRect(Math.random()*w,Math.random()*h,3,2)}},LEN/2,2);
+for(const z of [UP_Z,DN_Z]){
+  const bal=new THREE.Mesh(new THREE.BoxGeometry(LEN,.32,3.4),[lm(0x77736c),lm(0x77736c),new THREE.MeshLambertMaterial({map:ballastT}),lm(0x77736c),lm(0x77736c),lm(0x77736c)]);bal.position.set(0,.14,z);scene.add(bal);
+  const n=Math.floor(LEN/.65);const sl=new THREE.InstancedMesh(bx(.26,.14,2.6),lm(0x5a5a58),n);const d=new THREE.Object3D();
+  for(let i=0;i<n;i++){d.position.set(-LEN/2+i*.65,.33,z);d.updateMatrix();sl.setMatrixAt(i,d.matrix)}scene.add(sl);
+  for(const s of [-1,1]){const r=new THREE.Mesh(bx(LEN,.16,.08),lm(0x8d8a85));r.position.set(0,.47,z+s*RAIL_Z);scene.add(r);const top=new THREE.Mesh(bx(LEN,.02,.07),basic(0xd8d6d2));top.position.set(0,.56,z+s*RAIL_Z);scene.add(top)}
+}
+// cess path (near side) and far cess
+const cessT=ctex(64,64,(x,w,h)=>{x.fillStyle='#a08c6a';x.fillRect(0,0,w,h);for(let i=0;i<400;i++){x.fillStyle=Math.random()<.5?'#8c7a5a':'#b39f7c';x.fillRect(Math.random()*w,Math.random()*h,2,2)}},LEN/2,1);
+const cess=new THREE.Mesh(new THREE.PlaneGeometry(LEN,2.4).rotateX(-Math.PI/2),new THREE.MeshLambertMaterial({map:cessT}));cess.position.set(0,.03,3.0);scene.add(cess);
+// fence
+for(let x=-LEN/2;x<LEN/2;x+=3){const p=new THREE.Mesh(bx(.08,1.4,.08),lm(0x3a3d40));p.position.set(x,.7,4.9);scene.add(p)}
+for(const y of [.5,.9,1.3]){const w=new THREE.Mesh(bx(LEN,.03,.03),lm(0x555a60));w.position.set(0,y,4.9);scene.add(w)}
+for(const s of [1,-1])for(let x=-LEN/2;x<LEN/2;x+=7+Math.random()*9){if(s>0&&Math.abs(x)<40)continue;const z=s>0?8+Math.random()*12:-9-Math.random()*14;const t=new THREE.Mesh(bx(.3,2.2,.3),lm(0x5a3a22));t.position.set(x,1.1,z);scene.add(t);const f=new THREE.Mesh(new THREE.IcosahedronGeometry(1.6+Math.random(),0),lm([0x3f6a35,0x4c7a3c,0x35602e][Math.floor(Math.random()*3)]));f.position.set(x,3.3,z);scene.add(f)}
+// signal
+{const p=new THREE.Mesh(bx(.18,4.2,.18),lm(0x222222));p.position.set(-38,2.1,2.0);scene.add(p);const h=new THREE.Mesh(bx(.5,1.2,.4),lm(0x111111));h.position.set(-38,4.3,2.0);scene.add(h);const l=new THREE.Mesh(new THREE.SphereGeometry(.12,10,8),basic(0x57f287));l.position.set(-38,4.6,2.2);scene.add(l)}
+
+// ---------- people ----------
+function makePerson(vest,pants,skin,helmet){
+  const g=new THREE.Group();const legs=[],arms=[];
+  const body=new THREE.Group();g.add(body);
+  for(const s of [-1,1]){const p=new THREE.Group();p.position.set(.11*s,.82,0);const m=new THREE.Mesh(bx(.17,.82,.19),lm(pants));m.position.y=-.41;p.add(m);const b=new THREE.Mesh(bx(.2,.13,.3),lm(0x1a1a1a));b.position.set(0,-.78,-.04);p.add(b);body.add(p);legs.push(p)}
+  const torso=new THREE.Mesh(bx(.48,.62,.28),lm(vest));torso.position.y=1.13;body.add(torso);
+  if(vest===0xff7a00||vest===0xf5e042){for(const y of [1.0,1.22]){const st=new THREE.Mesh(bx(.49,.05,.29),basic(0xe8e8e8));st.position.y=y;body.add(st)}}
+  for(const s of [-1,1]){const p=new THREE.Group();p.position.set(.31*s,1.4,0);const m=new THREE.Mesh(bx(.14,.58,.15),lm(vest));m.position.y=-.27;p.add(m);const hd=new THREE.Mesh(bx(.12,.12,.12),lm(skin));hd.position.y=-.6;p.add(hd);body.add(p);arms.push(p)}
+  const head=new THREE.Mesh(bx(.3,.32,.3),lm(skin));head.position.y=1.62;body.add(head);
+  if(helmet){const h=new THREE.Mesh(bx(.36,.16,.38),lm(helmet));h.position.y=1.84;body.add(h);const br=new THREE.Mesh(bx(.36,.03,.12),lm(helmet));br.position.set(0,1.77,-.22);body.add(br)}
+  const sh=new THREE.Mesh(new THREE.CircleGeometry(.4,16).rotateX(-Math.PI/2),new THREE.MeshBasicMaterial({color:0,transparent:true,opacity:.25,depthWrite:false}));sh.position.y=.05;g.add(sh);
+  g.userData={legs,arms,body,head,walk:0,pose:'stand'};
+  return g;
+}
+const people=[];
+function addPerson(p,x,z,face){p.position.set(x,.32,z);p.rotation.y=face||0;scene.add(p);people.push(p);return p}
+// player: orange vest, white helmet (marked with a ring)
+const player=addPerson(makePerson(0xff7a00,0x1f2a44,0x7a4a2c,0xffffff),0,UP_Z,0);
+const ring=new THREE.Mesh(new THREE.RingGeometry(.5,.62,24).rotateX(-Math.PI/2),basic(0xffb020));ring.position.y=.06;player.add(ring);
+const youTag=label('YOU','#ffb020','#111',1.2);youTag.position.set(0,2.4,0);player.add(youTag);
+const coss=addPerson(makePerson(0xff7a00,0x1f2a44,0xf1c9a5,0x2b5fd6),-5,3.0,Math.PI/2);
+const cossTag=label('COSS','#2b5fd6','#fff',1.3);cossTag.position.set(0,2.4,0);coss.add(cossTag);
+const lookout=addPerson(makePerson(0xff7a00,0x1f2a44,0xa86b45,0xffffff),46,3.2,-Math.PI/2);
+const loTag=label('LOOKOUT','#111','#ffb020',1.6);loTag.position.set(0,2.4,0);lookout.add(loTag);
+const flag=new THREE.Mesh(bx(.02,.35,.45),basic(0xf5e042));flag.position.set(0,-.6,-.25);lookout.userData.arms[1].add(flag);
+const mate=addPerson(makePerson(0xff7a00,0x2a2a2a,0xd9a27a,0xffffff),2.4,UP_Z,0);
+armband(coss,0x2b5fd6);armband(lookout,0xffffff,0xd23b3b);
+
+// ---------- trains ----------
+function makeTrain(col,stripe){
+  const g=new THREE.Group();
+  const side=ctex(1024,256,(x,w,h)=>{
+    x.fillStyle=col;x.fillRect(0,0,w,h);x.fillStyle='rgba(0,0,0,.18)';x.fillRect(0,0,w,18);
+    x.fillStyle=stripe;x.fillRect(0,200,w,18);
+    for(let i=0;i<7;i++){const wx=40+i*140;
+      if(i===3){x.fillStyle='#e0b400';x.fillRect(wx-4,56,108,176);x.fillStyle='#1b1d22';x.fillRect(wx+8,70,38,80);x.fillRect(wx+58,70,38,80);x.fillStyle='#111';x.fillRect(wx+50,56,4,176);continue}
+      x.fillStyle='#1b1d22';if(x.roundRect){x.beginPath();x.roundRect(wx,64,104,70,12);x.fill()}else x.fillRect(wx,64,104,70);
+      x.fillStyle='rgba(255,255,255,.14)';x.fillRect(wx+8,70,44,18)}
+  });
+  const sideMat=new THREE.MeshLambertMaterial({map:side}),bodyMat=new THREE.MeshLambertMaterial({color:new THREE.Color(col)}),roofMat=lm(0x8b9097),under=lm(0x2a2a2a),dark=lm(0x1e1f22);
+  const roofGeo=new THREE.CylinderGeometry(1.4,1.4,19.9,18).rotateZ(Math.PI/2).scale(1,.3,1);
+  const wheelGeo=new THREE.CylinderGeometry(.42,.42,.12,14).rotateX(Math.PI/2);
+  for(let i=0;i<3;i++){
+    const cx=i*20.5+10.2;
+    const body=new THREE.Mesh(bx(20,2.7,2.8),[bodyMat,bodyMat,roofMat,under,sideMat,sideMat]);body.position.set(cx,2.35,0);g.add(body);
+    const roof=new THREE.Mesh(roofGeo,roofMat);roof.position.set(cx,3.7,0);g.add(roof);
+    const skirt=new THREE.Mesh(bx(19.6,.5,2.5),dark);skirt.position.set(cx,.85,0);g.add(skirt);
+    for(const bxp of [-7,7]){const bg=new THREE.Mesh(bx(2.8,.55,2.2),under);bg.position.set(cx+bxp,.78,0);g.add(bg);for(const wz of [-.72,.72])for(const wx of [-.85,.85]){const w=new THREE.Mesh(wheelGeo,lm(0x3a3a3a));w.position.set(cx+bxp+wx,.6,wz);g.add(w)}}
+    if(i<2){const gw=new THREE.Mesh(bx(.6,2.4,1.6),dark);gw.position.set(cx+10.25,2.3,0);g.add(gw)}
+  }
+  // cab front
+  const nose=new THREE.Mesh(bx(1.0,2.3,2.78),lm(0xf5d000));nose.position.set(-.3,2.05,0);g.add(nose);
+  const cabTop=new THREE.Mesh(bx(.8,1.15,2.6),bodyMat);cabTop.position.set(-.1,3.25,0);cabTop.rotation.z=-.22;g.add(cabTop);
+  const ws=new THREE.Mesh(bx(.06,.85,2.3),lm(0x14171c));ws.position.set(-.52,3.18,0);ws.rotation.z=-.22;g.add(ws);
+  for(const s of [-.85,.85]){const hl=new THREE.Mesh(bx(.08,.22,.42),basic(0xfff4c8));hl.position.set(-.82,1.55,s);g.add(hl);const gl=new THREE.Sprite(new THREE.SpriteMaterial({color:0xfff2c0,transparent:true,opacity:.35,depthWrite:false,blending:THREE.AdditiveBlending}));gl.scale.set(.45,.45,1);gl.position.set(-.95,1.55,s);g.add(gl)}
+  const coup=new THREE.Mesh(bx(.6,.3,.4),dark);coup.position.set(-.9,1.0,0);g.add(coup);
+  g.visible=false;scene.add(g);return g;
+}
+const upTrain=makeTrain('#e4e7ec','#2b5fd6'),dnTrain=makeTrain('#c64a3a','#f4f1ea');
+upTrain.position.z=UP_Z;dnTrain.position.z=DN_Z;dnTrain.rotation.y=Math.PI;
+// ---------- lineside detail ----------
+{
+  const skyT=ctex(4,256,(x,w,h)=>{const g=x.createLinearGradient(0,0,0,h);g.addColorStop(0,'#5d8fc4');g.addColorStop(.55,'#a9c3d6');g.addColorStop(1,'#dfe8ee');x.fillStyle=g;x.fillRect(0,0,w,h)});
+  skyT.wrapS=skyT.wrapT=THREE.ClampToEdgeWrapping;scene.background=skyT;
+  for(const z of [1.78,DN_Z-1.85]){const tr=new THREE.Mesh(bx(LEN,.24,.42),lm(0xb8b4aa));tr.position.set(0,.12,z);scene.add(tr);const lid=new THREE.Mesh(bx(LEN,.03,.44),lm(0xa6a299));lid.position.set(0,.25,z);scene.add(lid)}
+  for(let x=-LEN/2+40;x<LEN/2;x+=95){const c=new THREE.Mesh(bx(1.1,1.5,.8),lm(0x9aa0a8));c.position.set(x,.75,4.15);scene.add(c);const r=new THREE.Mesh(bx(1.25,.08,.95),lm(0x6c727a));r.position.set(x,1.54,4.15);scene.add(r);const d=new THREE.Mesh(bx(.9,1.1,.02),lm(0x8a9098));d.position.set(x,.8,3.74);scene.add(d)}
+  const mpT=ctex(64,64,(x)=>{x.fillStyle='#fff';x.fillRect(0,0,64,64);x.fillStyle='#111';x.font='900 30px system-ui';x.textAlign='center';x.fillText('12',32,30);x.font='900 20px system-ui';x.fillText('¼',32,55)});
+  for(let x=-LEN/2+25;x<LEN/2;x+=101){const p=new THREE.Mesh(bx(.08,1.0,.08),lm(0x222222));p.position.set(x,.5,4.5);scene.add(p);const s=new THREE.Mesh(bx(.45,.45,.04),[lm(0xffffff),lm(0xffffff),lm(0xffffff),lm(0xffffff),new THREE.MeshBasicMaterial({map:mpT}),new THREE.MeshBasicMaterial({map:mpT})]);s.position.set(x,1.15,4.5);scene.add(s)}
+}
+function armband(p,col,col2){const b=new THREE.Mesh(bx(.165,.13,.175),basic(col));b.position.set(0,-.13,0);p.userData.arms[0].add(b);if(col2){const s=new THREE.Mesh(bx(.168,.04,.178),basic(col2));s.position.set(0,-.13,0);p.userData.arms[0].add(s)}}
+
+
+// ---------- tween / animation system ----------
+const tweens=[];
+function tween(dur,fn){return new Promise(res=>tweens.push({t:0,dur,fn,res}))}
+const wait=ms=>new Promise(r=>setTimeout(r,ms));
+const ease=k=>k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2;
+const camP=new THREE.Vector3(14,7,16),camL=new THREE.Vector3(0,1,-1);
+function camTo(p,l,dur=1.4){const p0=camP.clone(),l0=camL.clone();return tween(dur,k=>{const e=ease(k);camP.lerpVectors(p0,p,e);camL.lerpVectors(l0,l,e)})}
+function walkTo(pp,x,z,speed=2.4){const sx=pp.position.x,sz=pp.position.z;const dist=Math.hypot(x-sx,z-sz);if(dist<.01)return Promise.resolve();pp.rotation.y=Math.atan2(-(x-sx),-(z-sz));pp.userData.pose='walk';return tween(dist/speed,k=>{pp.position.x=sx+(x-sx)*k;pp.position.z=sz+(z-sz)*k}).then(()=>{pp.userData.pose='stand'})}
+function runTrain(tr,from,to,speed){tr.visible=true;tr.position.x=from;return tween(Math.abs(to-from)/speed,k=>{tr.position.x=from+(to-from)*k}).then(()=>{tr.visible=false})}
+let shake=0;
+
+// ---------- UI ----------
+let score=0;
+function addScore(n){score+=n;$('score').textContent='✓ '+score}
+function stage(t){$('stage').textContent=t}
+function banner(t){$('banner').textContent=t||''}
+function pop(t,c){const p=$('pop');p.textContent=t;p.style.color=c||'#fff';p.classList.remove('on');void p.offsetWidth;p.classList.add('on')}
+function flash(){const f=$('flash');f.classList.remove('on');void f.offsetWidth;f.classList.add('on')}
+function sheet(html){const s=$('sheet');s.classList.remove('hide');s.classList.remove('compact');s.innerHTML=html;s.scrollTop=0}
+function hideSheet(){$('sheet').classList.add('hide')}
+function info(title,body,btn='Next'){return new Promise(res=>{sheet(`<h2>${title}</h2><div class="body">${body}</div><button class="go">${btn}</button>`);$('sheet').querySelector('.go').onclick=()=>{tone(1,.01,'sine',.0001);res()}})}
+function ask(title,q,opts,correct,fbOk,fbNo,ref,pts=10){
+  return new Promise(res=>{
+    sheet(`<h2>${title}</h2><div class="q">${q}</div><div class="opts">${opts.map((o,i)=>`<button class="opt" data-i="${i}">${o}</button>`).join('')}</div><div id="fbx"></div>`);
+    const btns=[...$('sheet').querySelectorAll('.opt')];
+    btns.forEach(b=>b.onclick=()=>{
+      const i=+b.dataset.i;const ok=i===correct;btns.forEach(x=>x.onclick=null);
+      btns[correct].classList.add('good');if(!ok)b.classList.add('bad');
+      if(ok){addScore(pts);S.good()}else S.bad();
+      $('fbx').innerHTML=`<div class="fb ${ok?'ok':'no'}"><b>${ok?'✅ Correct':'❌ Not quite'}</b>${ok?fbOk:fbNo}${ref?`<div class="ref">${ref}</div>`:''}</div><button class="go">Next</button>`;
+      $('fbx').querySelector('.go').onclick=()=>res(ok);
+      log.push({q:title,ok});
+    });
+  });
+}
+function multi(title,q,items,goodSet,fb,ref){
+  return new Promise(res=>{
+    const sel=new Set();
+    sheet(`<h2>${title}</h2><div class="q">${q}</div><div class="opts">${items.map((o,i)=>`<button class="opt" data-i="${i}">${o}</button>`).join('')}</div><button class="go" id="done">Done</button><div id="fbx"></div>`);
+    const btns=[...$('sheet').querySelectorAll('.opt')];
+    btns.forEach(b=>b.onclick=()=>{const i=+b.dataset.i;sel.has(i)?sel.delete(i):sel.add(i);b.classList.toggle('sel');S.tick()});
+    $('done').onclick=()=>{
+      btns.forEach(b=>b.onclick=null);$('done').remove();
+      let right=0;items.forEach((_,i)=>{const want=goodSet.includes(i),got=sel.has(i);b2=btns[i];if(want)b2.classList.add('good');else if(got)b2.classList.add('bad');if(want===got)right++});
+      const ok=right===items.length;addScore(right*2);ok?S.good():S.bad();
+      $('fbx').innerHTML=`<div class="fb ${ok?'ok':'no'}"><b>${ok?'✅ Spot on':`❌ ${right}/${items.length} right`}</b>${fb}${ref?`<div class="ref">${ref}</div>`:''}</div><button class="go">Next</button>`;
+      $('fbx').querySelector('.go').onclick=()=>res(ok);
+      log.push({q:title,ok});
+    };
+  });
+}
+let b2;
+const log=[];
+
+// ---------- picking ----------
+const ray=new THREE.Raycaster(),mv=new THREE.Vector2();
+let pickHandler=null;
+renderer.domElement.addEventListener('pointerdown',e=>{
+  if(!pickHandler)return;
+  mv.x=e.clientX/innerWidth*2-1;mv.y=-(e.clientY/innerHeight)*2+1;ray.setFromCamera(mv,camera);
+  const objs=[];scene.traverse(o=>{if(o.isMesh&&(o.userData.zone||o.userData.hz)&&(o.visible||o.userData.hz))objs.push(o)});
+  const hit=ray.intersectObjects(objs,false)[0];pickHandler(hit?hit.object:null,e);
+});
+function timer(sec){const bar=$('timerBar'),f=$('timerFill');bar.classList.remove('hide');f.style.transition='none';f.style.width='100%';void f.offsetWidth;f.style.transition=`width ${sec}s linear`;f.style.width='0%'}
+function stopTimer(){$('timerBar').classList.add('hide')}
+
+
+const RULES={"D1": "Position of safety distance, up to 100 mph", "D2": "Position of safety distance, over 100 mph", "D3": "\"On or near the line\" means on it, or within 3 m with no permanent fence between", "D4": "Platforms and level crossings are not on or near the line, unless doing engineering/technical work near the platform edge", "D5": "Names of the spaces: cess, four-foot, six-foot, ten-foot", "D6": "Lineside = between the boundary and the on-or-near-the-line area", "D7": "Warning systems: ATWS, LOWS, SATWS, TOWS", "D8": "Maximum speed is listed in the Sectional Appendix", "D9": "Safety barrier types: rigid, tensioned, netting, barricade tape", "G1": "Rules apply regardless of grade. If no rule covers it, do it the safest way you know", "G2": "Only operate plant/equipment you are trained and authorised for", "G3": "Never get on/off a moving rail vehicle (except slow continuous ones). Never ride on steps or trolleys", "G4": "Cab travel: show cab pass, tell driver reason/destination, never distract the driver", "L1": "Wear the high-vis you were issued", "L2": "Use authorised access points and walking routes", "L3": "Acknowledge a driver's horn: raise one arm above your head", "L4": "Lineside work must not affect on-or-near-the-line unless a COSS is there and agrees", "L5": "Road vehicles stay off on-or-near-the-line unless driver is COSS/IWA or a COSS agrees", "A1": "When you may go on or near the line alone (COSS/IWA, or told by a COSS to walk to a site)", "A2": "Hold a valid PTS certificate", "A3": "Never work alone unless you are a COSS or IWA", "A4": "Carry a lamp in darkness, poor visibility or a tunnel", "A5": "Know each line's max speed, direction, no-go areas, limited clearance spots", "A6": "Walking alone: light hand tools only", "A7": "Nothing that stops you seeing or hearing trains (headphones, hood)", "A8": "Crossing: don't step on rails, sleepers or between moving parts of points", "A9": "Phone call: move to a position of safety and stand still first", "A10": "Look up at least every 5 seconds", "A11": "Be in a position of safety at least 10 s before a train arrives", "A12": "Train approaching: stay in/move to safety until it has passed and no other train is coming", "A13": "Joining a group: speak to the COSS first, agree access point and destination, don't walk until briefed", "A14": "Leaving a group: tell the COSS, agree destination and route", "A15": "Obstacle forces you onto an open line: tell the COSS and follow instructions", "W1": "Only go on with others if a COSS is present and stays with you", "W2": "Identify the COSS: armlet on left arm or chest badge", "W3": "Understand the briefing; ask if anything is unclear", "W4": "Sign the RT9909", "W5": "Never lean on or rest tools against a safety barrier", "W6": "Lookout warning: stop, acknowledge, go to safety immediately; stay until COSS says", "W7": "Urgent warning = series of short, sharp blasts", "W8": "Never distract a lookout", "W9": "Site warden warning: check you're in the safe area, step back if not", "W10": "ATWS/SATWS/TOWS/LOWS warning: go to safety, stay until the COSS says", "W11": "COSS arranges safe bypass of obstacles that force the group onto an open line", "W12": "Only cross open lines after the COSS explains the arrangements", "W13": "Route proving: only get off the train once the COSS has explained", "W14": "Train protecting you mustn't move until COSS confirms everyone and everything is clear", "W15": "Never use gangway doors to get to the track in an OLE area", "R1": "Accident: report ASAP to person in charge, signaller or Ops Control", "R2": "Start with \"This is an emergency call\"", "R3": "Give name, exact location, what happened, lines obstructed?, services needed", "R4": "Report all accidents and near misses to your supervisor", "R5": "Dangerous goods: say \"This is a rail dangerous goods emergency\" + UN number", "R6": "Keep well clear, wind behind you, avoid low ground, keep people away", "R7": "No naked lights, smoking or phones near flammable loads", "R8": "Contamination: wash with plenty of cold water, remove clothing carefully, get medical help", "H1": "No tools/equipment within 2 m of a line a train could pass (unless slipstream-proof)", "H2": "Keep access gates closed and locked; report damaged fences", "H3": "Report suspected trespassers", "H4": "Report lineside fires immediately", "H5": "Report flowing or pooling water near structures/earthworks", "H6": "Report unsafe trains: open door, insecure load, fire, hot axle box", "H7": "Report missing/unlit headlight or tail lamp", "H8": "Train in distress = continuous long horn blasts; flashing headlights = hazard warning", "H9": "Keep 5 m from a fallen overhead power line until the electricity company says safe", "E1": "When to stop trains: track defect, flood, obstruction, fire, structure damage, large animal", "E2": "Tell the person in charge/signaller/Ops Control immediately", "E3": "Daylight: red flag, or both arms above your head", "E4": "On a vehicle: raise one arm horizontally", "E5": "Dark/poor visibility: red light, or wave any light violently", "C1": "Confirm who you're talking to; give location, name, employer, task", "C2": "Say \"line blocked\", never \"not clear\"", "C3": "Say numbers one digit at a time (except times and Rule Book refs)", "C4": "Repeat messages back", "C5": "Who leads the conversation (ECO > signaller > PICOP \u2026; COSS leads with group/lookouts)", "C6": "\"Repeat back\" and \"Correction\" phrases", "C7": "Radio: \"Over\" = reply expected, \"Out\" = no reply", "C8": "Use the phonetic alphabet for signal/point IDs, spelling, interference", "C9": "Be in a position of safety before using mobile equipment", "C10": "No group/conference calls for safety instructions (except emergencies)", "S1": "Limited clearance sign: no position of safety this side, don't stand there while trains run", "S2": "No refuges sign: refuges are on the other side", "S3": "Prohibition sign: don't pass it while trains run (except emergency protection)", "S4": "Limited-clearance telephones: emergency use only, if nothing else available"};
+// ================= PTS MICRO-SCENES (HB1 Issue 9, own wording) =================
+const R1=0.7175; // near rail of the Up line, z
+const CAM0=[-6,3.6,10.5],LOOK0=[2,1,.5];
+const SCENES=[
+// ---------- DEFINITIONS ----------
+{id:'D1',r:['D1'],sec:'D',t:'Train coming, 90 mph line',ref:'HB1 §1',
+ set(W){W.speed(90);W.me(-1,4.1);W.cam([-4,4.8,8.5],[3,.3,.8])},
+ q:{t:'tap',walk:1,p:'Line speed is 90 mph. A train is coming on the near line. Tap where you\'d stand.',z:[{id:'a',x:3,z:R1+.5,l:'A'},{id:'b',x:3,z:R1+1.7,l:'B'},{id:'c',x:3,z:-1.7,l:'C'}],a:'b'},
+ async after(W,ok){if(ok)await W.train('up',{speed:34});else{S.trainHorn();W.pose(player,null);await W.wait(900)}},
+ why:'Up to 100 mph, a position of safety is at least <b>1.25 m (4 ft)</b> from the nearest rail. B is about 1.7 m away. A is too close, and this six-foot leaves you under 1.25 m from both lines.'},
+{id:'D2',r:['D2'],sec:'D',t:'Train coming, 110 mph line',ref:'HB1 §1',
+ set(W){W.speed(110);W.me(-1,4.2);W.cam([-4,4.8,9],[3,.3,1.6])},
+ q:{t:'tap',walk:1,p:'This line is 110 mph. Tap the spot that\'s far enough from the rail.',z:[{id:'a',x:3,z:R1+1.4,l:'A'},{id:'b',x:3,z:R1+2.3,l:'B'}],a:'b'},
+ async after(W,ok){if(ok)await W.train('up',{speed:44});else{S.trainHorn();await W.wait(900)}},
+ why:'Over 100 mph you need at least <b>2 m (6 ft 6 in)</b> from the nearest rail. A (1.4 m) would only do on a line up to 100 mph.'},
+{id:'D3',r:['D3'],sec:'D',t:'Are you on or near the line?',ref:'HB1 §1',
+ set(W){W.me(1,R1+2.5,0);W.P.measure(-.2,R1,R1+2.5,'2.5 m');W.cam([-5,3.2,8],[1,.6,1.5])},
+ q:{t:'pick',p:'You\'re 2.5 m from the nearest rail. The fence is behind you, not between you and the track. Are you on or near the line?',o:['Yes','No, I\'m not on the track itself','Only when a train is coming'],a:0},
+ why:'"On or near the line" means on the track, or within <b>3 m (10 ft)</b> of it with no permanent fence in between. At 2.5 m you\'re on or near the line.'},
+{id:'D4',r:['D4'],sec:'D',t:'Work on a platform',ref:'HB1 §1',
+ set(W){W.P.platform(-30,30);W.me(1,-7.4,Math.PI,1.0);W.guy({x:4,z:-5.9,y:1.0,face:0,tag:'COPING STONES'});W.cam([-6,4.4,6],[2,1.2,-6])},
+ q:{t:'pick',p:'Which of these platform jobs counts as being on or near the line?',o:['Repairing the coping stones right at the platform edge','Changing a poster at the back of the platform','Sweeping the waiting room','Checking tickets at the gate line'],a:0},
+ why:'A platform isn\'t on or near the line by itself. It becomes so when you\'re doing engineering or technical work within <b>1.25 m of the platform edge</b>.'},
+{id:'D5',r:['D5'],sec:'D',t:'Meet me in the six-foot',ref:'HB1 §1',
+ set(W){cast(coss,6,3.0,Math.PI/2);W.say(coss,'Meet me in the six-foot',6000);W.cam([0,6,9.5],[4,.3,-.8])},
+ q:{t:'tap',p:'The COSS says "Meet me in the six-foot." Tap the six-foot.',z:[{id:'a',x:4,z:2.9,l:'A'},{id:'b',x:4,z:0,l:'B'},{id:'c',x:4,z:-1.7,l:'C'},{id:'d',x:4,z:-3.4,l:'D'}],a:'c'},
+ why:'<b>Cess</b> (A): beside the line on the outside. <b>Four-foot</b> (B, D): between the two rails of one line. <b>Six-foot</b> (C): the gap between two lines. <b>Ten-foot</b>: a wider gap between lines, found where there are more than two.'},
+{id:'D6',r:['D6'],sec:'D',t:'Cutting back bushes',ref:'HB1 §1',
+ set(W){W.me(2,4.45,0);W.P.measure(.6,R1,4.45,'3.7 m');W.P.tool(2.6,4.3,.4);W.cam([-4,3.4,9.5],[2,.8,3])},
+ q:{t:'pick',p:'You\'re cutting back bushes by the boundary fence, 3.7 m from the nearest rail. Where are you?',o:['Lineside','On or near the line','Off the railway altogether'],a:0},
+ why:'<b>Lineside</b> is railway land between the boundary and the on-or-near-the-line area (3 m from the rail). Beyond 3 m but inside the fence = lineside.'},
+{id:'D7',r:['D7'],sec:'D',t:'Horns along the site',ref:'HB1 §1',
+ set(W){for(const x of[-4,2,8])W.P.hornUnit(x,4.2);cast(lookout,6,3.2,-Math.PI/2);W.me(0,3.0);W.cam([-5,3.6,10],[3,1.4,2])},
+ async play(W){await W.wait(700);W.pose(lookout,'phone');W.say(lookout,'*presses button*',1800);S.siren();await W.wait(2200);W.pose(lookout,null)},
+ q:{t:'pick',p:'The lookout presses a button and horns sound all along the site. What\'s this system?',o:['LOWS: Lookout Operated Warning System','ATWS: Automatic Track Warning System','TOWS: Train Operated Warning System','A site warden system'],a:0},
+ why:'LOWS is set off by a lookout. ATWS detects trains automatically, TOWS is a fixed system set off by the train, and SATWS is semi-automatic. You need to know all four names.'},
+{id:'D8',r:['D8'],sec:'D',t:'What\'s the line speed?',ref:'HB1 §1',
+ set(W){W.speed(75);W.me(5,3.2,-Math.PI/2);W.cam([2,2.6,6],[9,1.8,2])},
+ q:{t:'pick',p:'You need the official maximum speed for this line. Where is it listed?',o:['The Sectional Appendix','The Rule Book','Ask the next train driver','The public timetable'],a:0},
+ why:'Maximum line speeds are listed in the <b>Sectional Appendix</b>. Your COSS will brief you on the speed of each line.'},
+{id:'D9',r:['D9'],sec:'D',t:'Know your barriers',ref:'HB1 §1',
+ set(W){W.P.barrier('rigid',-9,-3,-1.7);W.P.barrier('net',-1,5,-1.7);W.P.barrier('tape',7,13,-1.7);W.hz('rigid',-6,1,-1.7,6,2,1);W.hz('net',2,1,-1.7,6,2,1);W.hz('tape',10,1,-1.7,6,2,1);player.visible=false;W.cam([-12,3.8,4.5],[2,.6,-1.7])},
+ q:{t:'spot',p:'Three types of safety barrier in the six-foot. Tap the <b>rigid</b> barrier.',a:'rigid',labels:{rigid:'RIGID'}},
+ why:'Rigid = solid posts and rails. The others you\'ll see are <b>tensioned</b> (taut wires or ropes), <b>netting</b> and <b>barricade tape</b>.'},
+// ---------- GENERAL ----------
+{id:'G1a',r:['G1'],sec:'G',t:'The senior visitor',ref:'HB1 §2',
+ set(W){W.guy({x:-4,z:4.4,vest:0xff7a00,helmet:0xffffff,tag:'SENIOR MANAGER',face:Math.PI})},
+ async play(W){const m=tmpPeople[0];W.say(m,'Rules are for the gang, not me',2400);await W.walk(m,1,1.4,1.6)},
+ q:{t:'pick',p:'A senior manager visiting the site walks onto the track without a briefing. What do you do?',o:['Stop him: the rules apply to everyone, whatever their grade','Let him, he\'s senior','Follow him to keep an eye on him','Leave it, it\'s his call'],a:0},
+ why:'The Rule Book applies to everyone, <b>whatever their grade</b>. Nobody goes on without the safe system.'},
+{id:'G1b',r:['G1'],sec:'G',t:'No rule for this',ref:'HB1 §2',
+ set(W){W.P.box(5,.55,3.3,1.6,.5,1,0x8a2be2);W.say(player,'Never seen this before…',3000);W.cam([-5,3,8],[3,1,2.5])},
+ q:{t:'pick',p:'Something comes up that no rule seems to cover, and you can\'t reach anyone to ask. What do you do?',o:['Do it the safest way you know','Do it the quickest way','Skip that bit of the job','Copy what someone did last week'],a:0},
+ why:'If no rule covers it, you do it <b>the safest way you know</b>, and ask when you can.'},
+{id:'G2',r:['G2'],sec:'G',t:'"Just use the saw"',ref:'HB1 §2',
+ set(W){cast(mate,3,3.0,Math.PI/2);mate.visible=true;W.P.box(4.5,.55,3.6,.8,.5,.5,0xf5d000);W.say(mate,'Grab the rail saw, you\'ve seen me do it',4000);W.cam([-4,3,8],[3,1,3])},
+ q:{t:'pick',p:'Your mate wants you to cut a rail with the saw. You\'ve never been trained on it.',o:['Say no: only use kit you\'re trained and authorised for','Give it a go carefully','Do it if the COSS is watching','Do it after he shows you once'],a:0},
+ why:'Only operate plant and equipment you are <b>trained and authorised</b> to use.'},
+{id:'G3',r:['G3'],sec:'G',t:'Riding the step',ref:'HB1 §2',
+ set(W){cast(mate,-2,3.0,0);W.cam([-8,3.6,10],[2,1.5,0])},
+ async play(W){W.say(mate,'Hop on the step, save the walk',3000);upTrain.visible=true;S.rumble();await tween(4,k=>upTrain.position.x=14-8*k)},
+ q:{t:'pick',p:'An engineering train is moving off slowly. Your mate says ride on the step to the next site.',o:['No: never ride on the steps, and never get on or off a moving vehicle','Fine at walking pace','Fine if you hold on with both hands','Only if the driver waves you on'],a:0},
+ why:'Never get on or off a moving rail vehicle, and <b>never ride on steps</b> or trolleys.'},
+{id:'G4',r:['G4'],sec:'G',t:'Cab ride to site',ref:'HB1 §2',
+ set(W){upTrain.visible=true;upTrain.position.x=4;W.me(2.4,2.6,-Math.PI/2);W.cam([-3,3.4,7],[3,2,0])},
+ q:{t:'pick',p:'You\'re riding in the cab to get to site. What do you do?',o:['Show your cab pass, tell the driver why and where you\'re going, then don\'t distract them','Chat to keep the driver alert','Film the route on your phone','Stand by the driver\'s controls'],a:0},
+ why:'Show your <b>cab pass</b>, tell the driver the <b>reason and destination</b>, and <b>never distract</b> the driver.'},
+// ---------- LINESIDE ----------
+{id:'L1',r:['L1'],sec:'L',t:'Kit check',ref:'HB1 §3',
+ set(W){const a=W.guy({x:1,z:3.0,face:-Math.PI/2});const b=W.guy({x:3.5,z:3.0,vest:0x6b7078,helmet:null,face:-Math.PI/2});const c=W.guy({x:6,z:3.0,face:-Math.PI/2});player.visible=false;W.hzOn('ok1',a);W.hzOn('bad',b);W.hzOn('ok2',c);W.cam([3.5,2.6,12.5],[3.5,1.2,3])},
+ q:{t:'spot',p:'Your group is heading to site. Tap the person who isn\'t dressed right.',a:'bad',labels:{bad:'NO HIGH-VIS'}},
+ why:'Always wear the <b>high-visibility clothing you\'ve been issued</b> when you\'re on the railway.'},
+{id:'L2',r:['L2'],sec:'L',t:'Getting on to the railway',ref:'HB1 §3',
+ set(W){W.P.gate(4.6,false);W.P.sign(8.2,5.1,['ACCESS','POINT'],{face:0,y:1.3,w:1,h:.6,bg:'#0b4a9e',fg:'#fff'});W.P.gap(-1.5);W.me(2.4,8.5,0);W.cam([2.4,5.5,21],[2.4,.8,5])},
+ q:{t:'tap',p:'You\'ve parked up. Tap how you\'ll get on to the railway.',z:[{id:'gate',x:6.2,z:6,l:'A'},{id:'gap',x:-1.5,z:6.3,l:'B'}],a:'gate'},
+ why:'Use <b>authorised access points</b> and walking routes only. Never use gaps in the fence.'},
+{id:'L3',r:['L3'],sec:'L',t:'Driver sounds the horn',ref:'HB1 §3',
+ set(W){W.speed(60);W.me(0,3.1,-Math.PI/2);W.cam([-7,3,9],[6,1.8,1])},
+ async play(W){upTrain.visible=true;upTrain.position.x=170;S.trainHorn();await tween(2.5,k=>upTrain.position.x=170-100*k)},
+ q:{t:'pick',p:'You\'re in your position of safety. The driver sounds the horn at you. How do you acknowledge?',o:['Raise one arm above your head','Raise both arms above your head','Thumbs up','Do nothing, stay still'],a:0},
+ async after(W,ok){W.pose(player,'one');await runTrain(upTrain,70,-212,32);W.pose(player,null)},
+ why:'Acknowledge by raising <b>one arm</b> above your head. Both arms above your head is the emergency signal to <b>stop</b>.'},
+{id:'L4',r:['L4'],sec:'L',t:'Where does the spoil go?',ref:'HB1 §3',
+ set(W){W.me(1,4.4,Math.PI);W.P.spoil(-3,4.2);W.P.measure(3,R1,R1+2,'2 m');W.cam([-5,3.6,9.5],[1,.6,3])},
+ q:{t:'pick',p:'You\'re digging lineside. You want to put the spoil heap 2 m from the rail. No COSS on site.',o:['Only if a COSS is there and agrees','Fine, it\'s still lineside work','Fine at night when there are fewer trains','Fine if you look out for trains yourself'],a:0},
+ why:'Lineside work must not affect the on-or-near-the-line area (within 3 m) unless a <b>COSS is there and agrees</b>.'},
+{id:'L5',r:['L5'],sec:'L',t:'Van on the access road',ref:'HB1 §3',
+ set(W){W.P.van(-2,7);W.P.gate(1,true);W.me(5,6.3,Math.PI/2);W.cam([4,4,15],[1,1,4])},
+ q:{t:'pick',p:'The van driver (PTS only) wants to drive along the cess to drop materials, within 3 m of the line. No COSS here.',o:['Not allowed: he\'d need to be a COSS or IWA, or a COSS has to agree','Fine if he goes slowly','Fine with hazard lights on','Fine in daylight'],a:0},
+ why:'Road vehicles stay off on-or-near-the-line unless the driver is a <b>COSS/IWA</b> or a <b>COSS agrees</b>.'},
+// ---------- GOING ON ALONE ----------
+{id:'A1',r:['A1'],sec:'A',t:'Walking on your own',ref:'HB1 §4',
+ set(W){W.me(-4,3.0)},
+ q:{t:'pick',p:'You\'re PTS only. When can you go on or near the line by yourself?',o:['When a COSS has told you to walk to or from a site on your own','Any time you\'ve got a valid PTS','When the line speed is under 50 mph','When it\'s daylight'],a:0},
+ why:'You can only go on or near the line alone if you\'re a <b>COSS or IWA</b>, or a <b>COSS has told you</b> to walk to (or from) a site.'},
+{id:'A2',r:['A2'],sec:'A',t:'At the access point',ref:'HB1 §4',
+ set(W){W.me(3,6.2,0);W.P.gate(1,false);W.card(`<div class="idc"><b>SENTINEL</b><span>Personal Track Safety</span><div class="exp">EXPIRED<br><small>last month</small></div></div>`);W.cam([3,3,12],[2,1.5,4.5])},
+ q:{t:'pick',p:'At the gate, you notice your PTS ran out last month.',o:['Don\'t go on: you need a valid PTS','Go on, it\'s only a month','Go on if nobody checks','Go on and renew it tomorrow'],a:0},
+ why:'You must hold a <b>valid PTS</b> certificate to go on or near the line.'},
+{id:'A3',r:['A3'],sec:'A',t:'Last few clips',ref:'HB1 §4',
+ set(W){W.me(2,0,-Math.PI/2);player.userData.pose='kneel';for(let i=0;i<3;i++)W.P.box(4+i*.65,.45,.7,.2,.12,.2,0x333333)},
+ async play(W){W.say(player,'Gang\'s gone… I\'ll just finish these',2600);await W.wait(2400);player.userData.pose='stand'},
+ q:{t:'pick',p:'The gang\'s left. You\'re PTS only and want to finish the last few clips on your own.',o:['Stop and get off: you can\'t work alone unless you\'re a COSS or IWA','Carry on, you know the job','Carry on if you keep looking up','Carry on if you tell the signaller'],a:0},
+ why:'<b>Never work alone</b> on or near the line unless you\'re a COSS or IWA.'},
+{id:'A4',r:['A4'],sec:'A',t:'Night walk',ref:'HB1 §4',
+ set(W){W.night(true);W.me(-2,3.0);W.cam([-7,3,8],[3,1,1])},
+ q:{t:'pick',p:'It\'s dark and you\'re about to walk to site. What must you carry?',o:['A lamp','Nothing, your high-vis reflects','A whistle','A red flag'],a:0},
+ async after(W){const l=flameSprite(0xfff2c0,2.5);l.position.set(.35,.9,-.3);player.add(l);await W.wait(1200)},
+ why:'Carry a <b>lamp</b> in darkness, poor visibility or a tunnel.'},
+{id:'A5',r:['A5'],sec:'A',t:'Before you set off',ref:'HB1 §4',
+ set(W){W.speed(75);W.me(4,3.0,-Math.PI/2);W.cam([0,3,8],[8,1.5,1])},
+ q:{t:'multi',p:'Before you walk on your own, what must you know?',o:['The maximum speed on each line','Which direction trains run on each line','Where there\'s limited clearance','Any places you mustn\'t go','Which company runs the trains','The drivers\' names'],a:[0,1,2,3]},
+ why:'Know each line\'s <b>max speed</b> and <b>direction</b>, any <b>no-go areas</b>, and where there\'s <b>limited clearance</b>.'},
+{id:'A6',r:['A6'],sec:'A',t:'What can you carry?',ref:'HB1 §4',
+ set(W){W.P.bag(1.5,3.6);W.P.box(3.5,.7,3.4,1.2,.8,.6,0xc23b22);W.P.sign(3.5,3.9,['RAIL DRILL'],{y:.9,w:1,h:.3,face:0})},
+ q:{t:'pick',p:'You\'re walking to site alone. What can you carry?',o:['Light hand tools only','The rail drill if you\'re careful','A trolley load of clips','Anything, as long as you stay in the cess'],a:0},
+ why:'When walking alone you can only carry <b>light hand tools</b>, so you can get clear quickly.'},
+{id:'A7',r:['A7'],sec:'A',t:'Can they hear the train?',ref:'HB1 §4',
+ set(W){player.visible=false;const a=W.guy({x:0,z:3,phones:1,face:Math.PI*.15});const b=W.guy({x:2.5,z:3,hood:1,helmet:null,face:Math.PI*.15});const c=W.guy({x:5,z:3,face:Math.PI*.15});W.hzOn('phones',a);W.hzOn('hood',b);W.hzOn('ok',c);W.cam([2.5,2.6,12.5],[2.5,1.3,3])},
+ q:{t:'spot',multi:1,p:'Tap anyone who might not see or hear a train coming.',a:['phones','hood'],labels:{phones:'HEADPHONES',hood:'HOOD UP'}},
+ why:'Nothing that stops you <b>seeing or hearing</b> trains: no headphones, no hood up.'},
+{id:'A8',r:['A8'],sec:'A',t:'Crossing at the points',ref:'HB1 §4',
+ set(W){W.P.points(-2);W.me(4,2.6,Math.PI);W.cam([-2,4,5.5],[2,.4,0])},
+ q:{t:'pick',p:'You need to cross the line by the points. Where do your feet go?',o:['Step over the rails onto the ballast: never on rails, sleepers or between the moving parts of points','Walk on the sleepers, they\'re flat','Step on the rail head, it\'s quicker','Cross between the switch blades'],a:0},
+ why:'When crossing, <b>don\'t step on rails or sleepers</b>, or between the moving parts of points.'},
+{id:'A9',r:['A9','C9'],sec:'A',t:'Phone rings',ref:'HB1 §4 & §10',
+ set(W){W.me(-1,3.0)},
+ async play(W){W.walk(player,3,3.0,1.6);S.ring();W.card('<div class="ring">📞<b>COSS calling…</b></div>');await W.wait(2200)},
+ q:{t:'pick',p:'Your phone rings while you\'re walking in the cess.',o:['Get to a position of safety and stand still, then answer','Answer while you keep walking','Step into the four-foot where it\'s quieter','Answer but keep looking up'],a:0},
+ async after(W){W.uncard();W.pose(player,'phone');await W.wait(900)},
+ why:'Before using a phone or radio, <b>move to a position of safety and stand still</b>.'},
+{id:'A10',r:['A10'],sec:'A',t:'Keep looking up',ref:'HB1 §4',
+ set(W){W.me(-8,3.0)},
+ q:{t:'look',p:'Walk to site. Tap <b>LOOK UP</b> at least every 5 seconds.'},
+ why:'When walking on or near the line, <b>look up at least every 5 seconds</b> so you see trains in time.'},
+{id:'A11',r:['A11'],sec:'A',t:'How early?',ref:'HB1 §4',
+ set(W){W.speed(100);W.me(2,R1+1.6);W.cam([-6,3.2,9],[10,1.8,0])},
+ async play(W){upTrain.visible=true;upTrain.position.x=170;await tween(2,k=>upTrain.position.x=170-90*k)},
+ q:{t:'pick',p:'Train in sight. How long before it reaches you must you be in your position of safety?',o:['At least 10 seconds before','When it sounds its horn','2 seconds before','When you feel the rail vibrate'],a:0},
+ async after(W){await runTrain(upTrain,80,-212,44)},
+ why:'Be in your position of safety <b>at least 10 seconds</b> before the train arrives.'},
+{id:'A12',r:['A12'],sec:'A',t:'After the train passes',ref:'HB1 §4',
+ set(W){W.me(1,R1+1.6);W.cam([-7,3.2,9],[3,1.4,-1])},
+ async play(W){await W.train('up',{speed:32})},
+ q:{t:'pick',p:'The train\'s gone past. When can you step back on?',o:['When it\'s passed and you\'ve checked nothing else is coming on any line','As soon as the last coach passes','When the driver waves','After counting to ten'],a:0},
+ async after(W){banner('Another train on the Down line…');await W.train('down',{speed:30});banner('')},
+ why:'Stay put until the train has passed <b>and no other train is coming</b>. Trains often pass each other.'},
+{id:'A13',r:['A13'],sec:'A',t:'Joining a group',ref:'HB1 §4',
+ set(W){cast(coss,6,3.0,Math.PI/2);for(let i=0;i<3;i++)W.guy({x:7.5+i*1.3,z:0,face:-Math.PI/2});W.me(0,3.0);W.cam([-5,3.6,10],[4,1,1])},
+ q:{t:'pick',p:'You\'ve been sent to join a group already working.',o:['Speak to the COSS first, agree your access point and destination, and don\'t walk until briefed','Walk to the group and start','Ask a mate what\'s going on and crack on','Get briefed by the lookout'],a:0},
+ why:'<b>Speak to the COSS first.</b> Agree where you\'ll get on and where you\'re going, and don\'t walk to site until you\'ve been briefed.'},
+{id:'A14',r:['A14'],sec:'A',t:'Leaving early',ref:'HB1 §4',
+ set(W){cast(coss,4,3.0,Math.PI/2);W.guy({x:7,z:0,face:-Math.PI/2});W.me(2,3.0,Math.PI/2)},
+ q:{t:'pick',p:'You need to leave the group early.',o:['Tell the COSS, and agree where you\'re going and the route','Just go, you\'re PTS','Tell a mate to let the COSS know','Text the COSS once you\'re off'],a:0},
+ why:'<b>Tell the COSS</b> before leaving, and agree your destination and route.'},
+{id:'A15',r:['A15'],sec:'A',t:'Blocked cess',ref:'HB1 §4',
+ set(W){W.P.rails(6,3.0);W.me(-2,3.0);W.cam([-8,3.6,9],[5,.8,1.5])},
+ q:{t:'pick',p:'You\'re walking alone to site. A stack of rails blocks the cess. The only way past is on the open line.',o:['Stop, tell the COSS, and do what they say','Nip round in the four-foot quickly','Climb over the rails','Wait for a gap in trains and go'],a:0},
+ why:'If an obstacle would force you onto an open line, <b>tell the COSS</b> and follow their instructions.'},
+// ---------- WORKING IN A GROUP ----------
+{id:'W1',r:['W1'],sec:'W',t:'COSS nips off',ref:'HB1 §5',
+ set(W){cast(coss,3,3.0,0);W.me(0,0,-Math.PI/2);W.guy({x:2,z:0,face:-Math.PI/2})},
+ async play(W){W.say(coss,'Back in 10 mins, crack on',2400);await W.walk(coss,3,7,2)},
+ q:{t:'pick',p:'The COSS heads back to the van for ten minutes and tells you to crack on.',o:['Stop and get clear until the COSS is back, or another COSS takes over','Crack on, the lookout\'s here','Crack on but work faster','Keep going if no trains are due'],a:0},
+ why:'Only go on with others if a <b>COSS is present and stays with you</b>.'},
+{id:'W2',r:['W2'],sec:'W',t:'Who\'s the COSS?',ref:'HB1 §5',
+ set(W){player.visible=false;const a=W.guy({x:0,z:3,face:0});const b=W.guy({x:2.4,z:3,face:0,coss:1,helmet:0x2b5fd6});const c=W.guy({x:4.8,z:3,face:0});W.hzOn('a',a);W.hzOn('coss',b);W.hzOn('c',c);W.cam([2.4,2.5,12.5],[2.4,1.3,3])},
+ q:{t:'spot',p:'You\'ve just arrived on site. Tap the COSS.',a:'coss',labels:{coss:'COSS ARMLET'}},
+ why:'The COSS wears an <b>armlet on the left arm</b> or a <b>chest badge</b>. If you\'re not sure, ask.'},
+{id:'W3',r:['W3'],sec:'W',t:'The briefing',ref:'HB1 §5',
+ set(W){cast(coss,3,3.0,Math.PI/2);W.me(0,3.0);W.guy({x:-1.2,z:3.6,face:-Math.PI/2})},
+ async play(W){W.say(coss,'…and your position of safety is…',2400);S.trainHorn();await W.wait(2500)},
+ q:{t:'pick',p:'A train went past mid-briefing and you didn\'t catch where your position of safety is.',o:['Ask the COSS','Sign and ask a mate later','Follow everyone else','Work it out when the warning comes'],a:0},
+ why:'Make sure you <b>understand the briefing</b>. If anything is unclear, ask the COSS.'},
+{id:'W4',r:['W4'],sec:'W',t:'The briefing form',ref:'HB1 §5',
+ set(W){cast(coss,2,3.0,Math.PI/2);W.me(0,3.0);W.card('<div class="form"><b>RT9909</b><span>Safe work pack · briefing record</span><i>Signature: ______</i></div>')},
+ q:{t:'pick',p:'The COSS hands you the RT9909.',o:['Sign it once you\'ve been briefed and understand it','Sign it first to save time','Sign for your mate as well','Don\'t bother, it\'s optional'],a:0},
+ why:'<b>Sign the RT9909</b> to confirm you\'ve been briefed and understood it. Never sign for anyone else.'},
+{id:'W5',r:['W5'],sec:'W',t:'Behind the barrier',ref:'HB1 §5',
+ set(W){W.P.barrier('rigid',-6,8,-1.7);player.visible=false;const m=W.guy({x:-1,z:-1.25,face:Math.PI});m.userData.pose='lean';W.P.tool(3,-1.45,.45);W.P.bag(5.5,1.6,0x2b5fd6);W.hz('lean',-1,1,-1.3,1,2,1);W.hz('spade',3,1,-1.4,1,1.6,1);W.hz('bag',5.5,.6,1.6,1,1,1);W.cam([.6,3.6,6.8],[.8,.8,-1.4])},
+ q:{t:'spot',multi:1,p:'Trains are running on the Down line. Tap anything wrong with how the barrier is being used.',a:['lean','spade'],labels:{lean:'LEANING ON IT',spade:'TOOL ON IT'}},
+ why:'<b>Never lean on</b> a safety barrier or <b>rest tools</b> against it.'},
+{id:'W6a',r:['W6'],sec:'W',t:'Lookout warning!',ref:'HB1 §5',
+ set(W){W.me(1,0,-Math.PI/2);player.userData.pose='kneel';cast(lookout,9,3.2,-Math.PI/2);W.guy({x:3,z:0,face:-Math.PI/2});W.cam([-5,4.4,8.5],[3.5,.6,1])},
+ async play(W){await W.wait(600);S.lookoutHorn();W.pose(lookout,'one');player.userData.pose='stand'},
+ q:{t:'tap',walk:1,time:5,p:'Lookout\'s warning! Tap where you go.',z:[{id:'a',x:1,z:R1+1.8,l:'A'},{id:'b',x:1,z:-1.7,l:'B'},{id:'c',x:2,z:0,l:'C: finish the bolt'}],a:'a'},
+ async after(W,ok){W.pose(lookout,null);if(ok)await W.train('up',{speed:30});else await W.wait(800)},
+ why:'On a warning: <b>stop work, acknowledge, and go straight to your position of safety</b>. Never finish the job first.'},
+{id:'W6b',r:['W6'],sec:'W',t:'Train\'s gone',ref:'HB1 §5',
+ set(W){W.me(1,R1+1.8);cast(coss,-3,3.0,-Math.PI/2);W.guy({x:2.5,z:R1+1.8})},
+ async play(W){await W.train('up',{speed:32})},
+ q:{t:'pick',p:'The train\'s passed. When do you go back on the track?',o:['When the COSS says so','When the lookout stops sounding','Straight away','When you can\'t hear the train'],a:0},
+ why:'Stay in your position of safety <b>until the COSS tells you</b> it\'s safe to go back.'},
+{id:'W7',r:['W7'],sec:'W',t:'What does that mean?',ref:'HB1 §5',
+ set(W){W.me(1,0,-Math.PI/2);cast(lookout,7,3.2,-Math.PI/2);W.cam([-5,3.6,9],[4,1,1])},
+ async play(W){await W.wait(500);W.pose(lookout,'one');S.urgent();await W.wait(2000);W.pose(lookout,null)},
+ q:{t:'pick',p:'That was a series of short, sharp blasts. What does it mean?',o:['Urgent warning: get clear immediately','Normal warning: a train\'s coming','All clear','Testing the horn'],a:0},
+ why:'A series of <b>short, sharp blasts</b> is an urgent warning. Get to safety at once.'},
+{id:'W8',r:['W8'],sec:'W',t:'Chatting to the lookout',ref:'HB1 §5',
+ set(W){cast(lookout,8,3.2,-Math.PI/2);cast(mate,2,3.0,-Math.PI/2);W.cam([-4,3.4,9],[5,1,2])},
+ async play(W){W.say(mate,'Did you see the match?',2400);await W.walk(mate,6.6,3.2,1.8)},
+ q:{t:'pick',p:'Your mate wanders over to chat to the lookout.',o:['Tell him to leave the lookout alone','Join in, it\'s a quiet line','Leave it','Offer to cover for the lookout'],a:0},
+ why:'<b>Never distract a lookout.</b> Their only job is watching for trains.'},
+{id:'W9',r:['W9'],sec:'W',t:'Site warden',ref:'HB1 §5',
+ set(W){W.P.barrier('tape',-8,10,-1.5);W.guy({x:-6,z:-.6,tag:'SITE WARDEN',face:-Math.PI/2});W.me(3,-1.2,Math.PI);W.cam([-3,5,8],[2,.5,-1])},
+ async play(W){await W.wait(500);S.whistle();W.say(tmpPeople[0],'Stay in the safe area!',2200);await W.wait(1600)},
+ q:{t:'pick',p:'The site warden gives a warning. You\'re working near the edge of the fenced area.',o:['Check you\'re inside the safe area, and step back in if not','Run to the cess','Ignore it, it\'s for another gang','Stop and wait for the train'],a:0},
+ why:'On a site warden\'s warning, <b>check you\'re in the safe area</b> and step back into it if you\'re not.'},
+{id:'W10',r:['W10'],sec:'W',t:'ATWS goes off',ref:'HB1 §5',
+ set(W){for(const x of[-8,0,8])W.P.hornUnit(x,4.2);W.me(1,0,-Math.PI/2);cast(coss,-3,3.0,0);W.cam([-6,3.6,8],[2,1,1])},
+ async play(W){await W.wait(400);S.siren();await W.wait(2200)},
+ q:{t:'pick',p:'The automatic warning goes off.',o:['Go to your position of safety and stay until the COSS says','Finish what you\'re doing first','Go to safety until the noise stops','Look for the train and decide'],a:0},
+ why:'For ATWS, SATWS, TOWS or LOWS warnings: <b>go to safety and stay until the COSS says</b> it\'s safe.'},
+{id:'W11',r:['W11'],sec:'W',t:'Spoil heap in the way',ref:'HB1 §5',
+ set(W){W.P.spoil(6,3.0);cast(coss,-2,3.0,-Math.PI/2);for(let i=0;i<3;i++)W.guy({x:-4-i*1.3,z:3.0,face:-Math.PI/2});W.me(0,3.0);W.cam([-9,4,9],[4,.8,1.5])},
+ q:{t:'pick',p:'A spoil heap blocks the cess. Your group can only get past on the open line.',o:['The COSS arranges a safe way past','Each person picks their own moment','Whoever\'s at the front decides','Go round it quickly in single file'],a:0},
+ why:'The <b>COSS must arrange a safe way</b> past obstacles that would put the group on an open line.'},
+{id:'W12',r:['W12'],sec:'W',t:'Crossing the Down line',ref:'HB1 §5',
+ set(W){cast(coss,2,3.0,Math.PI);for(let i=0;i<3;i++)W.guy({x:-1-i*1.3,z:3.0,face:Math.PI});W.me(0,3.0,Math.PI);W.cam([-6,5,9],[1,.5,-1.5])},
+ q:{t:'pick',p:'Your group needs to cross the open Down line to the other side.',o:['Only cross once the COSS has explained how','Cross when you can\'t see a train','Cross one at a time on your own judgement','Follow the lookout'],a:0},
+ why:'Only cross open lines <b>after the COSS has explained the arrangements</b>.'},
+{id:'W13',r:['W13'],sec:'W',t:'Route-proving train stops',ref:'HB1 §5',
+ set(W){upTrain.visible=true;upTrain.position.x=-12;W.me(-2,1.75,-Math.PI/2);player.visible=false;W.cam([-6,3.4,9],[2,2,0])},
+ q:{t:'pick',p:'You\'re on a route-proving train. It stops at your site.',o:['Wait until the COSS has explained, then get off','Get off as soon as it stops','Get off on whichever side is nearest','Get off while it\'s slowing down'],a:0},
+ why:'On route proving, <b>only get off once the COSS has explained</b> the arrangements.'},
+{id:'W14',r:['W14'],sec:'W',t:'Ready to move?',ref:'HB1 §5',
+ set(W){upTrain.visible=true;upTrain.position.x=-12;cast(coss,4,3.0,Math.PI/2);W.me(6,3.0,Math.PI/2);W.guy({x:8,z:-1.7})},
+ q:{t:'pick',p:'You\'re all back on board. The driver asks if he can move.',o:['Not until the COSS confirms everyone and everything is clear','Yes, if you can see your mates','Yes, if the lookout agrees','Yes, slowly'],a:0},
+ why:'The protecting train must not move <b>until the COSS confirms</b> everyone and everything is clear.'},
+{id:'W15',r:['W15'],sec:'W',t:'Gangway door, wires overhead',ref:'HB1 §5',
+ set(W){W.P.ole(-60,60);upTrain.visible=true;upTrain.position.x=-30;W.me(-8.5,1.8,-Math.PI/2);W.cam([-15,4,8],[-9,3,0])},
+ q:{t:'pick',p:'There are overhead wires here. The quickest way down to the track is the gangway door at the end of the coach.',o:['Don\'t: never use gangway doors to get to the track in an OLE area','Fine if you\'re quick','Fine if the COSS is watching','Fine with gloves on'],a:0},
+ why:'In an overhead line (OLE) area, <b>never use gangway doors</b> to get to the track.'},
+// ---------- REPORTING ----------
+{id:'R1',r:['R1'],sec:'R',t:'Mate goes over',ref:'HB1 §6',
+ set(W){cast(mate,3,3.0,0);mate.userData.pose='kneel';W.say(mate,'Argh, my ankle',3000);W.cam([-4,3,8],[3,.8,2.5])},
+ q:{t:'pick',p:'Your mate trips over a cable and hurts his ankle. No trains involved.',o:['Report it as soon as possible to the person in charge, signaller or Ops Control','Report it at the end of the shift','Only report it if he goes to hospital','Don\'t report it if he carries on'],a:0},
+ why:'Report accidents <b>as soon as possible</b> to the person in charge, the signaller or Operations Control.'},
+{id:'R2',r:['R2'],sec:'R',t:'Making the call',ref:'HB1 §6',
+ set(W){cast(mate,3,3.0,0);mate.userData.pose='kneel';W.pose(player,'phone')},
+ q:{t:'pick',chat:[['Signaller','Signaller, go ahead.']],p:'You\'re reporting a serious accident. How do you start?',o:['"This is an emergency call"','"Hi, it\'s me from the gang"','"Urgent, urgent"','"Mayday, mayday"'],a:0},
+ why:'Start with <b>"This is an emergency call"</b> so everyone knows what\'s coming.'},
+{id:'R3',r:['R3'],sec:'R',t:'What do you tell them?',ref:'HB1 §6',
+ set(W){cast(mate,3,3.0,0);mate.userData.pose='kneel';W.pose(player,'phone')},
+ q:{t:'multi',chat:[['You','This is an emergency call.'],['Signaller','Go ahead.']],p:'What do you give the signaller?',o:['Your name','Your exact location','What happened','Whether any lines are blocked','Which emergency services are needed','Your shift pattern'],a:[0,1,2,3,4]},
+ why:'Give your <b>name, exact location, what happened, whether lines are obstructed</b>, and which <b>services</b> are needed.'},
+{id:'R4',r:['R4'],sec:'R',t:'Close one',ref:'HB1 §6',
+ set(W){cast(mate,3,0,-Math.PI/2);W.me(1,0,-Math.PI/2);W.P.tool(3.6,.9,1.57)},
+ q:{t:'pick',p:'A hammer slips out of someone\'s hand and lands next to your mate. Nobody\'s hurt.',o:['Report it to your supervisor as a near miss','Nothing to report, nobody\'s hurt','Just tell everyone to be careful','Only report it if the COSS saw'],a:0},
+ why:'Report <b>all accidents and near misses</b> to your supervisor. Near misses are how the next accident gets stopped.'},
+{id:'R5',r:['R5'],sec:'R',t:'Tank wagon leaking',ref:'HB1 §6',
+ set(W){W.P.tank(4,0,true);addSmoke(extras,3,.5,1.2,3,false);W.P.water(3,1.6,4,1.5);W.me(-8,3.6,-Math.PI/2);W.pose(player,'phone');W.cam([-12,3.4,9],[3,2,1])},
+ q:{t:'pick',p:'A tank wagon has derailed and is leaking. How do you start the call?',o:['"This is a rail dangerous goods emergency", then the UN number off the orange plate','"This is an emergency call", then "chemical leak"','Describe the colour of the tank','Wait until you know what it is'],a:0},
+ why:'Say <b>"This is a rail dangerous goods emergency"</b> and give the <b>UN number</b> (bottom of the orange plate, here 1203).'},
+{id:'R6',r:['R6'],sec:'R',t:'Where do you wait?',ref:'HB1 §6',
+ set(W){W.P.tank(2,0,true);addSmoke(extras,2,.5,1.2,5,false);W.P.windsock(-4,5.5);W.P.mound(-15,8);W.P.ditch(-12,-8);W.me(-4,3.0);W.cam([-6,10,16],[-4,0,0])},
+ q:{t:'tap',p:'Gas is drifting off the wagon. Tap where you\'ll wait for the emergency services.',z:[{id:'a',x:12,z:3,l:'A'},{id:'b',x:-15,z:8,y:1.25,l:'B'},{id:'c',x:-12,z:-8,l:'C'}],a:'b'},
+ why:'Keep well clear with the <b>wind behind you</b> (upwind), <b>avoid low ground</b> like ditches, and keep people away. B is upwind and high.'},
+{id:'R7',r:['R7'],sec:'R',t:'Lighting up',ref:'HB1 §6',
+ set(W){W.P.tank(6,0,true);W.P.water(5,1.6,4,1.5);cast(mate,-1,3.2,-Math.PI/2);W.pose(mate,'phone');const f=flameSprite(0xffa020,.35);f.position.set(-.85,1.75,3.0);W.P.add(f);W.cam([-6,3,8],[2,1.4,2])},
+ q:{t:'pick',p:'Your mate lights a cigarette near the leaking tank of petrol.',o:['Stop him: no smoking, naked lights or phones near a flammable load','Fine if he stands upwind','Fine if he stays out of the four-foot','Fine if it\'s only leaking a bit'],a:0},
+ why:'<b>No naked lights, smoking or mobile phones</b> near a flammable load.'},
+{id:'R8',r:['R8'],sec:'R',t:'Splashed',ref:'HB1 §6',
+ set(W){cast(mate,2,3.0,-Math.PI/2);W.say(mate,'It\'s on my hand and sleeve',3000)},
+ q:{t:'pick',p:'Some of the leaking chemical splashed onto your mate\'s hand and sleeve.',o:['Wash with plenty of cold water, take contaminated clothing off carefully, get medical help','Wipe it off with a rag','Wash it with hot water','Wait and see if it hurts'],a:0},
+ why:'Wash with <b>plenty of cold water</b>, remove contaminated clothing carefully, and <b>get medical help</b>.'},
+// ---------- HAZARDS ----------
+{id:'H1',r:['H1'],sec:'H',t:'Where\'s the kit?',ref:'HB1 §7',
+ set(W){W.P.bag(2,R1+.8);W.P.bag(6,R1+3.1,0x2b5fd6);W.hz('near',2,.5,R1+.8,1.2,1,1);W.hz('far',6,.5,R1+3.1,1.2,1,1);W.cam([-3,4,9],[3,.3,2])},
+ q:{t:'spot',p:'Trains are running on this line. Tap the kit that\'s in the wrong place.',a:'near',labels:{near:'UNDER 2 m'}},
+ async after(W){await W.train('up',{speed:30})},
+ why:'Don\'t put tools or equipment <b>within 2 m</b> of a line where trains can run, unless it\'s designed to stay put in a train\'s slipstream.'},
+{id:'H2',r:['H2'],sec:'H',t:'Boundary check',ref:'HB1 §7',
+ set(W){W.P.gate(.5,true);W.P.gap(-4);W.hz('gate',2,1,5.4,3,2,1.5);W.hz('fence',-4,1,5.4,2.6,2,1.5);player.visible=false;W.cam([-1,4.5,-7.5],[-1,1,5])},
+ q:{t:'spot',multi:1,p:'Tap the problems with the boundary.',a:['gate','fence'],labels:{gate:'GATE LEFT OPEN',fence:'DAMAGED FENCE'}},
+ why:'Keep access gates <b>closed and locked</b>, and <b>report damaged fencing</b>.'},
+{id:'H3',r:['H3'],sec:'H',t:'Kids on the bank',ref:'HB1 §7',
+ set(W){W.P.gap(4);W.P.kid(3,4.0,0x3a5fcd);W.P.kid(5,3.8,0xc23b22);W.me(-6,3.0);W.cam([0,3,11],[3.5,1,3.5])},
+ q:{t:'pick',p:'Two kids are messing about inside the fence.',o:['Report it straight away','Chase them off yourself','Ignore them, they\'re not on the track','Film them for evidence'],a:0},
+ why:'<b>Report suspected trespassers</b> right away. Don\'t chase them.'},
+{id:'H4',r:['H4'],sec:'H',t:'Smoke by the line',ref:'HB1 §7',
+ set(W){W.P.fire(5,.2,4.0);W.me(-2,3.0);W.cam([-5,3.4,10],[4,1.2,3])},
+ q:{t:'pick',p:'The vegetation by the line is on fire.',o:['Report it immediately','Try to put it out, then decide','Ignore it, it\'s not on the track','Mention it at the end of the shift'],a:0},
+ why:'<b>Report lineside fires immediately.</b>'},
+{id:'H5',r:['H5'],sec:'H',t:'Water by the bridge',ref:'HB1 §7',
+ set(W){W.P.bridge(10);W.P.water(6,2.8,5,2.2);W.P.water(2,3.6,3,1);W.me(-3,3.0);W.cam([-6,3.4,9],[6,1,2.5])},
+ q:{t:'pick',p:'There\'s water flowing and pooling by the bridge abutment.',o:['Report it','Ignore it, it\'s only water','Dig a channel to drain it','Report it if it\'s still there next week'],a:0},
+ why:'<b>Report flowing or pooling water</b> near structures or earthworks. It can mean a washout or slip.'},
+{id:'H6',r:['H6'],sec:'H',t:'Something on that freight',ref:'HB1 §7',
+ set(W){W.me(-2,R1+1.8);W.cam([-9,3,10],[6,2,0])},
+ async play(W){await W.freight({shifted:1,follow:1})},
+ q:{t:'pick',p:'That freight train had a shifted container and a flapping sheet. What do you do?',o:['Report it straight away','Nothing, the driver will know','Mention it at the end of the shift','Wave at the driver'],a:0},
+ why:'Report unsafe trains straight away: <b>open doors, insecure loads, fire, a hot axle box</b>. Scene K covers these in full.'},
+{id:'H7',r:['H7'],sec:'H',t:'Check the back',ref:'HB1 §7',
+ set(W){W.me(-2,R1+1.8);W.cam([-9,3,10],[6,2,0])},
+ async play(W){await W.freight({tail:false,follow:1,speed:20})},
+ q:{t:'pick',p:'Did you see anything wrong as it went past?',o:['Yes: no tail lamp on the back','No, all fine','Yes: the headlights were off','Yes: a door was open'],a:0},
+ why:'<b>Report a missing or unlit tail lamp</b> (or headlight). No tail lamp can mean part of the train has been left behind.'},
+{id:'H8',r:['H8'],sec:'H',t:'That horn',ref:'HB1 §7',
+ set(W){W.me(-2,R1+1.8);W.cam([-8,3,9],[10,2,0])},
+ async play(W){upTrain.visible=true;upTrain.position.x=170;S.distress();await tween(3.6,k=>upTrain.position.x=170-70*k)},
+ q:{t:'pick',p:'The driver sounds a series of continuous long blasts.',o:['The train is in distress and needs help','The driver is saying hello','A normal warning to you','The train is about to reverse'],a:0},
+ async after(W){await runTrain(upTrain,100,-212,30)},
+ why:'Continuous long blasts = <b>train in distress</b>. Flashing headlights = a <b>hazard warning</b>. Either way, report it.'},
+{id:'H9',r:['H9'],sec:'H',t:'Power line down',ref:'HB1 §7',
+ set(W){W.P.poles(10);W.me(-4,3.0);W.cam([-6,6,12],[5,1,1])},
+ q:{t:'tap',walk:1,p:'An electricity company\'s power line has come down across the track. Tap where you\'ll wait.',z:[{id:'a',x:8,z:3,l:'A'},{id:'b',x:6,z:3,l:'B'},{id:'c',x:3,z:3,l:'C'}],a:'c'},
+ why:'Keep at least <b>5 m</b> from a fallen power line until the electricity company says it\'s safe. A is 2 m, B is 4 m, C is 7 m.'},
+// ---------- EMERGENCIES ----------
+{id:'E1',r:['E1'],sec:'E',t:'Stop the trains?',ref:'HB1 §8',
+ set(W){W.P.tree(4,0);W.me(-2,3.0);W.cam([-6,4,9],[3,.6,0])},
+ q:{t:'multi',p:'Which of these mean trains need to be stopped?',o:['A broken rail','Flood water over the track','A tree across the line','Large animals on the line','A fire next to the track','A damaged bridge','Litter in the cess','Graffiti on a wall'],a:[0,1,2,3,4,5]},
+ why:'Stop trains for anything that makes the line unsafe: <b>track defects, flooding, obstructions, fire, damaged structures, large animals</b>.'},
+{id:'E2',r:['E2'],sec:'E',t:'Who to tell',ref:'HB1 §8',
+ set(W){W.P.tree(4,0);W.me(-2,3.0);W.pose(player,'phone');W.cam([-6,4,9],[3,.6,0])},
+ q:{t:'pick',p:'You\'ve found a tree across the line. Who do you tell, and when?',o:['The person in charge, signaller or Ops Control, immediately','Your supervisor at the end of the shift','Nobody, the driver will see it','Post it in the group chat'],a:0},
+ why:'Tell the <b>person in charge, signaller or Operations Control immediately</b>.'},
+{id:'E3',r:['E3'],sec:'E',t:'Stop that train',ref:'HB1 §8',
+ set(W){W.P.tree(-8,0);W.me(8,3.0,-Math.PI/2);W.cam([0,3.6,9],[14,1.8,1])},
+ async play(W){upTrain.visible=true;upTrain.position.x=200;await tween(1.6,k=>upTrain.position.x=200-40*k)},
+ q:{t:'pick',p:'Train coming towards the tree. You\'ve got no flag. How do you signal the driver to stop?',o:['Raise both arms above your head','Raise one arm above your head','Point at the tree','Wave one arm side to side'],a:0},
+ async after(W,ok){if(ok){W.pose(player,'two');S.trainHorn();await W.train('up',{from:160,stopAt:22,speed:30});await W.wait(500);W.pose(player,null)}else{W.pose(player,'one');await W.wait(900)}},
+ why:'In daylight: wave a <b>red flag</b>, or if you haven\'t got one, raise <b>both arms above your head</b>.'},
+{id:'E4',r:['E4'],sec:'E',t:'Stopping a train from a vehicle',ref:'HB1 §8',
+ set(W){W.P.trolley(4);W.me(4,.9,-Math.PI/2,1.0);W.cam([-3,3.4,8],[10,1.6,0])},
+ q:{t:'pick',p:'You\'re on a vehicle on the line and need to stop an approaching train. What\'s the hand signal?',o:['One arm held out horizontally','Both arms above your head','One arm above your head','Thumbs down'],a:0},
+ async after(W){W.pose(player,'out');await W.wait(1200)},
+ why:'From a vehicle, the emergency stop hand signal is <b>one arm held out horizontally</b>.'},
+{id:'E5',r:['E5'],sec:'E',t:'Night, white torch only',ref:'HB1 §8',
+ set(W){W.night(true);W.P.tree(-8,0);W.me(8,3.0,-Math.PI/2);const l=flameSprite(0xfff2c0,1.6);l.position.set(.4,.8,-.3);player.add(l);W.cam([0,3.6,9],[14,1.8,1])},
+ q:{t:'pick',p:'It\'s dark and you need to stop a train. You\'ve only got a white torch.',o:['Wave it violently','Hold it still, pointed at the train','Switch it off','Flash it on and off slowly'],a:0},
+ why:'In darkness or poor visibility: show a <b>red light</b>, or if you haven\'t got one, wave <b>any light violently</b>.'},
+// ---------- COMMUNICATION ----------
+{id:'C1',r:['C1'],sec:'C',t:'Calling the signaller',ref:'HB1 §10',
+ set(W){W.pose(player,'phone')},
+ q:{t:'pick',chat:[['Signaller','Westfield panel, signaller speaking.']],p:'What do you say first?',o:['Confirm who you\'re talking to, then give your location, name, employer and what you\'re doing','Ask if the line is clear','Just your first name','"It\'s me"'],a:0},
+ why:'<b>Confirm who you\'re speaking to</b>, then give your <b>location, name, employer and task</b>.'},
+{id:'C2',r:['C2'],sec:'C',t:'Tree on the Down',ref:'HB1 §10',
+ set(W){W.P.tree(4,-3.4);W.pose(player,'phone')},
+ q:{t:'pick',chat:[['Signaller','Can I run trains on the Down line?']],p:'There\'s a tree across it. What do you say?',o:['"Line blocked"','"Not clear"','"Hold on"','"Negative"'],a:0},
+ why:'Say <b>"line blocked"</b>. Never say "not clear": over a bad line it can be heard as "clear".'},
+{id:'C3',r:['C3'],sec:'C',t:'Give the signal number',ref:'HB1 §10',
+ set(W){W.P.sign(5,2.3,['WF 8107'],{y:2.2,w:1.2,h:.45,bg:'#fff'});W.pose(player,'phone');W.cam([-2,2.6,7],[5,2,2])},
+ q:{t:'pick',p:'You\'re telling the signaller you\'re at signal 8107. How do you say the number?',o:['"Eight-one-zero-seven"','"Eighty-one oh seven"','"Eight thousand one hundred and seven"','"Eighty-one-seven"'],a:0},
+ why:'Say numbers <b>one digit at a time</b>. The exceptions are times and Rule Book references.'},
+{id:'C4',r:['C4'],sec:'C',t:'Got the message?',ref:'HB1 §10',
+ set(W){W.pose(player,'phone')},
+ q:{t:'pick',chat:[['Signaller','Line blocked on the Down between signals eight-one-zero-seven and eight-one-zero-nine.']],p:'What do you do?',o:['Repeat the message back','Say "Got it"','Say "Okay, cheers"','Nothing, they know you heard'],a:0},
+ why:'<b>Repeat messages back</b> so both of you know it was understood correctly.'},
+{id:'C5',r:['C5'],sec:'C',t:'Who leads?',ref:'HB1 §10',
+ set(W){cast(coss,3,3.0,Math.PI/2);W.pose(coss,'phone')},
+ q:{t:'pick',p:'The COSS is on the phone to the signaller. Who leads the conversation?',o:['The signaller','The COSS','Whoever made the call','Whoever is more senior'],a:0},
+ why:'There\'s a set order: the <b>ECO</b> leads with anyone, then the <b>signaller</b>, then PICOP and so on. With the group and lookouts, the <b>COSS</b> leads.'},
+{id:'C6',r:['C6'],sec:'C',t:'Wrong number',ref:'HB1 §10',
+ set(W){W.pose(player,'phone')},
+ q:{t:'pick',chat:[['You','I\'m at signal eight-zero-one-seven.']],p:'You realise you meant 8107. What do you say?',o:['"Correction", then the right number','"Sorry" and carry on','Hang up and call back','Leave it, it\'s close enough'],a:0},
+ why:'Use <b>"Correction"</b> to fix a mistake, and <b>"Repeat back"</b> to ask for a message to be repeated.'},
+{id:'C7',r:['C7'],sec:'C',t:'Ending a radio message',ref:'HB1 §10',
+ set(W){W.pose(player,'phone')},
+ q:{t:'pick',chat:[['You','COSS to lookout: group is clear of the Up line.']],p:'No reply is needed. How do you end it?',o:['"Out"','"Over"','"Over and out"','"Roger"'],a:0},
+ why:'<b>"Over"</b> = I expect a reply. <b>"Out"</b> = no reply needed. Never both together.'},
+{id:'C8',r:['C8'],sec:'C',t:'Bad line',ref:'HB1 §10',
+ set(W){W.pose(player,'phone');W.P.sign(5,2.3,['DE 123'],{y:2.2,w:1.2,h:.45,bg:'#fff'});W.cam([-2,2.6,7],[5,2,2])},
+ q:{t:'pick',p:'The radio is breaking up. How do you give the signal ID "DE 123"?',o:['"Delta Echo one-two-three"','"D for dog, E for egg, one two three"','"DE one hundred and twenty-three"','"Dee-ee one-two-three"'],a:0},
+ why:'Use the <b>phonetic alphabet</b> for signal and points IDs, for spelling, and when the line is bad.'},
+{id:'C9',r:['C9'],sec:'C',t:'Radio crackles',ref:'HB1 §10',
+ set(W){W.me(1,0,-Math.PI/2);player.userData.pose='kneel'},
+ async play(W){S.radio();W.card('<div class="ring">📻<b>"COSS to Phil, over"</b></div>');await W.wait(2000)},
+ q:{t:'pick',p:'You\'re working in the four-foot when the radio goes.',o:['Get to a position of safety before you use it','Answer straight away','Answer while you finish the job','Ignore it'],a:0},
+ async after(W){W.uncard()},
+ why:'Be in a <b>position of safety</b> before using a radio or phone.'},
+{id:'C10',r:['C10'],sec:'C',t:'Conference call',ref:'HB1 §10',
+ set(W){W.pose(player,'phone');W.card('<div class="ring">👥<b>Group call · 9 people</b><small>"Tonight\'s safety briefing…"</small></div>')},
+ q:{t:'pick',p:'The supervisor sets up a group call to give everyone tonight\'s safety instructions.',o:['Not allowed: safety instructions aren\'t given on group or conference calls, except in emergencies','Fine if everyone repeats back','Fine if it\'s recorded','Fine at night'],a:0},
+ why:'<b>No group or conference calls</b> for safety-critical instructions, except in an emergency.'},
+// ---------- SIGNS ----------
+{id:'S1',r:['S1'],sec:'S',t:'Sign under the bridge',ref:'HB1 §11',
+ set(W){W.P.bridge(20);W.P.sign(17.4,2.25,['LIMITED','CLEARANCE'],{wall:1,y:1.3,w:1.8,h:1.1,bg:'#fff',fg:'#111',border:'#d02020'});player.visible=false;W.cam([8,2.6,4.6],[17.4,1.9,2.25])},
+ q:{t:'pick',p:'You\'re walking towards the bridge and see this sign.',o:['There\'s no position of safety on this side: don\'t be here when trains are running','Low bridge, mind your head','Trains slow down here','Speed restriction ahead'],a:0},
+ why:'Limited clearance: <b>no position of safety on this side</b>. Don\'t stand there while trains are running.'},
+{id:'S2',r:['S2'],sec:'S',t:'Refuges sign',ref:'HB1 §11',
+ set(W){W.P.bridge(20);W.P.sign(17.4,2.25,['NO REFUGES','THIS SIDE','→ OTHER SIDE'],{wall:1,y:1.2,w:1.8,h:1.3,bg:'#fff',fg:'#111',border:'#111'});player.visible=false;W.cam([8,2.6,4.6],[17.4,1.9,2.25])},
+ q:{t:'pick',p:'What does this sign tell you?',o:['The refuges are on the other side of the line','There are no refuges anywhere here','A refuge is coming up shortly','Don\'t walk any further'],a:0},
+ why:'It tells you the <b>refuges are on the other side</b>.'},
+{id:'S3',r:['S3'],sec:'S',t:'Red circle sign',ref:'HB1 §11',
+ set(W){W.P.sign(12,2.4,['⛔ NO ACCESS','WHILE TRAINS','ARE RUNNING'],{y:1.2,w:1.6,h:1.3,bg:'#fff',fg:'#b01010',border:'#d02020'});player.visible=false;W.cam([5,2.6,5.2],[12,1.8,2.4])},
+ q:{t:'pick',p:'You reach this prohibition sign. What does it mean?',o:['Don\'t pass it while trains are running (except to protect a train in an emergency)','No smoking','No stopping','Staff only, carry on'],a:0},
+ why:'A prohibition sign means <b>don\'t pass it while trains are running</b>, except to give emergency protection.'},
+{id:'S4',r:['S4'],sec:'S',t:'Phone under the bridge',ref:'HB1 §11',
+ set(W){W.P.bridge(20);W.P.box(17.3,1.3,2.25,.3,.5,.4,0xf5d000);W.P.sign(17.4,2.25,['LC PHONE'],{wall:1,y:1.7,w:.8,h:.3,bg:'#111',fg:'#ffb020'});player.visible=false;W.cam([9,2.4,4.6],[17.4,1.6,2.25])},
+ q:{t:'pick',p:'There\'s a telephone in this limited-clearance area. When can you use it?',o:['Only in an emergency, if nothing else is available','For routine calls to the signaller','To phone home','Any time'],a:0},
+ why:'Limited-clearance telephones are for <b>emergency use only</b>, when nothing else is available.'},
+];
+
+// ================= MICRO-SCENE ENGINE =================
+const lo2=null;let tickFn=null;const FX=[];
+const glowTex=ctex(64,64,(c)=>{const g=c.createRadialGradient(32,32,1,32,32,30);g.addColorStop(0,'rgba(255,255,255,1)');g.addColorStop(.35,'rgba(255,255,255,.7)');g.addColorStop(1,'rgba(255,255,255,0)');c.fillStyle=g;c.fillRect(0,0,64,64)});glowTex.wrapS=glowTex.wrapT=THREE.ClampToEdgeWrapping;
+const smokeTex=ctex(64,64,(c)=>{const g=c.createRadialGradient(32,32,2,32,32,30);g.addColorStop(0,'rgba(60,60,60,.85)');g.addColorStop(1,'rgba(60,60,60,0)');c.fillStyle=g;c.fillRect(0,0,64,64)});smokeTex.wrapS=smokeTex.wrapT=THREE.ClampToEdgeWrapping;
+function flameSprite(col,s){const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:glowTex,color:col,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending}));sp.scale.set(s,s,1);return sp}
+function addSmoke(group,x,y,z,rate,dark){FX.push({type:'smoke',group,x,y,z,rate,acc:0,dark,parts:[]})}
+S.urgent=()=>{for(let i=0;i<9;i++){tone(560,.11,'square',.07,i*.19);tone(700,.11,'square',.05,i*.19)}};
+S.distress=()=>{for(let i=0;i<3;i++){tone(311,1.25,'sawtooth',.07,i*1.5);tone(392,1.25,'sawtooth',.05,i*1.5)}};
+S.whistle=()=>{tone(2300,.35,'sine',.06);tone(2300,.5,'sine',.06,.45)};
+S.ring=()=>{for(let i=0;i<3;i++){tone(880,.35,'sine',.05,i*.9);tone(1100,.35,'sine',.04,i*.9+.05)}};
+S.siren=()=>{for(let i=0;i<4;i++)tone(600,.5,'square',.05,i*.55,900)};
+S.radio=()=>{tone(1400,.05,'square',.03);tone(900,.08,'square',.03,.06)};
+
+// camera content sits higher so the bottom sheet doesn't cover it
+function viewOff(){camera.setViewOffset(innerWidth,innerHeight,0,innerHeight*.17,innerWidth,innerHeight)}
+addEventListener('resize',viewOff);viewOff();
+
+const HEMI=scene.children.find(o=>o.isHemisphereLight);const SKY=scene.background;
+let extras=new THREE.Group();scene.add(extras);
+const tmpPeople=[];
+mate.visible=false;lookout.visible=false;coss.visible=false;
+[upTrain,dnTrain].forEach(t=>t.visible=false);
+
+// ---------- props ----------
+function plate(lines,o={}){const w=o.w||1.2,h=o.h||.8;const c=document.createElement('canvas');c.width=512;c.height=Math.round(512*h/w);const x=c.getContext('2d');x.fillStyle=o.bg||'#fff';x.fillRect(0,0,c.width,c.height);if(o.border){x.strokeStyle=o.border;x.lineWidth=c.width*.06;x.strokeRect(x.lineWidth/2,x.lineWidth/2,c.width-x.lineWidth,c.height-x.lineWidth)}x.fillStyle=o.fg||'#111';x.textAlign='center';x.textBaseline='middle';const n=lines.length;lines.forEach((t,i)=>{let f=(o.fs||(c.height*.62/n));x.font=`900 ${f}px system-ui,sans-serif`;while(x.measureText(t).width>c.width*.86){f-=2;x.font=`900 ${f}px system-ui,sans-serif`}x.fillText(t,c.width/2,c.height*(i+.5)/n+c.height*.02)});const t=new THREE.CanvasTexture(c);t.anisotropy=8;return new THREE.Mesh(new THREE.PlaneGeometry(w,h),new THREE.MeshBasicMaterial({map:t,side:THREE.DoubleSide}))}
+const P={
+  add(o){extras.add(o);return o},
+  box(x,y,z,w,h,d,col){const m=new THREE.Mesh(bx(w,h,d),lm(col));m.position.set(x,y,z);return P.add(m)},
+  sign(x,z,lines,o={}){const g=new THREE.Group();const y=o.y||1.6;if(!o.wall){const p=new THREE.Mesh(bx(.08,y,.08),lm(0x333333));p.position.y=y/2;g.add(p)}const pl=plate(lines,o);pl.position.y=y+(o.h||.8)/2-.05;pl.rotation.y=o.face!=null?o.face:-Math.PI/2;g.add(pl);g.position.set(x,0,z);return P.add(g)},
+  bag(x,z,col=0xff7a00){const g=new THREE.Group();const b=new THREE.Mesh(bx(.7,.4,.35),lm(col));b.position.y=.2;g.add(b);const h=new THREE.Mesh(bx(.5,.06,.06),lm(0x222222));h.position.y=.45;g.add(h);g.position.set(x,.3,z);return P.add(g)},
+  tool(x,z,lean){const g=new THREE.Group();const s=new THREE.Mesh(bx(.05,1.3,.05),lm(0x8a5a2b));s.position.y=.65;g.add(s);const bl=new THREE.Mesh(bx(.25,.3,.03),lm(0x666a70));bl.position.y=.1;g.add(bl);g.position.set(x,.3,z);if(lean)g.rotation.x=lean;return P.add(g)},
+  barrier(type,x0,x1,z){const g=new THREE.Group();const len=x1-x0;
+    if(type==='rigid'){for(let x=x0;x<=x1;x+=1.5){const p=new THREE.Mesh(bx(.08,1.1,.08),lm(0xf5d000));p.position.set(x,.85,z);g.add(p)}for(const y of[.8,1.3]){const r=new THREE.Mesh(bx(len,.08,.06),lm(0xf5d000));r.position.set(x0+len/2,y,z);g.add(r)}const s=new THREE.Mesh(bx(len,.05,.065),basic(0x222222));s.position.set(x0+len/2,1.3,z);s.scale.set(1,.5,1);g.add(s)}
+    if(type==='net'){for(let x=x0;x<=x1;x+=2){const p=new THREE.Mesh(bx(.06,1.2,.06),lm(0x444444));p.position.set(x,.9,z);g.add(p)}const tx=ctex(64,64,(c)=>{c.clearRect(0,0,64,64);c.strokeStyle='#ff7a00';c.lineWidth=4;for(let i=0;i<64;i+=16){c.beginPath();c.moveTo(i,0);c.lineTo(i,64);c.stroke();c.beginPath();c.moveTo(0,i);c.lineTo(64,i);c.stroke()}},len,2);const n=new THREE.Mesh(new THREE.PlaneGeometry(len,1.1),new THREE.MeshBasicMaterial({map:tx,transparent:true,side:THREE.DoubleSide}));n.position.set(x0+len/2,.88,z);g.add(n)}
+    if(type==='tape'){for(let x=x0;x<=x1;x+=2.5){const p=new THREE.Mesh(bx(.05,1.0,.05),lm(0x444444));p.position.set(x,.8,z);g.add(p)}const tx=ctex(64,8,(c)=>{for(let i=0;i<8;i++){c.fillStyle=i%2?'#fff':'#e02020';c.fillRect(i*8,0,8,8)}},len*2,1);const t=new THREE.Mesh(new THREE.PlaneGeometry(len,.08),new THREE.MeshBasicMaterial({map:tx,side:THREE.DoubleSide}));t.position.set(x0+len/2,1.2,z);g.add(t)}
+    return P.add(g)},
+  gate(x,open){const g=new THREE.Group();for(const dx of[0,3.2]){const p=new THREE.Mesh(bx(.15,1.6,.15),lm(0x2a2d30));p.position.set(x+dx,.8,4.9);g.add(p)}const panel=new THREE.Group();const f=new THREE.Mesh(bx(3,1.2,.06),lm(0x6b7280));f.position.set(1.5,.75,0);panel.add(f);const in2=new THREE.Mesh(bx(2.6,.85,.07),lm(0x3a3f46));in2.position.set(1.5,.75,0);panel.add(in2);panel.position.set(x+.1,0,4.9);if(open)panel.rotation.y=1.25;g.add(panel);return P.add(g)},
+  gap(x){const g=new THREE.Group();const w=new THREE.Mesh(bx(.08,1.4,3),lm(0x3a3d40));w.position.set(x,.35,5.6);w.rotation.x=-1.2;g.add(w);const m=new THREE.Mesh(new THREE.PlaneGeometry(2.6,1.3),basic(0x6f8a4a));m.position.set(x,.7,4.95);g.add(m);return P.add(g)},
+  fire(x,y,z,n=5){const g=new THREE.Group();g.position.set(x,y,z);const fl=[];for(let i=0;i<n;i++){const s=flameSprite(i%2?0xff7a00:0xffc030,1.2);s.position.set((Math.random()-.5)*1.4,.4+Math.random()*.6,(Math.random()-.5)*1.2);g.add(s);fl.push(s)}P.add(g);addSmoke(extras,x,y+1,z,6,true);anims.push(()=>fl.forEach(s=>{s.scale.setScalar(.9+Math.random()*1.1);s.material.opacity=.6+Math.random()*.4}));return g},
+  water(x,z,w,d){const m=new THREE.Mesh(new THREE.PlaneGeometry(w,d).rotateX(-Math.PI/2),new THREE.MeshLambertMaterial({color:0x3b6fa0,transparent:true,opacity:.85}));m.position.set(x,.36,z);anims.push(()=>{m.material.opacity=.75+Math.sin(T*3)*.1});return P.add(m)},
+  tree(x,z){const g=new THREE.Group();const t=new THREE.Mesh(new THREE.CylinderGeometry(.35,.45,9,8).rotateX(Math.PI/2),lm(0x5a3a22));t.position.set(0,.85,0);t.rotation.y=.35;g.add(t);for(let i=0;i<5;i++){const f=new THREE.Mesh(new THREE.IcosahedronGeometry(1+Math.random()*.6,0),lm(0x3f6a35));f.position.set((Math.random()-.5)*2,1.2,-4+Math.random()*2);g.add(f)}g.position.set(x,0,z);return P.add(g)},
+  ole(x0,x1){for(let x=x0;x<=x1;x+=40){P.box(x,3.4,2.3,.3,6.8,.3,0x8a8f96);P.box(x,6.6,.4,.15,.15,4.2,0x8a8f96);P.box(x,3.4,-5.6,.3,6.8,.3,0x8a8f96);P.box(x,6.6,-3.6,.15,.15,4.2,0x8a8f96)}for(const z of[0,-3.4]){P.box((x0+x1)/2,5.6,z,x1-x0,.03,.03,0x222222);P.box((x0+x1)/2,6.4,z,x1-x0,.03,.03,0x222222)}},
+  platform(x0,x1){const len=x1-x0;P.box(x0+len/2,.5,-8.3,len,1.0,6.0,0xb5b0a6);P.box(x0+len/2,1.01,-5.55,len,.02,.5,0xd9d4ca);const l=new THREE.Mesh(new THREE.PlaneGeometry(len,.1).rotateX(-Math.PI/2),basic(0xf5d000));l.position.set(x0+len/2,1.02,-6.4);P.add(l)},
+  measure(x,z0,z1,txt,y=.4){const m=new THREE.Mesh(bx(.05,.05,Math.abs(z1-z0)),basic(0xffb020));m.position.set(x,y,(z0+z1)/2);P.add(m);for(const z of[z0,z1]){const e=new THREE.Mesh(bx(.05,.35,.05),basic(0xffb020));e.position.set(x,y,z);P.add(e)}const l=label(txt,'#ffb020','#111',1.6);l.position.set(x,y+.45,(z0+z1)/2);P.add(l)},
+  hornUnit(x,z){const g=new THREE.Group();const p=new THREE.Mesh(bx(.06,1.3,.06),lm(0x333333));p.position.y=.65;g.add(p);const h=new THREE.Mesh(new THREE.CylinderGeometry(.08,.22,.4,10).rotateZ(Math.PI/2),lm(0xf5d000));h.position.set(.15,1.35,0);g.add(h);const b=new THREE.Mesh(bx(.3,.3,.2),lm(0xf5d000));b.position.set(-.1,1.35,0);g.add(b);g.position.set(x,0,z);return P.add(g)},
+  spoil(x,z){const m=new THREE.Mesh(new THREE.ConeGeometry(1.8,1.4,9),lm(0x5b4632));m.position.set(x,.7,z);return P.add(m)},
+  rails(x,z){const g=new THREE.Group();for(let i=0;i<4;i++){const r=new THREE.Mesh(bx(12,.16,.14),lm(0x6d5a4a));r.position.set(0,.4+Math.floor(i/2)*.17,(i%2)*.3-.15+(i>1?.15:0));g.add(r)}g.position.set(x,0,z);g.scale.set(1,1,1.5);return P.add(g)},
+  points(x){const g=new THREE.Group();for(const s of[-1,1]){const r=new THREE.Mesh(bx(9,.12,.07),lm(0xa8a5a0));r.position.set(x+4.5,.5,s*.55);r.rotation.y=s*.025;g.add(r)}const sb=new THREE.Mesh(bx(.12,.08,1.6),lm(0x555555));sb.position.set(x+.6,.45,0);g.add(sb);for(let i=0;i<3;i++){const r=new THREE.Mesh(bx(9,.12,.07),lm(0x8d8a85));r.position.set(x+5+i*.0,.5,1.4+i*.0);r.rotation.y=-.09;if(i)break;g.add(r)}const l=label('POINTS','#111','#ffb020',1.6);l.position.set(x+3,1.6,0);g.add(l);return P.add(g)},
+  van(x,z){const g=new THREE.Group();const b=new THREE.Mesh(bx(4.6,2,2),lm(0xf0f0f0));b.position.y=1.3;g.add(b);const c=new THREE.Mesh(bx(.1,.8,1.8),lm(0x1b1d22));c.position.set(-2.32,1.75,0);g.add(c);const s=new THREE.Mesh(bx(4.62,.25,2.02),lm(0xff7a00));s.position.y=1.0;g.add(s);for(const dx of[-1.5,1.5])for(const dz of[-1,1]){const w=new THREE.Mesh(new THREE.CylinderGeometry(.38,.38,.25,12).rotateX(Math.PI/2),lm(0x222222));w.position.set(dx,.38,dz);g.add(w)}g.position.set(x,0,z);return P.add(g)},
+  tank(x,z,derail){const g=new THREE.Group();const t=new THREE.Mesh(new THREE.CylinderGeometry(1.35,1.35,11,18).rotateZ(Math.PI/2),lm(0x2b2e33));t.position.y=2.45;g.add(t);const f=new THREE.Mesh(bx(12,.4,2.4),lm(0x1e1f22));f.position.y=1.05;g.add(f);for(const dx of[-4,4])for(const dz of[-.72,.72]){const w=new THREE.Mesh(new THREE.CylinderGeometry(.42,.42,.12,12).rotateX(Math.PI/2),lm(0x3a3a3a));w.position.set(dx,.6,dz);g.add(w)}
+    const c=document.createElement('canvas');c.width=256;c.height=192;const x2=c.getContext('2d');x2.fillStyle='#ff8a00';x2.fillRect(0,0,256,192);x2.strokeStyle='#111';x2.lineWidth=10;x2.strokeRect(5,5,246,182);x2.beginPath();x2.moveTo(0,96);x2.lineTo(256,96);x2.stroke();x2.fillStyle='#111';x2.font='900 64px system-ui';x2.textAlign='center';x2.fillText('33',128,72);x2.fillText('1203',128,166);const pt=new THREE.Mesh(new THREE.PlaneGeometry(1.0,.75),new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture(c)}));pt.position.set(0,2.4,1.37);g.add(pt);
+    g.position.set(x,0,z);if(derail){g.rotation.z=.07;g.rotation.y=-.12;g.position.z+=.7;g.position.y=-.15}return P.add(g)},
+  bridge(x){P.box(x,6.1,0,5,.9,22,0x8c8576);P.box(x,6.9,0,5,.6,.3,0x6b665c);P.box(x,3,3.0,5,6,1.4,0x9a9284);P.box(x,3,-7,5,6,2,0x9a9284)},
+  poles(x){for(const z of[8,-10]){P.box(x,4,z,.3,8,.3,0x6b4a2b);P.box(x,7.6,z,.1,.1,1.6,0x6b4a2b)}const w=new THREE.Mesh(bx(.04,.04,18),basic(0x111111));w.position.set(x,7.6,-1);w.visible=false;P.add(w);
+    const pts=[];for(let i=0;i<=20;i++){const k=i/20;pts.push(new THREE.Vector3(x,7.6-7.1*Math.pow(k,1.6),8-8*k))}const geo=new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts),40,.03,5,false);P.add(new THREE.Mesh(geo,basic(0x111111)));
+    const sp=flameSprite(0x9fd0ff,1.2);sp.position.set(x,.6,0);P.add(sp);anims.push(()=>{sp.visible=Math.random()<.5;sp.scale.setScalar(.6+Math.random()*1.4)})},
+  trolley(x){const g=new THREE.Group();const d=new THREE.Mesh(bx(2.4,.12,1.8),lm(0xf5d000));d.position.y=.85;g.add(d);for(const dx of[-.9,.9])for(const dz of[-.72,.72]){const w=new THREE.Mesh(new THREE.CylinderGeometry(.18,.18,.08,12).rotateX(Math.PI/2),lm(0x333333));w.position.set(dx,.68,dz);g.add(w)}g.position.set(x,0,0);return P.add(g)},
+  windsock(x,z){P.box(x,1.6,z,.08,3.2,.08,0x555555);const s=new THREE.Mesh(new THREE.ConeGeometry(.3,1.6,10).rotateZ(Math.PI/2),lm(0xff7a00));s.position.set(x+.85,3.1,z);P.add(s);anims.push(()=>{s.rotation.y=Math.sin(T*5)*.12});const l=label('WIND →','#fff','#111',2);l.position.set(x+.5,3.9,z);P.add(l)},
+  mound(x,z){const m=new THREE.Mesh(new THREE.CylinderGeometry(3.5,5,1.2,14),lm(0x6f8a4a));m.position.set(x,.6,z);return P.add(m)},
+  ditch(x,z){const m=new THREE.Mesh(new THREE.PlaneGeometry(7,1.8).rotateX(-Math.PI/2),basic(0x2f3a22));m.position.set(x,.03,z);P.add(m);const l=label('DITCH','#111','#fff',1.4);l.position.set(x,.8,z);P.add(l)},
+  freight(o={}){const g=new THREE.Group();const loco=new THREE.Mesh(bx(20,3.2,2.8),lm(0x2f5a8c));loco.position.set(10,2.4,0);g.add(loco);const nose=new THREE.Mesh(bx(.5,1.6,2.8),lm(0xf5d000));nose.position.set(-.1,1.8,0);g.add(nose);for(const s of[-.85,.85]){const hl=new THREE.Mesh(bx(.08,.22,.42),basic(0xfff4c8));hl.position.set(-.38,1.4,s);g.add(hl)}
+    let len=20.5;for(let i=0;i<7;i++){const cx=len+7;const f=new THREE.Mesh(bx(13.6,.45,2.5),lm(0x2a2a2a));f.position.set(cx,1.15,0);g.add(f);for(const dx of[-4.8,4.8])for(const dz of[-.72,.72]){const w=new THREE.Mesh(new THREE.CylinderGeometry(.42,.42,.12,12).rotateX(Math.PI/2),lm(0x3a3a3a));w.position.set(cx+dx,.6,dz);g.add(w)}
+      const ct=new THREE.Mesh(bx(12,2.6,2.44),lm([0xb33a2a,0x2a6a8c,0x6a6f75,0x2d6b3a][i%4]));ct.position.set(cx,2.7,0);g.add(ct);
+      if(o.shifted&&i===2){ct.rotation.y=.18;ct.position.z=.6;const tarp=new THREE.Mesh(new THREE.PlaneGeometry(2.4,1.6),new THREE.MeshLambertMaterial({color:0x1d4a8a,side:THREE.DoubleSide}));tarp.position.set(cx-5,3.4,1.9);g.add(tarp);g.userData.tarp=tarp}
+      len+=14}
+    if(o.tail!==false){const l=new THREE.Mesh(bx(.1,.3,.3),basic(0xff2020));l.position.set(len+.1,1.4,0);g.add(l);const s=flameSprite(0xff2020,1);s.position.set(len+.2,1.4,0);g.add(s)}
+    g.userData.len=len;g.visible=false;return P.add(g)},
+  kid(x,z,col){const p=makePerson(col,0x2a2a2a,0xd9a27a,null);p.scale.setScalar(.72);return W.addGuy(p,x,z,0)}
+};
+const anims=[];
+
+// ---------- world API for scenes ----------
+let speedSign=null;
+const W={
+  P,
+  speed(n){if(speedSign){scene.remove(speedSign);speedSign=null}if(n==null)return;const g=new THREE.Group();const p=new THREE.Mesh(bx(.09,1.7,.09),lm(0x222222));p.position.y=.85;g.add(p);const pl=plate([String(n)],{w:.75,h:.6,bg:'#fff',fg:'#111',border:'#111'});pl.position.y=1.95;pl.rotation.y=-Math.PI/2;g.add(pl);g.position.set(9,0,2.05);scene.add(g);speedSign=g},
+  night(on){if(on){scene.background=new THREE.Color(0x142034);scene.fog.color.set(0x142034);scene.fog.near=12;scene.fog.far=95;HEMI.intensity=.55;sun.intensity=.12}else{scene.background=SKY;scene.fog.color.set(0xa9c3d6);scene.fog.near=60;scene.fog.far=260;HEMI.intensity=1.05;sun.intensity=.75}},
+  cam(p,l,d=1.1){return camTo(new THREE.Vector3(...p),new THREE.Vector3(...l),d)},
+  me(x,z,face=-Math.PI/2,y=.32){player.visible=true;player.position.set(x,y,z);player.rotation.y=face;W.pose(player,null)},
+  addGuy(p,x,z,face=0,y=.32){p.position.set(x,y,z);p.rotation.y=face;scene.add(p);people.push(p);tmpPeople.push(p);return p},
+  guy(o={}){const p=makePerson(o.vest!=null?o.vest:0xff7a00,o.pants||0x1f2a44,o.skin||[0xf1c9a5,0xa86b45,0x7a4a2c,0xd9a27a][Math.floor(Math.random()*4)],o.helmet===undefined?0xffffff:o.helmet);if(o.coss)armband(p,0x2b5fd6);if(o.tag){const t=label(o.tag,o.tagBg||'#111',o.tagFg||'#ffb020',Math.max(1.3,o.tag.length*.17));t.position.set(0,2.4,0);p.add(t)}if(o.phones){for(const s of[-1,1]){const e=new THREE.Mesh(bx(.06,.16,.16),basic(0x111111));e.position.set(.17*s,1.62,0);p.userData.body.add(e)}const bnd=new THREE.Mesh(bx(.38,.05,.06),basic(0x111111));bnd.position.set(0,1.95,0);p.userData.body.add(bnd)}if(o.hood){const h=new THREE.Mesh(bx(.38,.42,.38),lm(0x2c3440));h.position.set(0,1.66,.03);p.userData.body.add(h)}return W.addGuy(p,o.x||0,o.z||3,o.face!=null?o.face:0,o.y||.32)},
+  pose(p,kind){const a=p.userData.arms;if(!a)return;a.forEach(x=>{x.rotation.x=0;x.rotation.z=0});if(kind==='one')a[1].rotation.x=-3.0;if(kind==='two'){a[0].rotation.x=-3.0;a[1].rotation.x=-3.0}if(kind==='out')a[1].rotation.z=1.57;if(kind==='phone'){a[1].rotation.x=-2.3;a[1].rotation.z=.5}},
+  say(p,txt,ms=2600){const l=label(txt,'#fff','#111',Math.min(5.2,Math.max(2.2,txt.length*.13)));l.position.set(0,2.85,0);p.add(l);if(ms)setTimeout(()=>p.remove(l),ms);return l},
+  walk(p,x,z,s=2.4){return walkTo(p,x,z,s)},
+  wait:ms=>wait(ms),
+  card(html){const c=$('card');c.innerHTML=html;c.classList.remove('hide')},
+  uncard(){$('card').classList.add('hide')},
+  zone(id,x,z,w=1.4,d=.7,txt,y){if(y==null)y=(Math.abs(z)<1.1||Math.abs(z+3.4)<1.1)?.6:.36;const m=new THREE.Mesh(new THREE.PlaneGeometry(w,d).rotateX(-Math.PI/2),new THREE.MeshBasicMaterial({color:0xffb020,transparent:true,opacity:.45,depthWrite:false}));m.position.set(x,y,z);m.userData.zone=id;anims.push(()=>{m.material.opacity=.3+Math.abs(Math.sin(T*3))*.3});P.add(m);const big=new THREE.Mesh(bx(Math.max(w,1.6),2,Math.max(d,1.2)),new THREE.MeshBasicMaterial());big.visible=false;big.position.set(x,y+1,z);big.userData.hz='zone:'+id;P.add(big);if(txt){const l=label(txt,'#ffb020','#111',txt.length>3?2.6:1.5);l.position.set(x,y+1.5,z);P.add(l)}return m},
+  hz(id,x,y,z,w,h,d){const m=new THREE.Mesh(bx(w,h,d),new THREE.MeshBasicMaterial());m.visible=false;m.position.set(x,y,z);m.userData.hz=id;m.userData.spot=1;return P.add(m)},
+  hzOn(id,obj,w=1,h=2,d=1){const m=W.hz(id,0,1,0,w,h,d);extras.remove(m);obj.add(m);return m},
+  async train(which,o={}){const tr=which==='down'?dnTrain:upTrain;const sp=o.speed||30;const len=62;let from,to;
+    if(which==='down'){from=o.from!=null?o.from:-170;to=o.to!=null?o.to:200}else{from=o.from!=null?o.from:170;to=o.to!=null?o.to:-150-len}
+    if(o.horn)setTimeout(()=>S.trainHorn(),o.hornAt||600);S.rumble();
+    if(o.stopAt!=null){tr.visible=true;tr.position.x=from;await tween(Math.abs(o.stopAt-from)/sp*1.6,k=>{const e=1-Math.pow(1-k,2.2);tr.position.x=from+(o.stopAt-from)*e});return}
+    await runTrain(tr,from,to,sp)},
+  async freight(o={}){const g=P.freight(o);const from=170,to=-150-g.userData.len,sp=o.speed||22;g.visible=true;g.position.x=from;let t=0;
+    const prev=tickFn;tickFn=dt=>{t+=dt;if(g.userData.tarp){g.userData.tarp.rotation.x=Math.sin(t*14)*.7;g.userData.tarp.rotation.y=Math.sin(t*9)*.4}if(o.follow){const rear=g.position.x+g.userData.len;let tx=g.position.x>4?g.position.x:(rear<-6?rear:Math.max(-8,Math.min(8,g.position.x+g.userData.len*.3)));tx=Math.max(-40,Math.min(40,tx));camL.x+=(tx-camL.x)*Math.min(1,dt*3)}};
+    S.rumble();if(o.horn)S.trainHorn();await tween((from-to)/sp,k=>{g.position.x=from+(to-from)*k});tickFn=prev;g.visible=false},
+};
+
+function reset(){
+  for(const p of tmpPeople){scene.remove(p);const i=people.indexOf(p);if(i>=0)people.splice(i,1)}tmpPeople.length=0;
+  scene.remove(extras);extras=new THREE.Group();scene.add(extras);anims.length=0;
+  for(const f of FX){f.parts.forEach(p=>f.group.remove(p))}FX.length=0;tickFn=null;
+  [upTrain,dnTrain].forEach(t=>t.visible=false);
+  [coss,lookout,mate].forEach(p=>{p.visible=false;W.pose(p,null);p.userData.pose='stand'});
+  player.children.filter(c=>c.isSprite&&c!==youTag).forEach(c=>player.remove(c));W.me(0,3.0);player.userData.pose='stand';$('sheet').classList.remove('compact');ring.visible=true;youTag.visible=true;
+  W.night(false);W.speed(null);W.uncard();stopTimer();banner('');hideSheet();
+  $('lookBtn').classList.add('hide');$('lookMeter').classList.add('hide');$('dim').style.opacity=0;
+}
+function cast(p,x,z,face){p.visible=true;p.position.set(x,.32,z);p.rotation.y=face||0;W.pose(p,null);return p}
+
+// ---------- UI helpers ----------
+function shuffleIdx(n){const a=[...Array(n).keys()];for(let i=n-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function chatHtml(ch){return ch?`<div class="chat">${ch.map(([w,t])=>`<div class="m ${w==='You'?'me':''}"><i>${w}</i>${t}</div>`).join('')}</div>`:''}
+function pickUI(sc,q){return new Promise(res=>{const ord=shuffleIdx(q.o.length);
+  sheet(`<h2>${sc.t.toUpperCase()}</h2>${chatHtml(q.chat)}<div class="q">${q.p}</div><div class="opts">${ord.map(i=>`<button class="opt" data-i="${i}">${q.o[i]}</button>`).join('')}</div><div id="fbx"></div>`);
+  const btns=[...$('sheet').querySelectorAll('.opt')];
+  btns.forEach(b=>b.onclick=()=>{btns.forEach(x=>x.onclick=null);const i=+b.dataset.i;const ok=i===q.a;btns.forEach(x=>{if(+x.dataset.i===q.a)x.classList.add('good')});if(!ok)b.classList.add('bad');res({ok,ans:i})})})}
+function multiUI(sc,q){return new Promise(res=>{const ord=shuffleIdx(q.o.length);const sel=new Set();
+  sheet(`<h2>${sc.t.toUpperCase()}</h2>${chatHtml(q.chat)}<div class="q">${q.p}</div><div class="hint">Pick all that apply</div><div class="opts">${ord.map(i=>`<button class="opt" data-i="${i}">${q.o[i]}</button>`).join('')}</div><button class="go" id="done">Done</button><div id="fbx"></div>`);
+  const btns=[...$('sheet').querySelectorAll('.opt')];
+  btns.forEach(b=>b.onclick=()=>{const i=+b.dataset.i;sel.has(i)?sel.delete(i):sel.add(i);b.classList.toggle('sel');S.tick()});
+  $('done').onclick=()=>{btns.forEach(b=>b.onclick=null);$('done').remove();let ok=true;btns.forEach(b=>{const i=+b.dataset.i,want=q.a.includes(i),got=sel.has(i);b.classList.remove('sel');if(want)b.classList.add('good');else if(got)b.classList.add('bad');if(want!==got)ok=false});res({ok,ans:[...sel]})}})}
+function tapUI(sc,q){return new Promise(res=>{let done=false;
+  for(const z of q.z)W.zone(z.id,z.x,z.z,z.w||1.4,z.d||.7,z.l,z.y);
+  sheet(`<h2>${sc.t.toUpperCase()}</h2><div class="q">${q.p}</div><div class="zbtns">${q.z.map(z=>`<button class="zb" data-z="${z.id}">${z.l||z.id}</button>`).join('')}</div><div class="hint">Tap a glowing spot in the scene, or a letter</div><div id="fbx"></div>`);
+  $('sheet').classList.add('compact');
+  const finish=id=>{if(done)return;done=true;pickHandler=null;stopTimer();$('sheet').querySelectorAll('.zb').forEach(b=>{b.onclick=null;const good=[].concat(q.a).includes(b.dataset.z);if(good)b.classList.add('good');else if(b.dataset.z===id)b.classList.add('bad')});res({ok:id!=null&&[].concat(q.a).includes(id),ans:id})};
+  $('sheet').querySelectorAll('.zb').forEach(b=>b.onclick=()=>finish(b.dataset.z));
+  pickHandler=o=>{if(!o)return;const id=o.userData.zone||(String(o.userData.hz||'').startsWith('zone:')?o.userData.hz.slice(5):null);if(id)finish(id)};
+  if(q.time){timer(q.time);setTimeout(()=>{if(!done){pop("TOO SLOW",'#ff5a5a');finish(null)}},q.time*1000)}
+})}
+function spotUI(sc,q){return new Promise(res=>{const want=[].concat(q.a);const sel=new Set();const marks={};
+  sheet(`<h2>${sc.t.toUpperCase()}</h2><div class="q">${q.p}</div><div class="hint">${want.length>1||q.multi?'Tap everything that applies, then Done':'Tap it in the scene'}</div>${want.length>1||q.multi?'<button class="go" id="done">Done</button>':''}<div id="fbx"></div>`);
+  $('sheet').classList.add('compact');
+  const end=()=>{pickHandler=null;let ok=want.every(w=>sel.has(w))&&[...sel].every(s=>want.includes(s));
+    extras.traverse(o=>{if(o.userData&&o.userData.spot&&want.includes(o.userData.hz)){const l=label(q.labels&&q.labels[o.userData.hz]||'THIS','#3ccf7a','#06210f',1.8);const wp=new THREE.Vector3();o.getWorldPosition(wp);l.position.set(wp.x,wp.y+1.4,wp.z);extras.add(l)}});
+    const d=$('done');if(d)d.remove();res({ok,ans:[...sel]})};
+  pickHandler=o=>{if(!o||!o.userData.spot)return;const id=o.userData.hz;S.tick();
+    if(!(want.length>1||q.multi)){sel.add(id);if(!want.includes(id)){const wp=new THREE.Vector3();o.getWorldPosition(wp);const l=label('✗','#ff5a5a','#fff',.8);l.position.set(wp.x,wp.y+1.2,wp.z);extras.add(l)}end();return}
+    if(sel.has(id)){sel.delete(id);extras.remove(marks[id]);return}
+    sel.add(id);const wp=new THREE.Vector3();o.getWorldPosition(wp);const l=label('✓','#ffb020','#111',.8);l.position.set(wp.x,wp.y+1.1,wp.z);extras.add(l);marks[id]=l};
+  const d=$('done');if(d)d.onclick=end;
+})}
+async function lookUI(sc,q){
+  sheet(`<h2>${sc.t.toUpperCase()}</h2><div class="q">${q.p}</div><div class="hint">Your head drops while you walk. Keep tapping LOOK UP.</div>`);$('sheet').classList.add('compact');
+  const btn=$('lookBtn');btn.classList.remove('hide');$('lookMeter').classList.remove('hide');let since=0,maxGap=0,t=0;const dim=$('dim');
+  btn.onclick=()=>{since=0;S.tick();dim.style.opacity=0};
+  W.cam([-7,3.4,7],[2,1,1],.6);
+  const walkP=W.walk(player,24,3.0,1.6);
+  let trainGo=false;
+  tickFn=dt=>{t+=dt;since+=dt;maxGap=Math.max(maxGap,since);$('lookFill').style.width=Math.min(100,since/5*100)+'%';$('lookFill').style.background=since>5?'#ff5a5a':since>3.5?'#ffb020':'#3ccf7a';dim.style.opacity=Math.min(.85,Math.max(0,(since-1.2)/3));camP.x=player.position.x-7;camL.x=player.position.x+4;camL.y=1+Math.max(-1.2,-(since-1)*.35);if(!trainGo&&t>7){trainGo=true;W.train('down',{speed:28})}};
+  await walkP;tickFn=null;btn.classList.add('hide');$('lookMeter').classList.add('hide');dim.style.opacity=0;$('lookFill').style.width='0%';
+  return {ok:maxGap<=5.3,ans:maxGap};
+}
+
+// ---------- feedback / coverage ----------
+const COVK='tr_rules';
+function covGet(){try{return JSON.parse(localStorage.getItem(COVK)||'{}')}catch(e){return {}}}
+function covSet(rules,ok){try{const c=covGet();const now=Date.now();for(const r of rules){const o=c[r]||{n:0,w:0};o.n++;if(!ok)o.w++;o.ok=ok?1:0;o.t=now;c[r]=o}localStorage.setItem(COVK,JSON.stringify(c))}catch(e){}}
+function feedback(sc,ok){return new Promise(res=>{const fb=$('fbx')||(()=>{sheet('<div id="fbx"></div>');return $('fbx')})();$('sheet').classList.remove('compact');
+  fb.innerHTML=`<div class="fb ${ok?'ok':'no'}"><b>${ok?'✅ Right call':'❌ Not quite'}</b>${sc.why}<div class="ref">📖 ${sc.ref} · rule ${sc.r.join(', ')}</div></div><button class="go">${idx+1<list.length?'Next scene':'See results'}</button>`;
+  fb.querySelector('.go').onclick=()=>res();$('sheet').scrollTop=9999})}
+
+// ---------- runner ----------
+let list=[],idx=0;const results=[];
+function pickList(){const qs=new URLSearchParams(location.search);const ids=(qs.get('ids')||'').split(',').filter(Boolean);
+  if(ids.length)return SCENES.filter(s=>ids.includes(s.id)||s.r.some(r=>ids.includes(r)));
+  const sec=qs.get('sec');if(sec)return SCENES.filter(s=>s.sec===sec);return SCENES.slice()}
+async function playScene(sc){
+  reset();stage(`PTS · ${idx+1}/${list.length}`);
+  W.cam([-6,3.6,10.5],[2,1,.5],.01);
+  if(sc.set)sc.set(W);
+  if(sc.play){banner(sc.t);await sc.play(W);banner('')}
+  const q=sc.q;let r;
+  if(q.t==='pick')r=await pickUI(sc,q);else if(q.t==='multi')r=await multiUI(sc,q);else if(q.t==='tap')r=await tapUI(sc,q);else if(q.t==='spot')r=await spotUI(sc,q);else if(q.t==='look')r=await lookUI(sc,q);
+  r.ok?(S.good(),addScore(1)):(S.bad(),flash());
+  if(q.t==='tap'&&q.walk&&r.ans){const z=q.z.find(z=>z.id===r.ans);await W.walk(player,z.x,z.z,3)}
+  if(sc.after){$('sheet').classList.add('compact');await sc.after(W,r.ok,r.ans)}
+  covSet(sc.r,r.ok);results.push({id:sc.id,ok:r.ok,r:sc.r,t:sc.t});
+  await feedback(sc,r.ok);
+}
+async function run(){
+  window.__ready=1;
+  list=pickList();if(window.__only)list=SCENES.filter(s=>window.__only.includes(s.id));
+  W.cam([-6,3.6,10.5],[2,1,.5],.01);
+  await info('PTS · SCENE MODE',`<b>${list.length} scene${list.length>1?'s':''}.</b> Each one is a real moment on the track: watch, then make the call. Every scene proves a rule in Handbook 1 (Issue 9).<br><br><span style="opacity:.7">Sound on for horns and warnings. Signs are simplified.</span>`,'Start');
+  for(idx=0;idx<list.length;idx++)await playScene(list[idx]);
+  reset();player.visible=true;W.cam([-5,3,8],[0,1.2,3]);
+  const ok=results.filter(r=>r.ok).length,miss=results.filter(r=>!r.ok);
+  const cov=covGet();const proven=Object.keys(RULES).filter(k=>cov[k]&&cov[k].ok).length;
+  sheet(`<h2>RESULTS</h2><div class="q">${ok} / ${results.length} right calls</div>
+   <div class="body">PTS rules proven so far: <b>${proven} / ${Object.keys(RULES).length}</b></div>
+   ${miss.length?`<div class="body"><b>Go over these again:</b><ul class="miss">${miss.map(m=>`<li>${m.r.map(r=>RULES[r]).join('; ')}</li>`).join('')}</ul></div><a class="go" style="display:block;text-align:center;text-decoration:none" href="?ids=${miss.map(m=>m.id).join(',')}">Retry the ${miss.length} I missed</a>`:'<div class="body">Clean sheet. 👏</div>'}
+   <a class="go" style="display:block;text-align:center;text-decoration:none;background:#2a3442;color:#fff;box-shadow:none" href="app.html">Back to Track Ready</a>`);
+  window.__done=1;
+}
+window.__dbg={camP,camL,camera,W,P};
+
+// ---------- loop ----------
+let last=performance.now(),T=0;
+function frame(ts){
+  const dt=Math.min(.05,(ts-last)/1000);last=ts;T+=dt;
+  for(let i=tweens.length-1;i>=0;i--){const tw=tweens[i];tw.t+=dt;const k=Math.min(1,tw.t/tw.dur);tw.fn(k);if(k>=1){tweens.splice(i,1);tw.res()}}
+  for(const p of people){
+    const u=p.userData;if(!u.legs)continue;
+    if(u.pose==='walk'){u.walk+=dt*9;const s=Math.sin(u.walk);u.legs[0].rotation.x=s*.7;u.legs[1].rotation.x=-s*.7;u.arms[0].rotation.x=-s*.6;if(Math.abs(u.arms[1].rotation.x)<1.5)u.arms[1].rotation.x=s*.6;u.body.position.y=0}
+    else if(u.pose==='kneel'){u.legs[0].rotation.x=-1.4;u.legs[1].rotation.x=.2;u.body.position.y=-.38;u.body.rotation.x=.35;u.hammer=Math.max(0,(u.hammer||0)-dt);u.arms[1].rotation.x=-.9-Math.sin(T*(u.hammer>0?30:6))*.4;u.arms[0].rotation.x=-.6}
+    else if(u.pose==='lean'){u.body.rotation.x=.3;u.legs[0].rotation.x=0;u.legs[1].rotation.x=0}
+    else{u.legs[0].rotation.x*=.8;u.legs[1].rotation.x*=.8;u.body.position.y=0;u.body.rotation.x=0;if(p!==player&&p!==mate&&p!==lookout&&p!==lo2){}}
+  }
+  ring.rotation.y+=dt;
+  if(tickFn)tickFn(dt);for(const a of anims)a();
+  for(const f of FX){if(!f.group.visible){f.parts.forEach(p=>f.group.remove(p));f.parts.length=0;continue}f.acc+=dt*f.rate;while(f.acc>1){f.acc--;const s=new THREE.Sprite(new THREE.SpriteMaterial({map:smokeTex,transparent:true,depthWrite:false,opacity:f.dark?.8:.5}));s.position.set(f.x+(Math.random()-.5)*.6,f.y,f.z);s.userData.life=0;s.scale.setScalar(.6);f.group.add(s);f.parts.push(s)}for(let i=f.parts.length-1;i>=0;i--){const p=f.parts[i];p.userData.life+=dt;p.position.y+=dt*1.6;p.position.x+=dt*4;p.scale.setScalar(.6+p.userData.life*2.2);p.material.opacity=Math.max(0,(f.dark?.8:.5)*(1-p.userData.life/1.6));if(p.userData.life>1.6){f.group.remove(p);f.parts.splice(i,1)}}}
+  shake=Math.max(0,shake-dt*.6);
+  camera.position.set(camP.x+(Math.random()-.5)*shake,camP.y+(Math.random()-.5)*shake,camP.z);
+  camera.lookAt(camL);
+  renderer.render(scene,camera);
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+run();
+})();
+</script>
+</body>
+</html>

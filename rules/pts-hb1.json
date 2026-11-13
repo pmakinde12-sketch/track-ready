@@ -3,843 +3,1099 @@
  "rules": [
   {
    "id": "D1",
-   "ref": "HB1 \u00a71",
+   "ref": "HB1 §1",
    "rule": "Position of safety distance, up to 100 mph",
    "numbers": "1.25 m (4 ft)",
    "type": "SCENE",
    "scene": "B",
    "scene_name": "Walking alone",
-   "covered": "Quiz"
+   "covered": "Scene",
+   "micro_scenes": [
+    "D1"
+   ]
   },
   {
    "id": "D2",
-   "ref": "HB1 \u00a71",
+   "ref": "HB1 §1",
    "rule": "Position of safety distance, over 100 mph",
    "numbers": "2 m (6 ft 6 in)",
    "type": "SCENE",
    "scene": "B",
    "scene_name": "Walking alone",
-   "covered": "Quiz"
+   "covered": "Scene",
+   "micro_scenes": [
+    "D2"
+   ]
   },
   {
    "id": "D3",
-   "ref": "HB1 \u00a71",
+   "ref": "HB1 §1",
    "rule": "\"On or near the line\" means on it, or within 3 m with no permanent fence between",
    "numbers": "3 m (10 ft)",
    "type": "SCENE",
    "scene": "A",
    "scene_name": "Kit up & get on site",
-   "covered": "Quiz"
+   "covered": "Scene",
+   "micro_scenes": [
+    "D3"
+   ]
   },
   {
    "id": "D4",
-   "ref": "HB1 \u00a71",
+   "ref": "HB1 §1",
    "rule": "Platforms and level crossings are not on or near the line, unless doing engineering/technical work near the platform edge",
    "numbers": "1.25 m from edge",
    "type": "QUICK",
    "scene": "Q",
    "scene_name": "Quick-fire questions",
-   "covered": "Quiz"
+   "covered": "Scene",
+   "micro_scenes": [
+    "D4"
+   ]
   },
   {
    "id": "D5",
-   "ref": "HB1 \u00a71",
+   "ref": "HB1 §1",
    "rule": "Names of the spaces: cess, four-foot, six-foot, ten-foot",
-   "numbers": "\u2014",
+   "numbers": "—",
    "type": "SCENE",
    "scene": "A",
    "scene_name": "Kit up & get on site",
-   "covered": "Scenario 1"
+   "covered": "Scene",
+   "micro_scenes": [
+    "D5"
+   ]
   },
   {
    "id": "D6",
-   "ref": "HB1 \u00a71",
+   "ref": "HB1 §1",
    "rule": "Lineside = between the boundary and the on-or-near-the-line area",
-   "numbers": "\u2014",
+   "numbers": "—",
    "type": "QUICK",
    "scene": "Q",
    "scene_name": "Quick-fire questions",
-   "covered": "\u2014"
+   "covered": "Scene",
+   "micro_scenes": [
+    "D6"
+   ]
   },
   {
    "id": "D7",
-   "ref": "HB1 \u00a71",
+   "ref": "HB1 §1",
    "rule": "Warning systems: ATWS, LOWS, SATWS, TOWS",
-   "numbers": "\u2014",
+   "numbers": "—",
    "type": "QUICK",
    "scene": "Q",
    "scene_name": "Quick-fire questions",
-   "covered": "\u2014"
+   "covered": "Scene",
+   "micro_scenes": [
+    "D7"
+   ]
   },
   {
    "id": "D8",
-   "ref": "HB1 \u00a71",
+   "ref": "HB1 §1",
    "rule": "Maximum speed is listed in the Sectional Appendix",
-   "numbers": "\u2014",
+   "numbers": "—",
    "type": "QUICK",
    "scene": "Q",
    "scene_name": "Quick-fire questions",
-   "covered": "\u2014"
+   "covered": "Scene",
+   "micro_scenes": [
+    "D8"
+   ]
   },
   {
    "id": "D9",
-   "ref": "HB1 \u00a71",
+   "ref": "HB1 §1",
    "rule": "Safety barrier types: rigid, tensioned, netting, barricade tape",
-   "numbers": "\u2014",
+   "numbers": "—",
    "type": "QUICK",
    "scene": "Q",
    "scene_name": "Quick-fire questions",
-   "covered": "Scenario 2"
+   "covered": "Scene",
+   "micro_scenes": [
+    "D9"
+   ]
   },
   {
    "id": "G1",
-   "ref": "HB1 \u00a72.1",
+   "ref": "HB1 §2.1",
    "rule": "Rules apply regardless of grade. If no rule covers it, do it the safest way you know",
-   "numbers": "\u2014",
+   "numbers": "—",
    "type": "QUICK",
    "scene": "Q",
    "scene_name": "Quick-fire questions",
-   "covered": "\u2014"
+   "covered": "Scene",
+   "micro_scenes": [
+    "G1a",
+    "G1b"
+   ]
   },
   {
    "id": "G2",
-   "ref": "HB1 \u00a72.2",
+   "ref": "HB1 §2.2",
    "rule": "Only operate plant/equipment you are trained and authorised for",
-   "numbers": "\u2014",
+   "numbers": "—",
    "type": "QUICK",
    "scene": "Q",
    "scene_name": "Quick-fire questions",
-   "covered": "\u2014"
+   "covered": "Scene",
+   "micro_scenes": [
+    "G2"
+   ]
   },
   {
    "id": "G3",
-   "ref": "HB1 \u00a72.3",
+   "ref": "HB1 §2.3",
    "rule": "Never get on/off a moving rail vehicle (except slow continuous ones). Never ride on steps or trolleys",
-   "numbers": "\u2014",
+   "numbers": "—",
    "type": "QUICK",
    "scene": "Q",
    "scene_name": "Quick-fire questions",
-   "covered": "\u2014"
+   "covered": "Scene",
+   "micro_scenes": [
+    "G3"
+   ]
   },
   {
    "id": "G4",
-   "ref": "HB1 \u00a72.4",
+   "ref": "HB1 §2.4",
    "rule": "Cab travel: show cab pass, tell driver reason/destination, never distract the driver",
-   "numbers": "\u2014",
+   "numbers": "—",
    "type": "QUICK",
    "scene": "Q",
    "scene_name": "Quick-fire questions",
-   "covered": "\u2014"
+   "covered": "Scene",
+   "micro_scenes": [
+    "G4"
+   ]
   },
   {
    "id": "L1",
-   "ref": "HB1 \u00a73.1",
+   "ref": "HB1 §3.1",
    "rule": "Wear the high-vis you were issued",
-   "numbers": "\u2014",
+   "numbers": "—",
    "type": "SCENE",
    "scene": "A",
    "scene_name": "Kit up & get on site",
-   "covered": "Scenario 1 + Quiz"
+   "covered": "Scene",
+   "micro_scenes": [
+    "L1"
+   ]
   },
   {
    "id": "L2",
-   "ref": "HB1 \u00a73.1",
+   "ref": "HB1 §3.1",
    "rule": "Use authorised access points and walking routes",
-   "numbers": "\u2014",
+   "numbers": "—",
    "type": "SCENE",
    "scene": "A",
    "scene_name": "Kit up & get on site",
-   "covered": "\u2014"
+   "covered": "Scene",
+   "micro_scenes": [
+    "L2"
+   ]
   },
   {
    "id": "L3",
-   "ref": "HB1 \u00a73.1",
+   "ref": "HB1 §3.1",
    "rule": "Acknowledge a driver's horn: raise one arm above your head",
    "numbers": "One arm",
    "type": "SCENE",
    "scene": "B",
    "scene_name": "Walking alone",
-   "covered": "Scenario 1 + Quiz"
+   "covered": "Scene",
+   "micro_scenes": [
+    "L3"
+   ]
   },
   {
    "id": "L4",
-   "ref": "HB1 \u00a73.2",
+   "ref": "HB1 §3.2",
    "rule": "Lineside work must not affect on-or-near-the-line unless a COSS is there and agrees",
-   "numbers": "\u2014",
+   "numbers": "—",
    "type": "QUICK",
    "scene": "Q",
    "scene_name": "Quick-fire questions",
-   "covered": "\u2014"
+   "covered": "Scene",
+   "micro_scenes": [
+    "L4"
+   ]
   },
   {
    "id": "L5",
-   "ref": "HB1 \u00a73.3",
+   "ref": "HB1 §3.3",
    "rule": "Road vehicles stay off on-or-near-the-line unless driver is COSS/IWA or a COSS agrees",
-   "numbers": "\u2014",
+   "numbers": "—",
    "type": "QUICK",
    "scene": "Q",
    "scene_name": "Quick-fire questions",
-   "covered": "\u2014"
+   "covered": "Scene",
+   "micro_scenes": [
+    "L5"
+   ]
   },
   {
    "id": "A1",
-   "ref": "HB1 \u00a74.1",
+   "ref": "HB1 §4.1",
    "rule": "When you may go on or near the line alone (COSS/IWA, or told by a COSS to walk to a site)",
-   "numbers": "\u2014",
+   "numbers": "—",
    "type": "SCENE",
    "scene": "B",
    "scene_name": "Walking alone",
-   "covered": "\u2014"
+   "covered": "Scene",
+   "micro_scenes": [
+    "A1"
+   ]
   },
   {
    "id": "A2",
-   "ref": "HB1 \u00a74.1",
+   "ref": "HB1 §4.1",
    "rule": "Hold a valid PTS certificate",
-   "numbers": "\u2014",
+   "numbers": "—",
    "type": "SCENE",
    "scene": "A",
    "scene_name": "Kit up & get on site",
-   "covered": "Scenario 1"
+   "covered": "Scene",
+   "micro_scenes": [
+    "A2"
+   ]
   },
   {
    "id": "A3",
-   "ref": "HB1 \u00a74.1",
+   "ref": "HB1 §4.1",
    "rule": "Never work alone unless you are a COSS or IWA",
-   "numbers": "\u2014",
+   "numbers": "—",
    "type": "SCENE",
    "scene": "B",
    "scene_name": "Walking alone",
-   "covered": "\u2014"
+   "covered": "Scene",
+   "micro_scenes": [
+    "A3"
+   ]
   },
   {
    "id": "A4",
-   "ref": "HB1 \u00a74.1",
+   "ref": "HB1 §4.1",
    "rule": "Carry a lamp in darkness, poor visibility or a tunnel",
-   "numbers": "\u2014",
+   "numbers": "—",
    "type": "SCENE",
    "scene": "A",
    "scene_name": "Kit up & get on site",
-   "covered": "Quiz"
+   "covered": "Scene",
+   "micro_scenes": [
+    "A4"
+   ]
   },
   {
    "id": "A5",
-   "ref": "HB1 \u00a74.2",
+   "ref": "HB1 §4.2",
    "rule": "Know each line's max speed, direction, no-go areas, limited clearance spots",
-   "numbers": "\u2014",
+   "numbers": "—",
    "type": "SCENE",
    "scene": "B",
    "scene_name": "Walking alone",
-   "covered": "\u2014"
+   "covered": "Scene",
+   "micro_scenes": [
+    "A5"
+   ]
   },
   {
    "id": "A6",
-   "ref": "HB1 \u00a74.3",
+   "ref": "HB1 §4.3",
    "rule": "Walking alone: light hand tools only",
-   "numbers": "\u2014",
+   "numbers": "—",
    "type": "SCENE",
    "scene": "B",
    "scene_name": "Walking alone",
-   "covered": "\u2014"
+   "covered": "Scene",
+   "micro_scenes": [
+    "A6"
+   ]
   },
   {
    "id": "A7",
-   "ref": "HB1 \u00a74.3",
+   "ref": "HB1 §4.3",
    "rule": "Nothing that stops you seeing or hearing trains (headphones, hood)",
-   "numbers": "\u2014",
+   "numbers": "—",
    "type": "SCENE",
    "scene": "A",
    "scene_name": "Kit up & get on site",
-   "covered": "Scenario 1 + Quiz"
+   "covered": "Scene",
+   "micro_scenes": [
+    "A7"
+   ]
   },
   {
    "id": "A8",
-   "ref": "HB1 \u00a74.3",
+   "ref": "HB1 §4.3",
    "rule": "Crossing: don't step on rails, sleepers or between moving parts of points",
-   "numbers": "\u2014",
+   "numbers": "—",
    "type": "SCENE",
    "scene": "F",
    "scene_name": "Obstacles & crossing open lines",
-   "covered": "Quiz"
+   "covered": "Scene",
+   "micro_scenes": [
+    "A8"
+   ]
   },
   {
    "id": "A9",
-   "ref": "HB1 \u00a74.3",
+   "ref": "HB1 §4.3",
    "rule": "Phone call: move to a position of safety and stand still first",
-   "numbers": "\u2014",
+   "numbers": "—",
    "type": "SCENE",
    "scene": "B",
    "scene_name": "Walking alone",
-   "covered": "Quiz"
+   "covered": "Scene",
+   "micro_scenes": [
+    "A9"
+   ]
   },
   {
    "id": "A10",
-   "ref": "HB1 \u00a74.3",
+   "ref": "HB1 §4.3",
    "rule": "Look up at least every 5 seconds",
    "numbers": "5 s",
    "type": "SCENE",
    "scene": "B",
    "scene_name": "Walking alone",
-   "covered": "Quiz"
+   "covered": "Scene",
+   "micro_scenes": [
+    "A10"
+   ]
   },
   {
    "id": "A11",
-   "ref": "HB1 \u00a74.3",
+   "ref": "HB1 §4.3",
    "rule": "Be in a position of safety at least 10 s before a train arrives",
    "numbers": "10 s",
    "type": "SCENE",
    "scene": "B",
    "scene_name": "Walking alone",
-   "covered": "Quiz"
+   "covered": "Scene",
+   "micro_scenes": [
+    "A11"
+   ]
   },
   {
    "id": "A12",
-   "ref": "HB1 \u00a74.4",
+   "ref": "HB1 §4.4",
    "rule": "Train approaching: stay in/move to safety until it has passed and no other train is coming",
-   "numbers": "\u2014",
+   "numbers": "—",
    "type": "SCENE",
    "scene": "B",
    "scene_name": "Walking alone",
-   "covered": "Scenario 1"
+   "covered": "Scene",
+   "micro_scenes": [
+    "A12"
+   ]
   },
   {
    "id": "A13",
-   "ref": "HB1 \u00a74.5",
+   "ref": "HB1 §4.5",
    "rule": "Joining a group: speak to the COSS first, agree access point and destination, don't walk until briefed",
-   "numbers": "\u2014",
+   "numbers": "—",
    "type": "SCENE",
    "scene": "C",
    "scene_name": "Joining / leaving a group",
-   "covered": "Quiz"
+   "covered": "Scene",
+   "micro_scenes": [
+    "A13"
+   ]
   },
   {
    "id": "A14",
-   "ref": "HB1 \u00a74.5",
+   "ref": "HB1 §4.5",
    "rule": "Leaving a group: tell the COSS, agree destination and route",
-   "numbers": "\u2014",
+   "numbers": "—",
    "type": "SCENE",
    "scene": "C",
    "scene_name": "Joining / leaving a group",
-   "covered": "\u2014"
+   "covered": "Scene",
+   "micro_scenes": [
+    "A14"
+   ]
   },
   {
    "id": "A15",
-   "ref": "HB1 \u00a74.5",
+   "ref": "HB1 §4.5",
    "rule": "Obstacle forces you onto an open line: tell the COSS and follow instructions",
-   "numbers": "\u2014",
+   "numbers": "—",
    "type": "SCENE",
    "scene": "F",
    "scene_name": "Obstacles & crossing open lines",
-   "covered": "\u2014"
+   "covered": "Scene",
+   "micro_scenes": [
+    "A15"
+   ]
   },
   {
    "id": "W1",
-   "ref": "HB1 \u00a75.2",
+   "ref": "HB1 §5.2",
    "rule": "Only go on with others if a COSS is present and stays with you",
-   "numbers": "\u2014",
+   "numbers": "—",
    "type": "SCENE",
    "scene": "D",
    "scene_name": "Working with a COSS",
-   "covered": "\u2014"
+   "covered": "Scene",
+   "micro_scenes": [
+    "W1"
+   ]
   },
   {
    "id": "W2",
-   "ref": "HB1 \u00a75.2",
+   "ref": "HB1 §5.2",
    "rule": "Identify the COSS: armlet on left arm or chest badge",
-   "numbers": "\u2014",
+   "numbers": "—",
    "type": "SCENE",
    "scene": "D",
    "scene_name": "Working with a COSS",
-   "covered": "Quiz"
+   "covered": "Scene",
+   "micro_scenes": [
+    "W2"
+   ]
   },
   {
    "id": "W3",
-   "ref": "HB1 \u00a75.2",
+   "ref": "HB1 §5.2",
    "rule": "Understand the briefing; ask if anything is unclear",
-   "numbers": "\u2014",
+   "numbers": "—",
    "type": "SCENE",
    "scene": "D",
    "scene_name": "Working with a COSS",
-   "covered": "Scenario 1"
+   "covered": "Scene",
+   "micro_scenes": [
+    "W3"
+   ]
   },
   {
    "id": "W4",
-   "ref": "HB1 \u00a75.2",
+   "ref": "HB1 §5.2",
    "rule": "Sign the RT9909",
    "numbers": "RT9909",
    "type": "SCENE",
    "scene": "D",
    "scene_name": "Working with a COSS",
-   "covered": "Quiz"
+   "covered": "Scene",
+   "micro_scenes": [
+    "W4"
+   ]
   },
   {
    "id": "W5",
-   "ref": "HB1 \u00a75.3",
+   "ref": "HB1 §5.3",
    "rule": "Never lean on or rest tools against a safety barrier",
-   "numbers": "\u2014",
+   "numbers": "—",
    "type": "SCENE",
    "scene": "D",
    "scene_name": "Working with a COSS",
-   "covered": "Scenario 2 + Quiz"
+   "covered": "Scene",
+   "micro_scenes": [
+    "W5"
+   ]
   },
   {
    "id": "W6",
-   "ref": "HB1 \u00a75.4",
+   "ref": "HB1 §5.4",
    "rule": "Lookout warning: stop, acknowledge, go to safety immediately; stay until COSS says",
-   "numbers": "\u2014",
+   "numbers": "—",
    "type": "SCENE",
    "scene": "E",
    "scene_name": "Warnings: lookout, site warden, ATWS",
-   "covered": "Scenario 1 + Quiz"
+   "covered": "Scene",
+   "micro_scenes": [
+    "W6a",
+    "W6b"
+   ]
   },
   {
    "id": "W7",
-   "ref": "HB1 \u00a75.4",
+   "ref": "HB1 §5.4",
    "rule": "Urgent warning = series of short, sharp blasts",
-   "numbers": "\u2014",
+   "numbers": "—",
    "type": "SCENE",
    "scene": "E",
    "scene_name": "Warnings: lookout, site warden, ATWS",
-   "covered": "Quiz"
+   "covered": "Scene",
+   "micro_scenes": [
+    "W7"
+   ]
   },
   {
    "id": "W8",
-   "ref": "HB1 \u00a75.4",
+   "ref": "HB1 §5.4",
    "rule": "Never distract a lookout",
-   "numbers": "\u2014",
+   "numbers": "—",
    "type": "SCENE",
    "scene": "E",
    "scene_name": "Warnings: lookout, site warden, ATWS",
-   "covered": "Scenario 1"
+   "covered": "Scene",
+   "micro_scenes": [
+    "W8"
+   ]
   },
   {
    "id": "W9",
-   "ref": "HB1 \u00a75.5",
+   "ref": "HB1 §5.5",
    "rule": "Site warden warning: check you're in the safe area, step back if not",
-   "numbers": "\u2014",
+   "numbers": "—",
    "type": "SCENE",
    "scene": "E",
    "scene_name": "Warnings: lookout, site warden, ATWS",
-   "covered": "Quiz"
+   "covered": "Scene",
+   "micro_scenes": [
+    "W9"
+   ]
   },
   {
    "id": "W10",
-   "ref": "HB1 \u00a75.6",
+   "ref": "HB1 §5.6",
    "rule": "ATWS/SATWS/TOWS/LOWS warning: go to safety, stay until the COSS says",
-   "numbers": "\u2014",
+   "numbers": "—",
    "type": "SCENE",
    "scene": "E",
    "scene_name": "Warnings: lookout, site warden, ATWS",
-   "covered": "\u2014"
+   "covered": "Scene",
+   "micro_scenes": [
+    "W10"
+   ]
   },
   {
    "id": "W11",
-   "ref": "HB1 \u00a75.7",
+   "ref": "HB1 §5.7",
    "rule": "COSS arranges safe bypass of obstacles that force the group onto an open line",
-   "numbers": "\u2014",
+   "numbers": "—",
    "type": "SCENE",
    "scene": "F",
    "scene_name": "Obstacles & crossing open lines",
-   "covered": "\u2014"
+   "covered": "Scene",
+   "micro_scenes": [
+    "W11"
+   ]
   },
   {
    "id": "W12",
-   "ref": "HB1 \u00a75.8",
+   "ref": "HB1 §5.8",
    "rule": "Only cross open lines after the COSS explains the arrangements",
-   "numbers": "\u2014",
+   "numbers": "—",
    "type": "SCENE",
    "scene": "F",
    "scene_name": "Obstacles & crossing open lines",
-   "covered": "\u2014"
+   "covered": "Scene",
+   "micro_scenes": [
+    "W12"
+   ]
   },
   {
    "id": "W13",
-   "ref": "HB1 \u00a75.9",
+   "ref": "HB1 §5.9",
    "rule": "Route proving: only get off the train once the COSS has explained",
-   "numbers": "\u2014",
+   "numbers": "—",
    "type": "SCENE",
    "scene": "G",
    "scene_name": "Route proving from a train",
-   "covered": "\u2014"
+   "covered": "Scene",
+   "micro_scenes": [
+    "W13"
+   ]
   },
   {
    "id": "W14",
-   "ref": "HB1 \u00a75.9",
+   "ref": "HB1 §5.9",
    "rule": "Train protecting you mustn't move until COSS confirms everyone and everything is clear",
-   "numbers": "\u2014",
+   "numbers": "—",
    "type": "SCENE",
    "scene": "G",
    "scene_name": "Route proving from a train",
-   "covered": "\u2014"
+   "covered": "Scene",
+   "micro_scenes": [
+    "W14"
+   ]
   },
   {
    "id": "W15",
-   "ref": "HB1 \u00a75.9",
+   "ref": "HB1 §5.9",
    "rule": "Never use gangway doors to get to the track in an OLE area",
-   "numbers": "\u2014",
+   "numbers": "—",
    "type": "SCENE",
    "scene": "G",
    "scene_name": "Route proving from a train",
-   "covered": "\u2014"
+   "covered": "Scene",
+   "micro_scenes": [
+    "W15"
+   ]
   },
   {
    "id": "R1",
-   "ref": "HB1 \u00a76.1",
+   "ref": "HB1 §6.1",
    "rule": "Accident: report ASAP to person in charge, signaller or Ops Control",
-   "numbers": "\u2014",
+   "numbers": "—",
    "type": "SCENE",
    "scene": "H",
    "scene_name": "Accident: the emergency call",
-   "covered": "\u2014"
+   "covered": "Scene",
+   "micro_scenes": [
+    "R1"
+   ]
   },
   {
    "id": "R2",
-   "ref": "HB1 \u00a76.1",
+   "ref": "HB1 §6.1",
    "rule": "Start with \"This is an emergency call\"",
-   "numbers": "\u2014",
+   "numbers": "—",
    "type": "SCENE",
    "scene": "H",
    "scene_name": "Accident: the emergency call",
-   "covered": "Quiz"
+   "covered": "Scene",
+   "micro_scenes": [
+    "R2"
+   ]
   },
   {
    "id": "R3",
-   "ref": "HB1 \u00a76.1",
+   "ref": "HB1 §6.1",
    "rule": "Give name, exact location, what happened, lines obstructed?, services needed",
-   "numbers": "\u2014",
+   "numbers": "—",
    "type": "SCENE",
    "scene": "H",
    "scene_name": "Accident: the emergency call",
-   "covered": "\u2014"
+   "covered": "Scene",
+   "micro_scenes": [
+    "R3"
+   ]
   },
   {
    "id": "R4",
-   "ref": "HB1 \u00a76.1",
+   "ref": "HB1 §6.1",
    "rule": "Report all accidents and near misses to your supervisor",
-   "numbers": "\u2014",
+   "numbers": "—",
    "type": "QUICK",
    "scene": "Q",
    "scene_name": "Quick-fire questions",
-   "covered": "\u2014"
+   "covered": "Scene",
+   "micro_scenes": [
+    "R4"
+   ]
   },
   {
    "id": "R5",
-   "ref": "HB1 \u00a76.2",
+   "ref": "HB1 §6.2",
    "rule": "Dangerous goods: say \"This is a rail dangerous goods emergency\" + UN number",
    "numbers": "UN number",
    "type": "SCENE",
    "scene": "I",
    "scene_name": "Dangerous goods incident",
-   "covered": "\u2014"
+   "covered": "Scene",
+   "micro_scenes": [
+    "R5"
+   ]
   },
   {
    "id": "R6",
-   "ref": "HB1 \u00a76.2",
+   "ref": "HB1 §6.2",
    "rule": "Keep well clear, wind behind you, avoid low ground, keep people away",
-   "numbers": "\u2014",
+   "numbers": "—",
    "type": "SCENE",
    "scene": "I",
    "scene_name": "Dangerous goods incident",
-   "covered": "\u2014"
+   "covered": "Scene",
+   "micro_scenes": [
+    "R6"
+   ]
   },
   {
    "id": "R7",
-   "ref": "HB1 \u00a76.2",
+   "ref": "HB1 §6.2",
    "rule": "No naked lights, smoking or phones near flammable loads",
-   "numbers": "\u2014",
+   "numbers": "—",
    "type": "SCENE",
    "scene": "I",
    "scene_name": "Dangerous goods incident",
-   "covered": "\u2014"
+   "covered": "Scene",
+   "micro_scenes": [
+    "R7"
+   ]
   },
   {
    "id": "R8",
-   "ref": "HB1 \u00a76.2",
+   "ref": "HB1 §6.2",
    "rule": "Contamination: wash with plenty of cold water, remove clothing carefully, get medical help",
-   "numbers": "\u2014",
+   "numbers": "—",
    "type": "QUICK",
    "scene": "Q",
    "scene_name": "Quick-fire questions",
-   "covered": "\u2014"
+   "covered": "Scene",
+   "micro_scenes": [
+    "R8"
+   ]
   },
   {
    "id": "H1",
-   "ref": "HB1 \u00a77.1",
+   "ref": "HB1 §7.1",
    "rule": "No tools/equipment within 2 m of a line a train could pass (unless slipstream-proof)",
    "numbers": "2 m",
    "type": "SCENE",
    "scene": "J",
    "scene_name": "Site hazards: tools, gates, trespass, fire, water",
-   "covered": "Scenario 1 (shovel)"
+   "covered": "Scene",
+   "micro_scenes": [
+    "H1"
+   ]
   },
   {
    "id": "H2",
-   "ref": "HB1 \u00a77.2",
+   "ref": "HB1 §7.2",
    "rule": "Keep access gates closed and locked; report damaged fences",
-   "numbers": "\u2014",
+   "numbers": "—",
    "type": "SCENE",
    "scene": "J",
    "scene_name": "Site hazards: tools, gates, trespass, fire, water",
-   "covered": "\u2014"
+   "covered": "Scene",
+   "micro_scenes": [
+    "H2"
+   ]
   },
   {
    "id": "H3",
-   "ref": "HB1 \u00a77.3",
+   "ref": "HB1 §7.3",
    "rule": "Report suspected trespassers",
-   "numbers": "\u2014",
+   "numbers": "—",
    "type": "SCENE",
    "scene": "J",
    "scene_name": "Site hazards: tools, gates, trespass, fire, water",
-   "covered": "\u2014"
+   "covered": "Scene",
+   "micro_scenes": [
+    "H3"
+   ]
   },
   {
    "id": "H4",
-   "ref": "HB1 \u00a77.4",
+   "ref": "HB1 §7.4",
    "rule": "Report lineside fires immediately",
-   "numbers": "\u2014",
+   "numbers": "—",
    "type": "SCENE",
    "scene": "J",
    "scene_name": "Site hazards: tools, gates, trespass, fire, water",
-   "covered": "\u2014"
+   "covered": "Scene",
+   "micro_scenes": [
+    "H4"
+   ]
   },
   {
    "id": "H5",
-   "ref": "HB1 \u00a77.5",
+   "ref": "HB1 §7.5",
    "rule": "Report flowing or pooling water near structures/earthworks",
-   "numbers": "\u2014",
+   "numbers": "—",
    "type": "SCENE",
    "scene": "J",
    "scene_name": "Site hazards: tools, gates, trespass, fire, water",
-   "covered": "\u2014"
+   "covered": "Scene",
+   "micro_scenes": [
+    "H5"
+   ]
   },
   {
    "id": "H6",
-   "ref": "HB1 \u00a77.6",
+   "ref": "HB1 §7.6",
    "rule": "Report unsafe trains: open door, insecure load, fire, hot axle box",
-   "numbers": "\u2014",
+   "numbers": "—",
    "type": "SCENE",
    "scene": "K",
    "scene_name": "Spot the unsafe train",
-   "covered": "\u2014"
+   "covered": "Scene",
+   "micro_scenes": [
+    "H6"
+   ]
   },
   {
    "id": "H7",
-   "ref": "HB1 \u00a77.6",
+   "ref": "HB1 §7.6",
    "rule": "Report missing/unlit headlight or tail lamp",
-   "numbers": "\u2014",
+   "numbers": "—",
    "type": "SCENE",
    "scene": "K",
    "scene_name": "Spot the unsafe train",
-   "covered": "\u2014"
+   "covered": "Scene",
+   "micro_scenes": [
+    "H7"
+   ]
   },
   {
    "id": "H8",
-   "ref": "HB1 \u00a77.6",
+   "ref": "HB1 §7.6",
    "rule": "Train in distress = continuous long horn blasts; flashing headlights = hazard warning",
-   "numbers": "\u2014",
+   "numbers": "—",
    "type": "SCENE",
    "scene": "K",
    "scene_name": "Spot the unsafe train",
-   "covered": "\u2014"
+   "covered": "Scene",
+   "micro_scenes": [
+    "H8"
+   ]
   },
   {
    "id": "H9",
-   "ref": "HB1 \u00a77.7",
+   "ref": "HB1 §7.7",
    "rule": "Keep 5 m from a fallen overhead power line until the electricity company says safe",
    "numbers": "5 m",
    "type": "SCENE",
    "scene": "L",
    "scene_name": "Fallen power line",
-   "covered": "Quiz"
+   "covered": "Scene",
+   "micro_scenes": [
+    "H9"
+   ]
   },
   {
    "id": "E1",
-   "ref": "HB1 \u00a78.1",
+   "ref": "HB1 §8.1",
    "rule": "When to stop trains: track defect, flood, obstruction, fire, structure damage, large animal",
-   "numbers": "\u2014",
+   "numbers": "—",
    "type": "SCENE",
    "scene": "M",
    "scene_name": "Stop a train in an emergency",
-   "covered": "\u2014"
+   "covered": "Scene",
+   "micro_scenes": [
+    "E1"
+   ]
   },
   {
    "id": "E2",
-   "ref": "HB1 \u00a78.2",
+   "ref": "HB1 §8.2",
    "rule": "Tell the person in charge/signaller/Ops Control immediately",
-   "numbers": "\u2014",
+   "numbers": "—",
    "type": "SCENE",
    "scene": "M",
    "scene_name": "Stop a train in an emergency",
-   "covered": "\u2014"
+   "covered": "Scene",
+   "micro_scenes": [
+    "E2"
+   ]
   },
   {
    "id": "E3",
-   "ref": "HB1 \u00a78.2",
+   "ref": "HB1 §8.2",
    "rule": "Daylight: red flag, or both arms above your head",
    "numbers": "Both arms",
    "type": "SCENE",
    "scene": "M",
    "scene_name": "Stop a train in an emergency",
-   "covered": "Quiz"
+   "covered": "Scene",
+   "micro_scenes": [
+    "E3"
+   ]
   },
   {
    "id": "E4",
-   "ref": "HB1 \u00a78.2",
+   "ref": "HB1 §8.2",
    "rule": "On a vehicle: raise one arm horizontally",
-   "numbers": "\u2014",
+   "numbers": "—",
    "type": "SCENE",
    "scene": "M",
    "scene_name": "Stop a train in an emergency",
-   "covered": "\u2014"
+   "covered": "Scene",
+   "micro_scenes": [
+    "E4"
+   ]
   },
   {
    "id": "E5",
-   "ref": "HB1 \u00a78.2",
+   "ref": "HB1 §8.2",
    "rule": "Dark/poor visibility: red light, or wave any light violently",
-   "numbers": "\u2014",
+   "numbers": "—",
    "type": "SCENE",
    "scene": "M",
    "scene_name": "Stop a train in an emergency",
-   "covered": "Quiz"
+   "covered": "Scene",
+   "micro_scenes": [
+    "E5"
+   ]
   },
   {
    "id": "C1",
-   "ref": "HB1 \u00a79.1",
+   "ref": "HB1 §9.1",
    "rule": "Confirm who you're talking to; give location, name, employer, task",
-   "numbers": "\u2014",
+   "numbers": "—",
    "type": "SCENE",
    "scene": "N",
    "scene_name": "Radio & phone calls",
-   "covered": "\u2014"
+   "covered": "Scene",
+   "micro_scenes": [
+    "C1"
+   ]
   },
   {
    "id": "C2",
-   "ref": "HB1 \u00a79.1",
+   "ref": "HB1 §9.1",
    "rule": "Say \"line blocked\", never \"not clear\"",
-   "numbers": "\u2014",
+   "numbers": "—",
    "type": "SCENE",
    "scene": "N",
    "scene_name": "Radio & phone calls",
-   "covered": "\u2014"
+   "covered": "Scene",
+   "micro_scenes": [
+    "C2"
+   ]
   },
   {
    "id": "C3",
-   "ref": "HB1 \u00a79.1",
+   "ref": "HB1 §9.1",
    "rule": "Say numbers one digit at a time (except times and Rule Book refs)",
    "numbers": "8107 = eight-one-zero-seven",
    "type": "SCENE",
    "scene": "N",
    "scene_name": "Radio & phone calls",
-   "covered": "\u2014"
+   "covered": "Scene",
+   "micro_scenes": [
+    "C3"
+   ]
   },
   {
    "id": "C4",
-   "ref": "HB1 \u00a79.1",
+   "ref": "HB1 §9.1",
    "rule": "Repeat messages back",
-   "numbers": "\u2014",
+   "numbers": "—",
    "type": "SCENE",
    "scene": "N",
    "scene_name": "Radio & phone calls",
-   "covered": "\u2014"
+   "covered": "Scene",
+   "micro_scenes": [
+    "C4"
+   ]
   },
   {
    "id": "C5",
-   "ref": "HB1 \u00a79.2",
-   "rule": "Who leads the conversation (ECO > signaller > PICOP \u2026; COSS leads with group/lookouts)",
-   "numbers": "\u2014",
+   "ref": "HB1 §9.2",
+   "rule": "Who leads the conversation (ECO > signaller > PICOP …; COSS leads with group/lookouts)",
+   "numbers": "—",
    "type": "QUICK",
    "scene": "Q",
    "scene_name": "Quick-fire questions",
-   "covered": "\u2014"
+   "covered": "Scene",
+   "micro_scenes": [
+    "C5"
+   ]
   },
   {
    "id": "C6",
-   "ref": "HB1 \u00a79.3",
+   "ref": "HB1 §9.3",
    "rule": "\"Repeat back\" and \"Correction\" phrases",
-   "numbers": "\u2014",
+   "numbers": "—",
    "type": "SCENE",
    "scene": "N",
    "scene_name": "Radio & phone calls",
-   "covered": "\u2014"
+   "covered": "Scene",
+   "micro_scenes": [
+    "C6"
+   ]
   },
   {
    "id": "C7",
-   "ref": "HB1 \u00a79.4",
+   "ref": "HB1 §9.4",
    "rule": "Radio: \"Over\" = reply expected, \"Out\" = no reply",
-   "numbers": "\u2014",
+   "numbers": "—",
    "type": "QUICK",
    "scene": "Q",
    "scene_name": "Quick-fire questions",
-   "covered": "\u2014"
+   "covered": "Scene",
+   "micro_scenes": [
+    "C7"
+   ]
   },
   {
    "id": "C8",
-   "ref": "HB1 \u00a79.5",
+   "ref": "HB1 §9.5",
    "rule": "Use the phonetic alphabet for signal/point IDs, spelling, interference",
-   "numbers": "\u2014",
+   "numbers": "—",
    "type": "SCENE",
    "scene": "N",
    "scene_name": "Radio & phone calls",
-   "covered": "\u2014"
+   "covered": "Scene",
+   "micro_scenes": [
+    "C8"
+   ]
   },
   {
    "id": "C9",
-   "ref": "HB1 \u00a79.6",
+   "ref": "HB1 §9.6",
    "rule": "Be in a position of safety before using mobile equipment",
-   "numbers": "\u2014",
+   "numbers": "—",
    "type": "SCENE",
    "scene": "B",
    "scene_name": "Walking alone",
-   "covered": "Quiz"
+   "covered": "Scene",
+   "micro_scenes": [
+    "A9",
+    "C9"
+   ]
   },
   {
    "id": "C10",
-   "ref": "HB1 \u00a79.6",
+   "ref": "HB1 §9.6",
    "rule": "No group/conference calls for safety instructions (except emergencies)",
-   "numbers": "\u2014",
+   "numbers": "—",
    "type": "QUICK",
    "scene": "Q",
    "scene_name": "Quick-fire questions",
-   "covered": "\u2014"
+   "covered": "Scene",
+   "micro_scenes": [
+    "C10"
+   ]
   },
   {
    "id": "S1",
-   "ref": "HB1 \u00a710",
+   "ref": "HB1 §10",
    "rule": "Limited clearance sign: no position of safety this side, don't stand there while trains run",
-   "numbers": "\u2014",
+   "numbers": "—",
    "type": "SCENE",
    "scene": "O",
    "scene_name": "Limited clearance signs",
-   "covered": "\u2014"
+   "covered": "Scene",
+   "micro_scenes": [
+    "S1"
+   ]
   },
   {
    "id": "S2",
-   "ref": "HB1 \u00a710",
+   "ref": "HB1 §10",
    "rule": "No refuges sign: refuges are on the other side",
-   "numbers": "\u2014",
+   "numbers": "—",
    "type": "SCENE",
    "scene": "O",
    "scene_name": "Limited clearance signs",
-   "covered": "\u2014"
+   "covered": "Scene",
+   "micro_scenes": [
+    "S2"
+   ]
   },
   {
    "id": "S3",
-   "ref": "HB1 \u00a710",
+   "ref": "HB1 §10",
    "rule": "Prohibition sign: don't pass it while trains run (except emergency protection)",
-   "numbers": "\u2014",
+   "numbers": "—",
    "type": "SCENE",
    "scene": "O",
    "scene_name": "Limited clearance signs",
-   "covered": "\u2014"
+   "covered": "Scene",
+   "micro_scenes": [
+    "S3"
+   ]
   },
   {
    "id": "S4",
-   "ref": "HB1 \u00a711",
+   "ref": "HB1 §11",
    "rule": "Limited-clearance telephones: emergency use only, if nothing else available",
-   "numbers": "\u2014",
+   "numbers": "—",
    "type": "QUICK",
    "scene": "Q",
    "scene_name": "Quick-fire questions",
-   "covered": "\u2014"
+   "covered": "Scene",
+   "micro_scenes": [
+    "S4"
+   ]
   }
- ]
+ ],
+ "note": "Every rule is covered by at least one micro-scene in micro.html (scene ids in micro_scenes)."
 }

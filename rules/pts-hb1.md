@@ -112,3 +112,8 @@
 | S2 | HB1 §10 | No refuges sign: refuges are on the other side | — | SCENE | O | — |
 | S3 | HB1 §10 | Prohibition sign: don't pass it while trains run (except emergency protection) | — | SCENE | O | — |
 | S4 | HB1 §11 | Limited-clearance telephones: emergency use only, if nothing else available | — | QUICK | Q | — |
+
+
+## Coverage update
+
+All 84 HB1 rules are now covered by 86 micro-scenes in `micro.html` (see `micro_scenes` in pts-hb1.json). Source for the scenes: `src/micro-pts.js`.

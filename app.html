@@ -81,7 +81,7 @@
 <nav><div class="in">
   <button data-t="home" class="on"><i>🏠</i>Home</button>
   <button data-t="scen"><i>🎮</i>Scenarios</button>
-  <button data-t="mock"><i>📝</i>Mock test</button>
+  <button data-t="mock"><i>📝</i>Exam practice</button>
   <button data-t="news"><i>🆕</i>What's changed</button>
   <button data-t="books"><i>📚</i>Handbooks</button>
 </div></nav>
@@ -262,6 +262,34 @@ const V=document.getElementById('view');
 let tab='home';
 let quiz=null,timerIv=null;
 
+
+// ================= PTS SCENE MODE =================
+const PTS_RULES={"D1": "Position of safety distance, up to 100 mph", "D2": "Position of safety distance, over 100 mph", "D3": "\"On or near the line\" means on it, or within 3 m with no permanent fence between", "D4": "Platforms and level crossings are not on or near the line, unless doing engineering/technical work near the platform edge", "D5": "Names of the spaces: cess, four-foot, six-foot, ten-foot", "D6": "Lineside = between the boundary and the on-or-near-the-line area", "D7": "Warning systems: ATWS, LOWS, SATWS, TOWS", "D8": "Maximum speed is listed in the Sectional Appendix", "D9": "Safety barrier types: rigid, tensioned, netting, barricade tape", "G1": "Rules apply regardless of grade. If no rule covers it, do it the safest way you know", "G2": "Only operate plant/equipment you are trained and authorised for", "G3": "Never get on/off a moving rail vehicle (except slow continuous ones). Never ride on steps or trolleys", "G4": "Cab travel: show cab pass, tell driver reason/destination, never distract the driver", "L1": "Wear the high-vis you were issued", "L2": "Use authorised access points and walking routes", "L3": "Acknowledge a driver's horn: raise one arm above your head", "L4": "Lineside work must not affect on-or-near-the-line unless a COSS is there and agrees", "L5": "Road vehicles stay off on-or-near-the-line unless driver is COSS/IWA or a COSS agrees", "A1": "When you may go on or near the line alone (COSS/IWA, or told by a COSS to walk to a site)", "A2": "Hold a valid PTS certificate", "A3": "Never work alone unless you are a COSS or IWA", "A4": "Carry a lamp in darkness, poor visibility or a tunnel", "A5": "Know each line's max speed, direction, no-go areas, limited clearance spots", "A6": "Walking alone: light hand tools only", "A7": "Nothing that stops you seeing or hearing trains (headphones, hood)", "A8": "Crossing: don't step on rails, sleepers or between moving parts of points", "A9": "Phone call: move to a position of safety and stand still first", "A10": "Look up at least every 5 seconds", "A11": "Be in a position of safety at least 10 s before a train arrives", "A12": "Train approaching: stay in/move to safety until it has passed and no other train is coming", "A13": "Joining a group: speak to the COSS first, agree access point and destination, don't walk until briefed", "A14": "Leaving a group: tell the COSS, agree destination and route", "A15": "Obstacle forces you onto an open line: tell the COSS and follow instructions", "W1": "Only go on with others if a COSS is present and stays with you", "W2": "Identify the COSS: armlet on left arm or chest badge", "W3": "Understand the briefing; ask if anything is unclear", "W4": "Sign the RT9909", "W5": "Never lean on or rest tools against a safety barrier", "W6": "Lookout warning: stop, acknowledge, go to safety immediately; stay until COSS says", "W7": "Urgent warning = series of short, sharp blasts", "W8": "Never distract a lookout", "W9": "Site warden warning: check you're in the safe area, step back if not", "W10": "ATWS/SATWS/TOWS/LOWS warning: go to safety, stay until the COSS says", "W11": "COSS arranges safe bypass of obstacles that force the group onto an open line", "W12": "Only cross open lines after the COSS explains the arrangements", "W13": "Route proving: only get off the train once the COSS has explained", "W14": "Train protecting you mustn't move until COSS confirms everyone and everything is clear", "W15": "Never use gangway doors to get to the track in an OLE area", "R1": "Accident: report ASAP to person in charge, signaller or Ops Control", "R2": "Start with \"This is an emergency call\"", "R3": "Give name, exact location, what happened, lines obstructed?, services needed", "R4": "Report all accidents and near misses to your supervisor", "R5": "Dangerous goods: say \"This is a rail dangerous goods emergency\" + UN number", "R6": "Keep well clear, wind behind you, avoid low ground, keep people away", "R7": "No naked lights, smoking or phones near flammable loads", "R8": "Contamination: wash with plenty of cold water, remove clothing carefully, get medical help", "H1": "No tools/equipment within 2 m of a line a train could pass (unless slipstream-proof)", "H2": "Keep access gates closed and locked; report damaged fences", "H3": "Report suspected trespassers", "H4": "Report lineside fires immediately", "H5": "Report flowing or pooling water near structures/earthworks", "H6": "Report unsafe trains: open door, insecure load, fire, hot axle box", "H7": "Report missing/unlit headlight or tail lamp", "H8": "Train in distress = continuous long horn blasts; flashing headlights = hazard warning", "H9": "Keep 5 m from a fallen overhead power line until the electricity company says safe", "E1": "When to stop trains: track defect, flood, obstruction, fire, structure damage, large animal", "E2": "Tell the person in charge/signaller/Ops Control immediately", "E3": "Daylight: red flag, or both arms above your head", "E4": "On a vehicle: raise one arm horizontally", "E5": "Dark/poor visibility: red light, or wave any light violently", "C1": "Confirm who you're talking to; give location, name, employer, task", "C2": "Say \"line blocked\", never \"not clear\"", "C3": "Say numbers one digit at a time (except times and Rule Book refs)", "C4": "Repeat messages back", "C5": "Who leads the conversation (ECO > signaller > PICOP \u2026; COSS leads with group/lookouts)", "C6": "\"Repeat back\" and \"Correction\" phrases", "C7": "Radio: \"Over\" = reply expected, \"Out\" = no reply", "C8": "Use the phonetic alphabet for signal/point IDs, spelling, interference", "C9": "Be in a position of safety before using mobile equipment", "C10": "No group/conference calls for safety instructions (except emergencies)", "S1": "Limited clearance sign: no position of safety this side, don't stand there while trains run", "S2": "No refuges sign: refuges are on the other side", "S3": "Prohibition sign: don't pass it while trains run (except emergency protection)", "S4": "Limited-clearance telephones: emergency use only, if nothing else available"};
+const PTS_SECS=[['D','Definitions','📏'],['G','General rules','📘'],['L','Lineside','🌿'],['A','On the line alone','🚶'],['W','Working in a group','👷'],['R','Accidents & reporting','🚨'],['H','Hazards & unsafe trains','⚠️'],['E','Stopping trains','✋'],['C','Talking safely','📻'],['S','Signs','🪧']];
+const ruleCov=()=>store.get('tr_rules',{});
+function ptsCard(){
+  const c=ruleCov(),ids=Object.keys(PTS_RULES),proven=ids.filter(k=>c[k]&&c[k].ok).length,wrong=ids.filter(k=>c[k]&&!c[k].ok);
+  const pct=Math.round(proven/ids.length*100);
+  return `<h2>PTS · SCENE MODE</h2>
+  <div class="card" style="border-color:var(--or)">
+    <div style="display:flex;justify-content:space-between;align-items:baseline"><b style="font-size:16px">Handbook 1 coverage</b><span class="muted"><b style="color:var(--tx)">${proven}</b> / ${ids.length} rules proven</span></div>
+    <div class="bar" style="height:9px"><div style="width:${pct}%"></div></div>
+    <p class="muted" style="margin:10px 0 12px">Every PTS rule as a short 3D scene. Watch, make the call, prove the rule.</p>
+    <button class="btn" id="ptsNext">${proven===ids.length?'Mixed run: 10 random scenes':'Play the next 8 scenes'}</button>
+    ${wrong.length?`<button class="btn sec" id="ptsWrong" style="margin-top:8px">Redo the ${wrong.length} rule${wrong.length>1?'s':''} I got wrong</button>`:''}
+    <div class="grid" style="margin-top:12px">${PTS_SECS.map(([k,n,e])=>{const r=ids.filter(i=>i[0]===k),d=r.filter(i=>c[i]&&c[i].ok).length;return `<button class="comp" data-sec="${k}" style="padding:10px"><div style="display:flex;gap:8px;align-items:center"><span style="font-size:18px">${e}</span><span class="n" style="margin:0;font-size:13.5px">${n}</span></div><div class="bar"><div style="width:${Math.round(d/r.length*100)}%"></div></div><div class="pct">${d}/${r.length} rules</div></button>`}).join('')}</div>
+    <p class="muted" style="margin-top:12px;font-size:12.5px">The real PTS assessment is multiple choice, so do a round of <u id="ptsExam" style="cursor:pointer">exam practice in question format</u> before your test.</p>
+  </div>`;
+}
+function ptsWire(){
+  const c=ruleCov(),ids=Object.keys(PTS_RULES);
+  const go=list=>location.href='micro.html?ids='+list.join(',');
+  const n=V.querySelector('#ptsNext');if(n)n.onclick=()=>{const un=ids.filter(k=>!(c[k]&&c[k].ok));go(un.length?un.slice(0,8):shuffle(ids).slice(0,10))};
+  const w=V.querySelector('#ptsWrong');if(w)w.onclick=()=>go(ids.filter(k=>c[k]&&!c[k].ok));
+  V.querySelectorAll('[data-sec]').forEach(b=>b.onclick=()=>location.href='micro.html?sec='+b.dataset.sec);
+  const e=V.querySelector('#ptsExam');if(e)e.onclick=()=>startPractice(qsOf('pts'),'PTS exam practice (question format)');
+}
+
 // ================= VIEWS =================
 function setTab(t){tab=t;document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.t===t));clearInterval(timerIv);quiz=null;render();scrollTo(0,0)}
 document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>setTab(b.dataset.t));
@@ -287,7 +315,8 @@ function home(){
     <div class="card"><b>${mineQs.length?Math.round(masteredN/mineQs.length*100):0}%</b><span>mastered</span></div>
     <div class="card"><b>${best?best.pct+'%':'–'}</b><span>best mock</span></div>
   </div>
-  <h2>YOUR COMPETENCIES · TAP TO PRACTISE</h2>
+  ${mine.includes('pts')?ptsCard():''}
+  <h2>QUESTION PRACTICE · YOUR COMPETENCIES</h2>
   <div class="grid">${Object.entries(COMPS).filter(([k])=>mine.includes(k)).map(([k,c])=>`
     <button class="comp on" data-p="${k}"><div class="e">${c.e}</div><div class="n">${c.n}</div><div class="h">${c.hb} · ${qsOf(k).length} questions</div>
     <div class="bar"><div style="width:${mastery(k)}%"></div></div><div class="pct">${mastery(k)}% mastered</div></button>`).join('')}</div>
@@ -304,6 +333,7 @@ function home(){
   V.querySelector('#practiseAll').onclick=()=>startPractice(Q.filter(q=>mine.includes(q[0])),'All my competencies');
   V.querySelector('#weakBtn').onclick=()=>{if(w.length)startPractice(w,'Weak spots')};
   V.querySelector('[data-go]').onclick=()=>setTab('news');
+  ptsWire();
 }
 
 function startPractice(qs,title){quiz={mode:'practice',title,qs:shuffle(qs),i:0,score:0,answered:false};render();scrollTo(0,0)}
@@ -368,6 +398,7 @@ function finishQuiz(timeout){
 
 function scenarios(){
   const S=[
+    {e:'🎬',n:'PTS: every rule as a scene',d:'86 short 3D scenes covering all 84 Handbook 1 rules. Position of safety, warnings, reporting, stopping trains, radio calls and signs. Progress tracks on Home.',c:'PTS · All rules',href:'micro.html',ready:1},
     {e:'📯',n:'Open line, lookout warning',d:'PTS · You\'re in a group on a 20 mph line. Kit up, walk to site, react to a warning in 4 seconds, then spot the hazards.',c:'PTS · Lookout',href:'scenario1.html',ready:1},
     {e:'🧢',n:'Set up the safe system',d:'COSS · 60 mph lines, clip renewal on the Up line. Pick the safe system, take the blockage, lay the detonators, fence the open line, brief the group and give it all back.',c:'COSS',href:'scenario2.html',ready:1},
     {e:'⚡',n:'Long ladder under the wires',d:'AC lines · Carry a 4 m ladder under live OLE, report an object on the wire to the ECO, and deal with a wire down.',c:'AC lines',href:'scenario3.html',ready:1},
@@ -386,7 +417,7 @@ function scenarios(){
 }
 function mockIntro(){
   const pool=Q.filter(q=>mine.includes(q[0]));const n=Math.min(20,pool.length);
-  V.innerHTML=`<h2>MOCK TEST</h2>
+  V.innerHTML=`<h2>EXAM PRACTICE · QUESTION FORMAT</h2>
   <div class="card"><div style="font-weight:900;font-size:18px">${n} questions · ${fmt(n*45)}</div>
   <p class="muted" style="margin-top:6px">Mixed from your competencies: ${mine.map(k=>COMPS[k].n).join(', ')}. No feedback until the end, just like the real thing. Wrong answers are saved to your weak spots.</p>
   <button class="btn" id="go" style="margin-top:14px">Start mock test</button></div>
